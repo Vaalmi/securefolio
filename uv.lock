@@ -966,110 +966,6 @@ wheels = [
 ]
 
 [[package]]
-name = "securefolio"
-version = "0.1.0"
-source = { virtual = "." }
-default-groups = "all"
-
-[package.dev-dependencies]
-app = [
-    { name = "alembic" },
-    { name = "anthropic" },
-    { name = "docling" },
-    { name = "fastapi" },
-    { name = "httpx" },
-    { name = "keyring" },
-    { name = "lancedb" },
-    { name = "langchain" },
-    { name = "langchain-anthropic" },
-    { name = "langchain-ollama" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
-    { name = "langgraph-checkpoint-sqlite" },
-    { name = "lxml" },
-    { name = "mcp" },
-    { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
-    { name = "mlx-vlm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
-    { name = "msoffcrypto-tool" },
-    { name = "numpy" },
-    { name = "ocrmac", marker = "sys_platform == 'darwin'" },
-    { name = "openai" },
-    { name = "openpyxl" },
-    { name = "pandas" },
-    { name = "pillow" },
-    { name = "pillow-heif" },
-    { name = "psutil" },
-    { name = "pypdf" },
-    { name = "python-pptx" },
-    { name = "rapidfuzz" },
-    { name = "send2trash" },
-    { name = "sentence-transformers" },
-    { name = "sqlalchemy" },
-    { name = "uvicorn" },
-    { name = "watchfiles" },
-]
-dev = [
-    { name = "apted" },
-    { name = "matplotlib" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-xdist" },
-    { name = "python-docx" },
-    { name = "reportlab" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-app = [
-    { name = "alembic", specifier = ">=1.16" },
-    { name = "anthropic", specifier = ">=0.60" },
-    { name = "docling", specifier = ">=2.145" },
-    { name = "fastapi", specifier = ">=0.162.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "keyring", specifier = ">=25" },
-    { name = "lancedb", specifier = ">=0.41" },
-    { name = "langchain", specifier = ">=1.4.7" },
-    { name = "langchain-anthropic", specifier = ">=1.7.6" },
-    { name = "langchain-ollama", specifier = ">=1.0" },
-    { name = "langchain-openai", specifier = ">=1.7.4" },
-    { name = "langgraph", specifier = ">=1.2.19" },
-    { name = "langgraph-checkpoint-sqlite", specifier = ">=3.1.3" },
-    { name = "lxml", specifier = ">=5" },
-    { name = "mcp", specifier = ">=2.3.0" },
-    { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'", specifier = ">=0.25" },
-    { name = "mlx-vlm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'", specifier = ">=0.7.0" },
-    { name = "msoffcrypto-tool", specifier = ">=5.4" },
-    { name = "numpy", specifier = ">=2" },
-    { name = "ocrmac", marker = "sys_platform == 'darwin'", specifier = ">=1.0.1" },
-    { name = "openai", specifier = ">=3.46.0" },
-    { name = "openpyxl", specifier = ">=3.1" },
-    { name = "pandas", specifier = ">=2" },
-    { name = "pillow", specifier = ">=11" },
-    { name = "pillow-heif", specifier = ">=1" },
-    { name = "psutil", specifier = ">=7" },
-    { name = "pypdf", specifier = ">=6" },
-    { name = "python-pptx", specifier = ">=1" },
-    { name = "rapidfuzz", specifier = ">=3.14.6" },
-    { name = "send2trash", specifier = ">=2.1.0" },
-    { name = "sentence-transformers", specifier = ">=6.2.0" },
-    { name = "sqlalchemy", specifier = ">=2.1.6" },
-    { name = "uvicorn", specifier = ">=0.54.0" },
-    { name = "watchfiles", specifier = ">=1.3.0" },
-]
-dev = [
-    { name = "apted", specifier = ">=1.0.3" },
-    { name = "matplotlib", specifier = ">=3.10" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
-    { name = "pytest-xdist", specifier = ">=3.8.0" },
-    { name = "python-docx", specifier = ">=1.2" },
-    { name = "reportlab", specifier = ">=4.4" },
-    { name = "ruff", specifier = ">=0.17.2" },
-]
-
-[[package]]
 name = "et-xmlfile"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3495,7 +3391,7 @@ wheels = [
 
 [[package]]
 name = "pytest"
-version = "9.1.1"
+version = "9.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -3504,9 +3400,9 @@ dependencies = [
     { name = "pluggy" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313", size = 1636369, upload-time = "2026-06-19T10:58:32.857Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/79/42/bb4641652e58dedeac2ec51abc1f8cae4fee4ec63899a0999016229a0f2a/pytest-9.2.0.tar.gz", hash = "sha256:97c4f3b1f3c7414aa36465e09b8220f1d03627993bd51b1282e193753c80557b", size = 1797555, upload-time = "2026-10-27T21:30:20.728Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c", size = 386536, upload-time = "2026-06-19T10:58:31.347Z" },
+    { url = "https://files.pythonhosted.org/packages/51/39/1f5d8c8877a0fa327db959c19341d4be61660de1ab6b7391f9eb805bcd67/pytest-9.2.0-py3-none-any.whl", hash = "sha256:07acdcf88ec174f907dc01af70bf52d49b014bbab03faeeade31c96b18c2e588", size = 411776, upload-time = "2026-10-27T21:30:19.131Z" },
 ]
 
 [[package]]
@@ -4188,6 +4084,110 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1c/03/e834bcd866f2f8a49a85eaff47340affa3bfa391ee9912a952a1faa68c7b/secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be", size = 19884, upload-time = "2025-11-23T19:02:53.191Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/46/f5af3402b579fd5e11573ce652019a67074317e18c1935cc0b4ba9b35552/secretstorage-3.5.0-py3-none-any.whl", hash = "sha256:0ce65888c0725fcb2c5bc0fdb8e5438eece02c523557ea40ce0703c266248137", size = 15554, upload-time = "2025-11-23T19:02:51.545Z" },
+]
+
+[[package]]
+name = "securefolio"
+version = "0.1.0"
+source = { virtual = "." }
+default-groups = "all"
+
+[package.dev-dependencies]
+app = [
+    { name = "alembic" },
+    { name = "anthropic" },
+    { name = "docling" },
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "keyring" },
+    { name = "lancedb" },
+    { name = "langchain" },
+    { name = "langchain-anthropic" },
+    { name = "langchain-ollama" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
+    { name = "langgraph-checkpoint-sqlite" },
+    { name = "lxml" },
+    { name = "mcp" },
+    { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
+    { name = "mlx-vlm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
+    { name = "msoffcrypto-tool" },
+    { name = "numpy" },
+    { name = "ocrmac", marker = "sys_platform == 'darwin'" },
+    { name = "openai" },
+    { name = "openpyxl" },
+    { name = "pandas" },
+    { name = "pillow" },
+    { name = "pillow-heif" },
+    { name = "psutil" },
+    { name = "pypdf" },
+    { name = "python-pptx" },
+    { name = "rapidfuzz" },
+    { name = "send2trash" },
+    { name = "sentence-transformers" },
+    { name = "sqlalchemy" },
+    { name = "uvicorn" },
+    { name = "watchfiles" },
+]
+dev = [
+    { name = "apted" },
+    { name = "matplotlib" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-xdist" },
+    { name = "python-docx" },
+    { name = "reportlab" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+app = [
+    { name = "alembic", specifier = ">=1.16" },
+    { name = "anthropic", specifier = ">=0.60" },
+    { name = "docling", specifier = ">=2.145" },
+    { name = "fastapi", specifier = ">=0.162.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "keyring", specifier = ">=25" },
+    { name = "lancedb", specifier = ">=0.41" },
+    { name = "langchain", specifier = ">=1.4.7" },
+    { name = "langchain-anthropic", specifier = ">=1.7.6" },
+    { name = "langchain-ollama", specifier = ">=1.0" },
+    { name = "langchain-openai", specifier = ">=1.7.4" },
+    { name = "langgraph", specifier = ">=1.2.19" },
+    { name = "langgraph-checkpoint-sqlite", specifier = ">=3.1.3" },
+    { name = "lxml", specifier = ">=5" },
+    { name = "mcp", specifier = ">=2.3.0" },
+    { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'", specifier = ">=0.25" },
+    { name = "mlx-vlm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'", specifier = ">=0.7.0" },
+    { name = "msoffcrypto-tool", specifier = ">=5.4" },
+    { name = "numpy", specifier = ">=2" },
+    { name = "ocrmac", marker = "sys_platform == 'darwin'", specifier = ">=1.0.1" },
+    { name = "openai", specifier = ">=3.46.0" },
+    { name = "openpyxl", specifier = ">=3.1" },
+    { name = "pandas", specifier = ">=2" },
+    { name = "pillow", specifier = ">=11" },
+    { name = "pillow-heif", specifier = ">=1" },
+    { name = "psutil", specifier = ">=7" },
+    { name = "pypdf", specifier = ">=6" },
+    { name = "python-pptx", specifier = ">=1" },
+    { name = "rapidfuzz", specifier = ">=3.14.6" },
+    { name = "send2trash", specifier = ">=2.1.0" },
+    { name = "sentence-transformers", specifier = ">=6.2.0" },
+    { name = "sqlalchemy", specifier = ">=2.1.6" },
+    { name = "uvicorn", specifier = ">=0.54.0" },
+    { name = "watchfiles", specifier = ">=1.3.0" },
+]
+dev = [
+    { name = "apted", specifier = ">=1.0.3" },
+    { name = "matplotlib", specifier = ">=3.10" },
+    { name = "pytest", specifier = ">=9.2.0" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "python-docx", specifier = ">=1.2" },
+    { name = "reportlab", specifier = ">=4.4" },
+    { name = "ruff", specifier = ">=0.17.2" },
 ]
 
 [[package]]
