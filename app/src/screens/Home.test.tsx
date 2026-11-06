@@ -281,16 +281,31 @@ describe("results that no longer apply", () => {
           });
         }),
     });
+    const searched = (words: string, wide: boolean) =>
+      calls.some((call) => {
+        const [path, query] = call.path.split("?");
+        const asked = new URLSearchParams(query);
+        return (
+          path === "/search" &&
+          asked.get("q") === words &&
+          asked.get("include_private") === String(wide)
+        );
+      });
     open("/home");
     const box = await screen.findByRole("combobox");
-    await userEvent.type(box, "lease");
+    // A slow runner searches part of the word while it's typed; so does this.
+    await userEvent.type(box, "lea");
+    await waitFor(() => {
+      expect(searched("lea", false)).toBe(true);
+    });
+    await userEvent.type(box, "se");
     await userEvent.keyboard("{Meta>}{Enter}{/Meta}");
     await userEvent.click(screen.getByRole("button", { name: /^Scope: / }));
     await userEvent.click(
       await screen.findByRole("menuitemradio", { name: /Private included/ }),
     );
     await waitFor(() => {
-      expect(calls.filter((c) => c.path.startsWith("/search"))).toHaveLength(2);
+      expect(searched("lease", true)).toBe(true);
     });
     for (const answer of waiting) answer();
     await screen.findByRole("option");

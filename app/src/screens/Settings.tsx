@@ -263,7 +263,7 @@ const SECTIONS = [
   { id: "privacy", label: "Privacy and MCP", body: <Privacy /> },
   { id: "spend", label: "Spending and cloud log", body: <Spending /> },
   { id: "memory", label: "Memory", body: <MemoryPage /> },
-  { id: "backup", label: "Backup and import", body: <Backup /> },
+  { id: "backup", label: "Backup", body: <Backup /> },
 ];
 
 export function Settings({

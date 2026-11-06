@@ -78,6 +78,25 @@ def hold_sleep_assertion(pid: int) -> subprocess.Popen | None:
     return subprocess.Popen(command)  # noqa: S603
 
 
+def memory_bytes() -> int:
+    """This Mac's memory. Off macOS, where sysctl has no such key, psutil's figure."""
+    if sys.platform != "darwin":
+        return psutil.virtual_memory().total
+    command = ["/usr/sbin/sysctl", "-n", "hw.memsize"]
+    found = subprocess.run(command, capture_output=True, text=True, check=False)  # noqa: S603
+    return int(found.stdout.strip() or 0)
+
+
+def ollama_no_cloud() -> bool:
+    """Whether launchd gives the Ollama app OLLAMA_NO_CLOUD=1. Off macOS there's no
+    launchd to ask, so it reads as not set."""
+    if sys.platform != "darwin":
+        return False
+    command = ["/bin/launchctl", "getenv", "OLLAMA_NO_CLOUD"]
+    found = subprocess.run(command, capture_output=True, text=True, check=False)  # noqa: S603
+    return found.stdout.strip() == "1"
+
+
 def open_in_background_download(path: Path) -> None:
     """Asks the file provider for a not-downloaded file by reading its first byte."""
     with path.open("rb") as file:

@@ -1,15 +1,19 @@
 """One fixture per format indexes end to end, with its expected locator."""
 
+import io
 import json
 import shutil
 from pathlib import Path
 
 import pytest
 import sqlalchemy as sa
+from PIL import Image
 
 from backend import database, documents, jobs, macos, revisions, sources, states
 from backend.database import document_locations
+from data.build.record_docling import IMAGE_SUFFIXES, RECORDED, key_of
 from testing.queue import drain
+from worker import parse
 
 DATA = Path(__file__).parents[2] / "data"
 KEYS = json.loads((DATA / "evals/calibration/locators.json").read_text())
@@ -78,6 +82,25 @@ def test_every_format_ends_where_it_should_with_its_locator(scanned_library):
             "anchor",
         }:
             assert locator[key] == expected[key], (relative, key, locator)
+
+
+@pytest.mark.parametrize(
+    "relative", [r for r in KEYS if Path(r).suffix.lower() in IMAGE_SUFFIXES]
+)
+def test_a_pictures_recording_is_found_however_its_png_is_compressed(relative):
+    """Pillow saves the same pixels as different PNG bytes on macOS and Linux."""
+    data = (DATA / "library" / relative).read_bytes()
+    png = parse._to_png(data, parse.KIND_OF_SUFFIX[Path(relative).suffix.lower()])
+    saved = {png}
+    with Image.open(io.BytesIO(png)) as picture:
+        for level in (0, 9):
+            buffer = io.BytesIO()
+            picture.save(buffer, "PNG", compress_level=level)
+            saved.add(buffer.getvalue())
+    assert len(saved) > 1
+    keys = {key_of(each, None) for each in saved}
+    assert len(keys) == 1
+    assert (RECORDED / f"{keys.pop()}.json").exists()
 
 
 def test_a_table_keeps_its_rows_and_a_card_is_written_pending(scanned_library):

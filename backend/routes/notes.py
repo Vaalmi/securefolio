@@ -1,4 +1,4 @@
-"""Notes with citations, and v1's saved queries."""
+"""Notes with citations, and saved searches."""
 
 from typing import Any
 
@@ -54,5 +54,5 @@ def delete_note(note_id: str, _: AppToken) -> Empty:
 
 @router.get("/saved-queries", operation_id="list_saved_queries")
 def list_saved_queries(_: AppToken) -> list[dict[str, Any]]:
-    """The searches saved in v1, which the Notes page runs."""
+    """The saved searches, which the Notes page runs."""
     return notes.queries()

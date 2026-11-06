@@ -1,4 +1,4 @@
-"""Notes, which keep their citations with revision ids, and v1's saved queries."""
+"""Notes, which keep their citations with revision ids, and saved searches."""
 
 import time
 import uuid

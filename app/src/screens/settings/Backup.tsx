@@ -3,7 +3,6 @@ import type { ReactElement } from "react";
 import { HardDriveDownload, Upload } from "lucide-react";
 
 import {
-  chooseFile,
   chooseFolder,
   isOpenAtLogin,
   openAtLogin,
@@ -17,8 +16,6 @@ import {
   listBackups,
   getLogFolder,
   getSettings,
-  getV1Import,
-  importV1,
   restoreBackup,
 } from "../../api";
 import type { BackupRow, Backups } from "../../api";
@@ -182,39 +179,6 @@ function BackupCard(): ReactElement {
   );
 }
 
-function V1Card(): ReactElement {
-  const last = useLoad(getV1Import, "v1");
-  const run = useAction(async () => {
-    const path = await chooseFile();
-    if (path) await importV1(path);
-    last.reload();
-  });
-  const line = last.data
-    ? `Imported ${fmtMoment(last.data.at)}: ${String(last.data.notes)} notes, ${String(last.data.sessions)} sessions, ${String(last.data.saved_queries)} saved queries. v1's files weren't changed.`
-    : "Brings in v1's notes, sessions and saved queries, as Private. v1's files aren't changed.";
-  return (
-    <div className="card">
-      <h2 style={{ marginBottom: 8 }}>DocSynth v1</h2>
-      <Row title="Import from v1" desc={line}>
-        <button
-          type="button"
-          className="btn sm"
-          onClick={() => {
-            void run.run();
-          }}
-        >
-          {last.data ? "Import again" : "Choose metadata.db…"}
-        </button>
-      </Row>
-      {run.error && (
-        <p role="alert" className="small">
-          {run.error}
-        </p>
-      )}
-    </div>
-  );
-}
-
 function AppCard(): ReactElement {
   const login = useLoad(isOpenAtLogin, "login");
   const setLogin = useAction(openAtLogin, login.reload);
@@ -268,7 +232,6 @@ export function Backup(): ReactElement {
   return (
     <>
       <BackupCard />
-      <V1Card />
       <AppCard />
     </>
   );

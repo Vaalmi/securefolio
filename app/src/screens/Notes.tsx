@@ -28,7 +28,7 @@ export function Notes(): ReactElement {
         {(queries.data?.length ?? 0) > 0 && (
           <section aria-labelledby="h-saved">
             <h2 id="h-saved" className="h-sm">
-              Saved searches from DocSynth v1
+              Saved searches
             </h2>
             {queries.data?.map((query) => (
               <a

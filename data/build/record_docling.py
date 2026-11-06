@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pypdfium2
 from docling.datamodel.base_models import DocumentStream
+from PIL import Image
 
 from worker import born_digital, docling_engine, parse
 
@@ -16,9 +17,15 @@ ROOT = Path(__file__).parent.parent
 RECORDED = ROOT / "recorded"
 LIBRARY = ROOT / "library"
 IMAGE_SUFFIXES = {".png", ".jpeg", ".heic", ".webp"}
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
 def key_of(data: bytes, page_range: tuple[int, int] | None) -> str:
+    """A picture is keyed by its pixels, not its PNG bytes: Pillow's zlib compresses
+    the same pixels differently on macOS and Linux."""
+    if data.startswith(PNG_SIGNATURE):
+        with Image.open(io.BytesIO(data)) as picture:
+            data = f"{picture.mode} {picture.size}".encode() + picture.tobytes()
     return hashlib.sha256(data + repr(page_range).encode()).hexdigest()
 
 

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { ReactElement } from "react";
-import { Cpu, Plug, Upload } from "lucide-react";
+import { Cpu, Plug } from "lucide-react";
 
 import { getJobCounts, listSources, listTaskModels } from "../api";
 import type { Source, TaskModels } from "../api";
 import { OrganizeDialog } from "../components/SourceDialogs";
-import { bridgePath, chooseFile, installExtension } from "../desktop";
+import { bridgePath, installExtension } from "../desktop";
 import { go } from "../router";
-import { updateSettings, importV1 } from "../api";
+import { updateSettings } from "../api";
 import { toast } from "../toast";
 import { useAction } from "../useAction";
 import { useLoad } from "../useLoad";
@@ -135,15 +135,6 @@ export function ReadyStep(): ReactElement {
   });
   const done = counts.data?.done ?? 0;
   const total = counts.data?.total ?? 0;
-  const [imported, setImported] = useState<string>();
-  const v1 = useAction(async () => {
-    const path = await chooseFile();
-    if (!path) return;
-    const found = await importV1(path);
-    setImported(
-      `Imported ${String(found.notes)} notes, ${String(found.sessions)} sessions and ${String(found.saved_queries)} saved queries, as Private. v1's files weren't changed.`,
-    );
-  });
   // Setup is done either way, so Settings opens rather than sending back here.
   const finish = useAction(async (to: string) => {
     await updateSettings({ setup_done: true });
@@ -222,37 +213,6 @@ export function ReadyStep(): ReactElement {
             Copy Claude Code command
           </button>
         </div>
-      </div>
-      <div className="folder-row">
-        <div className="hstack">
-          <Upload size={16} aria-hidden="true" />
-          <strong style={{ flex: 1 }}>Import from DocSynth v1</strong>
-        </div>
-        <p className="small" style={{ color: "var(--ink-2)" }}>
-          Choose v1's metadata.db to bring in its notes, sessions and saved
-          queries, as Private. Its files aren't changed.
-        </p>
-        <div>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => {
-              void v1.run();
-            }}
-          >
-            Choose metadata.db…
-          </button>
-        </div>
-        {imported && (
-          <p role="status" className="small">
-            {imported}
-          </p>
-        )}
-        {v1.error && (
-          <p role="alert" className="small">
-            {v1.error}
-          </p>
-        )}
       </div>
       <div className="hstack">
         <span className="spacer" />

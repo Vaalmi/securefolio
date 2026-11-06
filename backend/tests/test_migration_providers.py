@@ -125,7 +125,8 @@ def test_the_backup_is_taken_first_and_holds_the_old_values():
     a_vault_at_0002()
     old_setting("model_answer", "claude-opus-5-5")
     migrations.upgrade()
-    backups = list(vault.root().glob("library.before-0003.db"))
+    # Named after the newest migration, whichever that is now.
+    backups = list(vault.root().glob("library.before-*.db"))
     assert backups
     saved = sqlite3.connect(backups[0]).execute(
         "SELECT value FROM settings WHERE key = 'model_answer'"

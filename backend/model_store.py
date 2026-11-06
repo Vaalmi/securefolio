@@ -7,7 +7,6 @@ import hashlib
 import json
 import logging
 import os
-import subprocess
 import threading
 import time
 from collections.abc import Callable
@@ -18,7 +17,16 @@ from typing import Any
 import httpx
 import sqlalchemy as sa
 
-from backend import build_mode, database, jobs, providers, refusals, settings, vault
+from backend import (
+    build_mode,
+    database,
+    jobs,
+    macos,
+    providers,
+    refusals,
+    settings,
+    vault,
+)
 from backend.database import model_downloads
 
 logger = logging.getLogger(__name__)
@@ -600,13 +608,7 @@ def start_local_pull(tag: str, pull: Pull) -> None:
 
 
 def memory_gib() -> int:
-    found = subprocess.run(  # noqa: S603
-        ["/usr/sbin/sysctl", "-n", "hw.memsize"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return int(found.stdout.strip() or 0) // GIB
+    return macos.memory_bytes() // GIB
 
 
 def choose_local_model() -> None:
@@ -631,10 +633,4 @@ def default_local_tag(memory: int | None = None) -> str:
 def no_cloud_is_set() -> bool:
     """OLLAMA_NO_CLOUD belongs to the Ollama server. SecureFolio reads it, and only asks
     the owner to set it."""
-    found = subprocess.run(  # noqa: S603
-        ["/bin/launchctl", "getenv", "OLLAMA_NO_CLOUD"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return found.stdout.strip() == "1"
+    return macos.ollama_no_cloud()

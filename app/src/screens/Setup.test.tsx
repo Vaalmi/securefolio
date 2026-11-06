@@ -149,23 +149,14 @@ describe("the folders step", () => {
 describe("the ready step", () => {
   const COUNTS = { active: 0, done: 4, total: 9 };
 
-  it("imports v1 only from what was chosen, and finishes", async () => {
+  it("finishes, with nothing to import from an older app", async () => {
     fakeBackend({
       "GET /jobs/counts": COUNTS,
-      "POST /import/v1": { at: 1, notes: 2, sessions: 1, saved_queries: 3 },
       "PATCH /settings": {},
     });
     open("/setup/ready");
-    await userEvent.click(
-      screen.getByRole("button", { name: "Choose metadata.db…" }),
-    );
-    expect(posted("/import/v1")).toBe(false);
-    window.securefolioChosenPaths = ["/old/metadata.db"];
-    await userEvent.click(
-      screen.getByRole("button", { name: "Choose metadata.db…" }),
-    );
-    expect(await screen.findByText(/Imported 2 notes/)).toBeVisible();
-    window.securefolioChosenPaths = undefined;
+    expect(await screen.findByText(/Indexing has started/)).toBeVisible();
+    expect(screen.queryByText(/metadata\.db|DocSynth|v1/)).toBeNull();
     await userEvent.click(
       screen.getByRole("button", { name: "Open SecureFolio" }),
     );
@@ -177,22 +168,11 @@ describe("the ready step", () => {
     });
   });
 
-  it("names why a v1 file wasn't imported, and offers Claude", async () => {
-    window.securefolioChosenPaths = ["/old/other.db"];
-    fakeBackend({
-      "GET /jobs/counts": COUNTS,
-      "POST /import/v1": refusal("The table notes is missing."),
-    });
+  it("offers Claude Desktop and Claude Code", async () => {
+    fakeBackend({ "GET /jobs/counts": COUNTS });
     open("/setup/ready");
-    await userEvent.click(
-      screen.getByRole("button", { name: "Choose metadata.db…" }),
-    );
-    expect(
-      await screen.findByText("The table notes is missing."),
-    ).toBeVisible();
-    window.securefolioChosenPaths = undefined;
     fireEvent.click(
-      screen.getByRole("button", { name: "Install for Claude Desktop" }),
+      await screen.findByRole("button", { name: "Install for Claude Desktop" }),
     );
     expect(await screen.findByText(/Confirm there to install/)).toBeVisible();
     Object.defineProperty(navigator, "clipboard", {

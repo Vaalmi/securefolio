@@ -1,9 +1,7 @@
 """Settings: the key, a model per task, Offline, spending and the cloud log, models,
-backup, the v1 import, and pausing the queue from the menu bar."""
+backup, and pausing the queue from the menu bar."""
 
 import asyncio
-import time
-from pathlib import Path
 from typing import Any, Literal
 
 import sqlalchemy as sa
@@ -22,7 +20,6 @@ from backend import (
     refusals,
     settings,
     spend,
-    v1_import,
     vault,
 )
 from backend.database import egress_log
@@ -84,10 +81,6 @@ class KeyBody(BaseModel):
 
 class RestoreBody(BaseModel):
     id: str
-
-
-class V1Body(BaseModel):
-    path: str
 
 
 FIELDS = {
@@ -351,21 +344,6 @@ async def restore_backup(body: RestoreBody, request: Request, _: AppToken) -> Em
         state.supervisor.start()
         state.gate.open()
     return Empty()
-
-
-@router.post("/import/v1", operation_id="import_v1")
-def import_v1(body: V1Body, _: AppToken) -> dict[str, Any]:
-    """Only ever the file the owner picked."""
-    counts = v1_import.import_from(Path(body.path))
-    last = {"at": time.time(), **counts}
-    settings.put(settings.V1_LAST, last)
-    return last
-
-
-@router.get("/import/v1", operation_id="get_v1_import")
-def get_v1_import(_: AppToken) -> dict[str, Any] | None:
-    """What the last v1 import brought in, if any."""
-    return settings.get(settings.V1_LAST)
 
 
 @router.post("/indexing/toggle-pause", operation_id="toggle_indexing_pause")

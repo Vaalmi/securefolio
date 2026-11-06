@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { calls, fakeBackend, refusal } from "../fakeBackend";
+import { calls, fakeBackend } from "../fakeBackend";
 import { installBrowser, open, posted } from "../testApp";
 
 beforeEach(() => {
@@ -267,7 +267,7 @@ describe("spending and the cloud log", () => {
   });
 });
 
-describe("backup and import", () => {
+describe("backup", () => {
   const BACKUPS = {
     folder: "/v/backups",
     last: { at: 1_700_000_000, error: null, size_bytes: 2048 },
@@ -275,7 +275,6 @@ describe("backup and import", () => {
   };
   const COMMON = {
     "GET /settings": SETTINGS,
-    "GET /import/v1": { at: 1, notes: 1, sessions: 2, saved_queries: 3 },
     "GET /logs/folder": { path: "/v/logs" },
   };
 
@@ -317,8 +316,7 @@ describe("backup and import", () => {
     });
   });
 
-  it("shows a failed backup, and imports v1 again", async () => {
-    window.securefolioChosenPaths = ["/old/metadata.db"];
+  it("shows a failed backup", async () => {
     fakeBackend({
       ...COMMON,
       "GET /backups": {
@@ -326,18 +324,12 @@ describe("backup and import", () => {
         last: { at: 1, error: "The backup failed: full" },
         backups: [],
       },
-      "POST /import/v1": refusal("The table notes is missing."),
     });
     open("/settings/backup");
     expect(await screen.findByText(/The backup failed: full/)).toBeVisible();
     expect(
       screen.getByRole("button", { name: "Restore from backup…" }),
     ).toBeDisabled();
-    await userEvent.click(screen.getByRole("button", { name: "Import again" }));
-    expect(
-      await screen.findByText("The table notes is missing."),
-    ).toBeVisible();
-    window.securefolioChosenPaths = undefined;
     await userEvent.click(
       screen.getByRole("button", { name: "Show in Finder" }),
     );
@@ -346,16 +338,13 @@ describe("backup and import", () => {
     );
   });
 
-  it("says when there's been no backup or import yet", async () => {
+  it("says when there's been no backup yet, and offers no import from an older app", async () => {
     fakeBackend({
       ...COMMON,
-      "GET /import/v1": null,
       "GET /backups": { folder: "/v", last: null, backups: [] },
     });
     open("/settings/backup");
     expect(await screen.findByText(/No backup yet/)).toBeVisible();
-    expect(
-      screen.getByRole("button", { name: "Choose metadata.db…" }),
-    ).toBeVisible();
+    expect(screen.queryByText(/metadata\.db|DocSynth|v1/)).toBeNull();
   });
 });

@@ -145,8 +145,6 @@ Open the app. First run asks for a key from any of the three providers (or none)
 
 For local answers, install Ollama and the model Setup suggests. Please also run `launchctl setenv OLLAMA_NO_CLOUD 1` and restart Ollama, so Ollama itself never sends a request to its cloud models; SecureFolio can't set that for you.
 
-Coming from DocSynth, SecureFolio's earlier name? [CHANGELOG.md](CHANGELOG.md) says how your library moves over.
-
 ## Use
 
 - **Quick search:** Option-Space from anywhere. In the app, Command-K opens the palette and Command-comma opens Settings.
@@ -154,7 +152,7 @@ Coming from DocSynth, SecureFolio's earlier name? [CHANGELOG.md](CHANGELOG.md) s
 - **Sensitivity:** each watched folder is Standard or Private. Private folders, documents, threads and answers carry a lock badge, and answers written on your Mac carry a Local model badge.
 - **From Claude:** Settings, Privacy and MCP, Install, then choose which folders it can search. For Claude Code: `claude mcp add securefolio -- <path to securefolio-mcp>`, which the last step of first run copies for you.
 - **Closing the window** leaves SecureFolio in the menu bar, so MCP keeps working.
-- **Restore:** Settings, Backup and import, Restore from backup.
+- **Restore:** Settings, Backup, Restore from backup.
 
 ## Develop
 

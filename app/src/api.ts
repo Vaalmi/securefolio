@@ -40,7 +40,6 @@ import type {
   Spending,
   BackupLast,
   Backups,
-  V1Result,
 } from "./apiTypes";
 import type { OpenRouterList, ProviderKey, TaskModels } from "./apiModelTypes";
 
@@ -465,7 +464,7 @@ export function getOrganizeEstimate(id: string): Promise<OrganizeEstimate> {
   return get<OrganizeEstimate>(`/sources/${id}/organize-estimate`);
 }
 
-// Settings: the key, models, spending, backup and the v1 import.
+// Settings: the key, models, spending and backup.
 
 export function getSettings(): Promise<AppSettings> {
   return get<AppSettings>("/settings");
@@ -509,14 +508,6 @@ export function backUpNow(): Promise<BackupLast> {
 
 export function restoreBackup(id: string): Promise<object> {
   return post("/backups/restore", { id });
-}
-
-export function getV1Import(): Promise<V1Result | null> {
-  return get<V1Result | null>("/import/v1");
-}
-
-export function importV1(path: string): Promise<V1Result> {
-  return post<V1Result>("/import/v1", { path });
 }
 
 export function getLogFolder(): Promise<{ path: string }> {

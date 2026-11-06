@@ -48,7 +48,7 @@ test("Settings: every section, each accessible", async ({ page }) => {
     ["privacy", "Privacy and MCP"],
     ["spend", "Spending and cloud log"],
     ["memory", "Memory"],
-    ["backup", "Backup and import"],
+    ["backup", "Backup"],
   ] as const) {
     await page.goto(`/#/settings/${id}`);
     await expect(page.locator("#settings-h")).toHaveText(heading);
@@ -78,17 +78,10 @@ test("a model per task saves, and the cap is checked", async ({ page }) => {
   await api("/settings", "PATCH", { spend_cap_usd: 25 });
 });
 
-test("back up now, and the v1 import names a file that isn't v1's", async ({
-  page,
-}) => {
+test("back up now", async ({ page }) => {
   await page.goto("/#/settings/backup");
   await page.getByRole("button", { name: "Back up now" }).click();
   await expect(page.getByText(/Last backup:/)).toBeVisible();
-  await page.evaluate(() => {
-    window.securefolioChosenPaths = ["/nonexistent/metadata.db"];
-  });
-  await page.getByRole("button", { name: "Choose metadata.db…" }).click();
-  await expect(page.getByText("There's no file there.")).toBeVisible();
 });
 
 test("the palette opens with ⌘K, finds an action, and runs it", async ({

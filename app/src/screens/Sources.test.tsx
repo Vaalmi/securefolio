@@ -28,9 +28,10 @@ describe("Sources", () => {
   it("pauses, rescans, switches MCP and changes sensitivity", async () => {
     fakeBackend({ "GET /sources": [source()] });
     open("/sources");
-    await userEvent.click(
-      await screen.findByRole("button", { name: "Pause Home" }),
-    );
+    // A file's first role query runs cold, and on a busy runner takes longer than
+    // findBy waits. So this waits for the row by its text, and then asks by role.
+    await screen.findByText("/h");
+    await userEvent.click(screen.getByRole("button", { name: "Pause Home" }));
     await waitFor(() => {
       expect(posted("/sources/s1/pause")).toBe(true);
     });

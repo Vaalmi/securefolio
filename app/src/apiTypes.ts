@@ -445,7 +445,7 @@ export interface RelatedDocument {
   doc_date: string | null;
 }
 
-// Settings' records: the settings, models, spending, backup and the v1 import.
+// Settings' records: the settings, models, spending and backup.
 
 export interface AppSettings {
   model_answer: string;
@@ -537,13 +537,6 @@ export interface Backups {
   folder: string;
   last: BackupLast | null;
   backups: BackupRow[];
-}
-
-export interface V1Result {
-  at: number;
-  notes: number;
-  sessions: number;
-  saved_queries: number;
 }
 
 // Settings, Keys: one provider's key, never the key itself.

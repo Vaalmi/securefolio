@@ -55,7 +55,6 @@ The backend writes `runtime.json` (`0600`), holding its port, its pid, a version
     - Private sources never appear.
   - **The keys:** `keychain.py` is the only code that reads or writes a cloud key, one Keychain account per provider. Only the last four characters are ever shown.
   - **Spend:** `spend.py` keeps the month's spend from the egress log, with the dated price table. It stops background cloud work at the cap, and prices a Deep run, or a page the user asks a cloud model to read, before it starts.
-  - **v1 import:** `v1_import.py` copies notes, sessions and saved queries from a DocSynth v1 `metadata.db` into the new tables. It opens v1's file read-only.
   - **Backup:** `backup.py` runs nightly. It copies `library.db` through SQLite's backup API, the managed copies in `objects/`, and a manifest of the watched files' locations. LanceDB and thumbnails aren't backed up: they rebuild.
   - **Logs:** local structured logs with no document text at INFO, and a timeline for each job.
 - **`worker/`:** the ingestion pipeline, run as a SQLite job queue.
@@ -82,6 +81,7 @@ The backend writes `runtime.json` (`0600`), holding its port, its pid, a version
       - or the user chooses "Re-read this page".
 
       A re-read that leaves a page with fewer tables, or fewer of the words Apple Vision sees, is refused, and the first reading is kept. A table that continues onto the next page is stitched after reading.
+
     - **Page-reading models:** `page_reader.py` is the only code that runs the MLX models, with a stand-in on Linux and in the tests, so `hard_pages.py`'s routing and grounding are tested everywhere.
     - **Charts and figures:** a picture's own labels and values, as Docling reads them, are indexed with the picture's box before any model reads it. Charts and other pictures over 5% of the page are then read by the local model chosen for figures (`gemma4:26b` by default) through `agent/models.py`: a chart becomes a table, and a figure gets a description. A picture whose reader isn't installed is marked pending, and is read once it is.
     - **Hidden text:** text in the text layer that doesn't show on the rendered page (clipped, on a hidden layer, or off the page) is left out. Text that OCR read is never left out.
@@ -152,21 +152,20 @@ The backend writes `runtime.json` (`0600`), holding its port, its pid, a version
   - At least one fixture per format, each with its expected locators, including a scanned PDF, a rotated page, a password-protected PDF and a dataless placeholder.
   - Hard-page fixtures: born-digital and scanned tables, charts drawn from known numbers, pages with a broken, wrong or partial text layer, pages where grounding should fail, and cropped and rotated pages. Tables are scored by TEDS and exact cell match, charts by values within 2% of the chart's full scale, and routing by the share of bad-text-layer pages caught and of good ones read again.
   - Planted facts, near misses and card fields for the evaluation questions.
-  - A synthetic v1 `metadata.db` for the import.
 
 ## Models
 
 `agent/models.py` builds every chat model with LangChain's `init_chat_model`, using `langchain-anthropic`, `langchain-openai` (for OpenAI, and for OpenRouter at `https://openrouter.ai/api/v1`) and `langchain-ollama`. Every cloud call goes through that module, which asks `policy.py` first and writes the egress log. A model id is `provider:model`. You choose a model per task in Settings, from `backend/model_catalog.py`: Claude's models and OpenAI's short list, with dated prices, and OpenRouter's published list. The table holds the defaults. The three local jobs (answers, cards, figures) each take an Ollama model.
 
-| Task | Default model |
-| --- | --- |
-| Answer (Standard) | `anthropic:claude-sonnet-5-5` |
-| Deep | `anthropic:claude-opus-5-5` |
-| Helpers: rewrite, thread summary, memory extraction, Cloud organizing cards | `anthropic:claude-haiku-5-5` |
-| Private and Offline answers, and default cards | `ollama:gemma4:26b` on a Mac with 48 GB or more; `gemma4:12b` from 24 GB; `qwen3.5:9b` below that |
-| Figure descriptions and charts | `ollama:gemma4:26b`, which takes images |
-| A page you ask a cloud model to read (Standard only) | `anthropic:claude-sonnet-5-5` |
-| Evaluation judge | `anthropic:claude-opus-5-5`, never on Private evidence |
+| Task                                                                        | Default model                                                                                     |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Answer (Standard)                                                           | `anthropic:claude-sonnet-5-5`                                                                     |
+| Deep                                                                        | `anthropic:claude-opus-5-5`                                                                       |
+| Helpers: rewrite, thread summary, memory extraction, Cloud organizing cards | `anthropic:claude-haiku-5-5`                                                                      |
+| Private and Offline answers, and default cards                              | `ollama:gemma4:26b` on a Mac with 48 GB or more; `gemma4:12b` from 24 GB; `qwen3.5:9b` below that |
+| Figure descriptions and charts                                              | `ollama:gemma4:26b`, which takes images                                                           |
+| A page you ask a cloud model to read (Standard only)                        | `anthropic:claude-sonnet-5-5`                                                                     |
+| Evaluation judge                                                            | `anthropic:claude-opus-5-5`, never on Private evidence                                            |
 
 - **Some calls use the providers' SDKs directly:**
   - **Batches:** `models.py` uses the Anthropic and OpenAI Python SDKs to submit batches, poll them and fetch their results, because `init_chat_model` has no batch API. It still checks `policy.py` and writes the egress log for these calls.
@@ -188,6 +187,7 @@ The backend writes `runtime.json` (`0600`), holding its port, its pid, a version
   - `dev`.
 
   `npm run check:app` checks that both entry points import with `app` alone. Mac-only packages carry a `sys_platform == 'darwin'` marker: `ocrmac`, and the MLX packages, whose marker adds `platform_machine == 'arm64'`.
+
 - **Node:** 22.12 or later.
 - **Rust:** stable, for `desktop/` and the bridge.
 - **Lockfiles:** `uv.lock`, `package-lock.json` and each `Cargo.lock` are committed, and decide the versions.
