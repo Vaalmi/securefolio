@@ -8,7 +8,7 @@ dependencies = []
 [dependency-groups]
 app = [
     "alembic>=1.16",
-    "anthropic>=0.60",
+    "anthropic>=2.4.0",
     "docling>=2.145",
     "fastapi>=0.162.0",
     "httpx>=0.28.1",
