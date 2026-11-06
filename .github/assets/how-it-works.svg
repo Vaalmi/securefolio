@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="1000" height="620" role="img" aria-labelledby="title desc" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="title">How SecureFolio works</title>
+  <desc id="desc">Indexing: your folders are read on your Mac, chunked, embedded and given a card, into your vault, where they are searchable at once; afterwards, hard pages are read again and published again if the reading improved. Asking: a question in the app is searched in the vault, a policy check before every model call sends Private, Offline or keyless requests to a local model and the rest to the cloud model you chose, citations are verified, and the answer opens the exact page.</desc>
+  <style>
+    .bg { fill: #F8FAFC; }
+    .frame { fill: none; stroke: #CBD5E1; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .panel { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; }
+    .vault { fill: #EEF2FF; stroke: #C7D2FE; stroke-width: 1; }
+    .gate { fill: #4F46E5; }
+    .cloud { fill: #FFFFFF; stroke: #0369A1; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .title { fill: #0F172A; font-size: 14px; font-weight: 600; }
+    .sub { fill: #64748B; font-size: 11.5px; }
+    .lane { fill: #4F46E5; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
+    .where { fill: #64748B; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
+    .gate-text { fill: #FFFFFF; font-size: 13px; font-weight: 600; }
+    .gate-sub { fill: #E0E7FF; font-size: 11px; }
+    .cloud-title { fill: #0369A1; font-size: 14px; font-weight: 600; }
+    .label { fill: #475569; font-size: 11.5px; font-weight: 600; }
+    .note { fill: #64748B; font-size: 11.5px; }
+    .note-strong { fill: #0F172A; font-size: 12px; font-weight: 600; }
+    .flow { fill: none; stroke: #4F46E5; stroke-width: 1.8; }
+    .back { fill: none; stroke: #0369A1; stroke-width: 1.8; }
+    .head { fill: #4F46E5; }
+    .head-back { fill: #0369A1; }
+    .dot { fill: #4F46E5; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0B1120; }
+      .frame { stroke: #334155; }
+      .panel { fill: #111827; stroke: #1F2937; }
+      .vault { fill: #1E1B4B; stroke: #3730A3; }
+      .gate { fill: #4F46E5; }
+      .cloud { fill: #111827; stroke: #38BDF8; }
+      .title { fill: #E2E8F0; }
+      .sub { fill: #94A3B8; }
+      .lane { fill: #A5B4FC; }
+      .where { fill: #94A3B8; }
+      .cloud-title { fill: #7DD3FC; }
+      .label { fill: #CBD5E1; }
+      .note { fill: #94A3B8; }
+      .note-strong { fill: #E2E8F0; }
+      .flow { stroke: #818CF8; }
+      .back { stroke: #38BDF8; }
+      .head { fill: #818CF8; }
+      .head-back { fill: #38BDF8; }
+      .dot { fill: #A5B4FC; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="head" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+    <marker id="arrow-back" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="head-back" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1000" height="620" rx="16"/>
+
+  <!-- The Mac -->
+  <rect class="frame" x="16" y="40" width="756" height="564" rx="14"/>
+  <text class="where" x="36" y="64">ON YOUR MAC</text>
+  <text class="where" x="800" y="64">CLOUD, IF YOU CHOOSE</text>
+
+  <!-- 1. Indexing -->
+  <text class="lane" x="40" y="92">1 · INDEXING, IN THE BACKGROUND</text>
+
+  <rect class="panel" x="40" y="104" width="160" height="76" rx="10"/>
+  <text class="title" x="56" y="130">Your folders</text>
+  <text class="sub" x="56" y="150">watched, read-only</text>
+  <text class="sub" x="56" y="166">PDF, Office, email…</text>
+
+  <rect class="panel" x="225" y="104" width="160" height="76" rx="10"/>
+  <text class="title" x="241" y="130">Read every page</text>
+  <text class="sub" x="241" y="150">Docling for layout</text>
+  <text class="sub" x="241" y="166">Apple Vision for scans</text>
+
+  <rect class="panel" x="410" y="104" width="160" height="76" rx="10"/>
+  <text class="title" x="426" y="130" style="font-size:13px">Chunk, embed, card</text>
+  <text class="sub" x="426" y="150">Qwen3 embeddings</text>
+  <text class="sub" x="426" y="166">a card for each file</text>
+
+  <rect class="panel" x="595" y="104" width="160" height="76" rx="10"/>
+  <text class="title" x="611" y="130" style="font-size:13px">Re-read hard pages</text>
+  <text class="sub" x="611" y="150">later: tables, charts</text>
+  <text class="sub" x="611" y="166">Granite-Docling on MLX</text>
+
+  <path class="flow" d="M200,142 H221" marker-end="url(#arrow)"/>
+  <path class="flow" d="M385,142 H406" marker-end="url(#arrow)"/>
+  <path class="flow" d="M490,180 V208" marker-end="url(#arrow)"/>
+  <path class="flow" d="M650,212 V184" marker-end="url(#arrow)"/>
+  <path class="flow" d="M700,180 V208" marker-end="url(#arrow)"/>
+  <text class="note" x="500" y="200">searchable now</text>
+
+  <!-- The vault -->
+  <rect class="vault" x="225" y="212" width="530" height="72" rx="10"/>
+  <text class="title" x="241" y="239">Your vault</text>
+  <text class="sub" x="241" y="259">SQLite with full-text search · LanceDB vectors · cards, notes, threads, memory</text>
+  <text class="sub" x="241" y="275">copies of files you drag in · nightly backups</text>
+
+  <!-- 2. Asking -->
+  <text class="lane" x="40" y="324">2 · ASKING</text>
+
+  <rect class="panel" x="40" y="336" width="160" height="76" rx="10"/>
+  <text class="title" x="56" y="362">You ask</text>
+  <text class="sub" x="56" y="382">a question in the app</text>
+  <text class="sub" x="56" y="398">and press Return</text>
+
+  <rect class="panel" x="225" y="336" width="160" height="76" rx="10"/>
+  <text class="title" x="241" y="362">Hybrid search</text>
+  <text class="sub" x="241" y="382">keywords + meaning</text>
+  <text class="sub" x="241" y="398">then a reranker</text>
+
+  <path class="flow" d="M305,284 V332" marker-end="url(#arrow)"/>
+  <path class="flow" d="M200,374 H221" marker-end="url(#arrow)"/>
+  <path class="flow" d="M385,374 H416" marker-end="url(#arrow)"/>
+
+  <!-- The policy check -->
+  <text class="note" x="500" y="318" text-anchor="middle">checked before every model call</text>
+  <path class="gate" d="M500,326 L580,374 L500,422 L420,374 z"/>
+  <text class="gate-text" x="500" y="370" text-anchor="middle">Private, Offline</text>
+  <text class="gate-text" x="500" y="386" text-anchor="middle">or no key?</text>
+
+  <!-- yes: on the Mac -->
+  <path class="flow" d="M500,422 V452" marker-end="url(#arrow)"/>
+  <text class="label" x="510" y="442">yes</text>
+  <rect class="panel" x="420" y="456" width="160" height="64" rx="10"/>
+  <text class="title" x="436" y="482">Local model</text>
+  <text class="sub" x="436" y="502">Ollama, on your Mac</text>
+
+  <!-- no: to the cloud -->
+  <path class="flow" d="M580,374 H796" marker-end="url(#arrow)"/>
+  <text class="label" x="596" y="366">no</text>
+  <text class="note" x="596" y="394">only what the answer needs,</text>
+  <text class="note" x="596" y="409">never anything Private</text>
+
+  <rect class="cloud" x="800" y="336" width="180" height="76" rx="10"/>
+  <text class="cloud-title" x="816" y="362">Cloud model</text>
+  <text class="sub" x="816" y="382">Anthropic, OpenAI or</text>
+  <text class="sub" x="816" y="398">OpenRouter, your own key</text>
+
+  <path class="back" d="M890,412 V572 H305 V524" marker-end="url(#arrow-back)"/>
+  <text class="label" x="560" y="590">the answer comes back</text>
+
+  <!-- Verify and answer -->
+  <rect class="panel" x="225" y="456" width="160" height="64" rx="10"/>
+  <text class="title" x="241" y="482">Verify citations</text>
+  <text class="sub" x="241" y="502">drops unmatched ones</text>
+
+  <rect class="panel" x="40" y="456" width="160" height="64" rx="10"/>
+  <text class="title" x="56" y="482">Answer</text>
+  <text class="sub" x="56" y="502">opens the exact page</text>
+
+  <path class="flow" d="M420,488 H389" marker-end="url(#arrow)"/>
+  <path class="flow" d="M225,488 H204" marker-end="url(#arrow)"/>
+
+  <!-- What never goes -->
+  <text class="note-strong" x="800" y="104">Never sent to the cloud</text>
+  <circle class="dot" cx="804" cy="124" r="2.5"/>
+  <text class="note" x="814" y="128">Private folders</text>
+  <circle class="dot" cx="804" cy="144" r="2.5"/>
+  <text class="note" x="814" y="148">anything in Offline mode</text>
+  <circle class="dot" cx="804" cy="164" r="2.5"/>
+  <text class="note" x="814" y="168">your files and the index</text>
+
+  <text class="note-strong" x="800" y="212">Claude over MCP</text>
+  <text class="note" x="800" y="232">searches and reads passages,</text>
+  <text class="note" x="800" y="248">read-only, folder by folder.</text>
+  <text class="note" x="800" y="264">Private folders never show.</text>
+</svg>
