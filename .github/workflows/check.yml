@@ -1,5 +1,7 @@
-# Runs every check, as `npm run check` does on a laptop, on each platform the
-# repo supports. The checks need no secrets and never read .env.
+# Runs every check `npm run check` runs on a laptop, on each platform the repo
+# supports. The checks need no secrets and never read .env. Here they run one at a
+# time, each its own step: run all at once, as on a laptop, they starve a runner's
+# three cores until tests time out.
 name: check
 
 on:
@@ -20,7 +22,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       CI: true
     steps:
@@ -52,4 +54,10 @@ jobs:
       - if: runner.os != 'Linux'
         run: npx playwright install chromium
 
-      - run: npm run check
+      - run: npm run check:python
+      - run: npm run check:app
+      - run: npm run check:ts
+      - run: npm run check:rust
+      - run: npm run check:bundle
+      - run: npm run check:scripts
+      - run: npm run e2e
