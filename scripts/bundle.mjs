@@ -51,7 +51,10 @@ function preparePython() {
   ]);
   const home = dirname(dirname(realpathSync(interpreter)));
   cpSync(home, PYTHON, { recursive: true, verbatimSymlinks: true });
-  const requirements = join(CACHE, "requirements.txt");
+  // A pylock.toml names each wheel by its URL and hash, as uv.lock does, so it installs
+  // from what `uv sync` put in the cache. A requirements list would need the package
+  // index, which `uv sync` never fetches, so on a fresh Mac it couldn't install offline.
+  const requirements = join(CACHE, "pylock.toml");
   run("uv", [
     "export",
     "--frozen",
@@ -59,8 +62,9 @@ function preparePython() {
     "--no-default-groups",
     "--group",
     "app",
-    "--no-hashes",
     "--no-emit-project",
+    "--format",
+    "pylock.toml",
     "-o",
     requirements,
     "-q",
