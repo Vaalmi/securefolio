@@ -34,7 +34,7 @@
     "@tauri-apps/plugin-dialog": "^2.8.4",
     "@tauri-apps/plugin-global-shortcut": "^2.4.1",
     "@tauri-apps/plugin-opener": "^2.7.2",
-    "lucide-react": "^1.61.0",
+    "lucide-react": "^1.67.0",
     "pdfjs-dist": "^5.7.284",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
