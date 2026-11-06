@@ -1,0 +1,839 @@
+[
+ {
+  "id": "q1",
+  "category": "fact",
+  "question": "What is the pet deposit on my apartment lease?",
+  "expected_document": "Home/Apartment lease.pdf",
+  "expected_page": 3,
+  "answer": "$299.11",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q2",
+  "category": "find",
+  "question": "Find my apartment lease",
+  "expected_document": "Home/Apartment lease.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q3",
+  "category": "fact",
+  "question": "When does my apartment lease end?",
+  "expected_document": "Home/Apartment lease.pdf",
+  "expected_page": 1,
+  "answer": "August 3, 2027",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q4",
+  "category": "near_miss",
+  "question": "What is the parking fee on my apartment lease?",
+  "expected_document": "Home/Apartment lease.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q5",
+  "category": "fact",
+  "question": "When does the car warranty end?",
+  "expected_document": "Home/Car warranty booklet.pdf",
+  "expected_page": 2,
+  "answer": "March 6, 2029",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q6",
+  "category": "find",
+  "question": "Open the warranty booklet for my car",
+  "expected_document": "Home/Car warranty booklet.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q7",
+  "category": "near_miss",
+  "question": "Does the car warranty cover tire replacement?",
+  "expected_document": "Home/Car warranty booklet.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q8",
+  "category": "exact",
+  "question": "What is the policy number on my auto policy?",
+  "expected_document": "Finance/Auto policy.pdf",
+  "expected_page": null,
+  "answer": "POL-928046",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q9",
+  "category": "exact",
+  "question": "What is the policy number on my renters policy?",
+  "expected_document": "Finance/Renters policy.pdf",
+  "expected_page": null,
+  "answer": "POL-670333",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q10",
+  "category": "exact",
+  "question": "What is the policy number on my umbrella policy?",
+  "expected_document": "Finance/Umbrella policy.pdf",
+  "expected_page": null,
+  "answer": "POL-828705",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q11",
+  "category": "multi",
+  "question": "Compare the annual premiums across my insurance policies.",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Auto policy.pdf",
+   "Finance/Renters policy.pdf",
+   "Finance/Umbrella policy.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Auto policy.pdf": "$989.60",
+   "Finance/Renters policy.pdf": "$675.67",
+   "Finance/Umbrella policy.pdf": "$1,366.15"
+  },
+  "answer_facts": [
+   "$989.60",
+   "$675.67",
+   "$1,366.15"
+  ]
+ },
+ {
+  "id": "q12",
+  "category": "multi",
+  "question": "What did I spend on insurance in 2025?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Auto policy.pdf",
+   "Finance/Renters policy.pdf",
+   "Finance/Umbrella policy.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Auto policy.pdf": "$989.60",
+   "Finance/Renters policy.pdf": "$675.67",
+   "Finance/Umbrella policy.pdf": "$1,366.15"
+  },
+  "answer_facts": [
+   "$3,031.42"
+  ]
+ },
+ {
+  "id": "q13",
+  "category": "exact",
+  "question": "How much did I pay for a cordless drill?",
+  "expected_document": "Finance/Tanner Hardware receipt.pdf",
+  "expected_page": null,
+  "answer": "$322.63",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q14",
+  "category": "find",
+  "question": "Where's the receipt from Tanner Hardware?",
+  "expected_document": "Finance/Tanner Hardware receipt.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q15",
+  "category": "exact",
+  "question": "How much did I pay for a dishwasher?",
+  "expected_document": "Finance/Kilbride Appliances receipt.pdf",
+  "expected_page": null,
+  "answer": "$48.79",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q16",
+  "category": "find",
+  "question": "Where's the receipt from Kilbride Appliances?",
+  "expected_document": "Finance/Kilbride Appliances receipt.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q17",
+  "category": "fact",
+  "question": "What does the roof inspection report estimate the work will cost?",
+  "expected_document": "Home/Roof inspection report.pdf",
+  "expected_page": 2,
+  "answer": "$14,325.35",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q18",
+  "category": "fact",
+  "question": "What does the energy audit report estimate the work will cost?",
+  "expected_document": "Home/Energy audit report.pdf",
+  "expected_page": 2,
+  "answer": "$7,854.43",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q19",
+  "category": "fact",
+  "question": "What does the foundation survey report estimate the work will cost?",
+  "expected_document": "Home/Foundation survey report.pdf",
+  "expected_page": 2,
+  "answer": "$7,615.75",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q20",
+  "category": "multi",
+  "question": "What do the three house reports recommend, and what would it all cost?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Home/Roof inspection report.pdf",
+   "Home/Energy audit report.pdf",
+   "Home/Foundation survey report.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Home/Roof inspection report.pdf": "$14,325.35",
+   "Home/Energy audit report.pdf": "$7,854.43",
+   "Home/Foundation survey report.pdf": "$7,615.75"
+  },
+  "answer_facts": [
+   "$14,325.35",
+   "$7,854.43",
+   "$7,615.75",
+   "$29,795.53"
+  ]
+ },
+ {
+  "id": "q21",
+  "category": "multi",
+  "question": "Which of the house reports says work is needed soonest?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Home/Roof inspection report.pdf",
+   "Home/Energy audit report.pdf",
+   "Home/Foundation survey report.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Home/Roof inspection report.pdf": "2 years",
+   "Home/Energy audit report.pdf": "4 years",
+   "Home/Foundation survey report.pdf": "6 years"
+  },
+  "answer_facts": [
+   "2 years"
+  ]
+ },
+ {
+  "id": "q22",
+  "category": "fact",
+  "question": "What was my closing balance in March 2026?",
+  "expected_document": "Finance/Bank statement March.pdf",
+  "expected_page": 1,
+  "answer": "$17,292.91",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q23",
+  "category": "fact",
+  "question": "What was my closing balance in April 2026?",
+  "expected_document": "Finance/Bank statement April.pdf",
+  "expected_page": 1,
+  "answer": "$35,445.31",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q24",
+  "category": "multi",
+  "question": "How did my closing balance change from March to April 2026?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Bank statement March.pdf",
+   "Finance/Bank statement April.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Bank statement March.pdf": "$17,292.91",
+   "Finance/Bank statement April.pdf": "$35,445.31"
+  },
+  "answer_facts": [
+   "$18,152.40"
+  ]
+ },
+ {
+  "id": "q25",
+  "category": "private",
+  "question": "What refund was due on my 2024 federal return?",
+  "expected_document": "Taxes/Federal return 2024.pdf",
+  "expected_page": 1,
+  "answer": "$4,561.96",
+  "documents": [],
+  "private": true,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q26",
+  "category": "private",
+  "question": "What dose was I prescribed at the clinic?",
+  "expected_document": "Medical/Clinic visit.pdf",
+  "expected_page": 1,
+  "answer": "22 mg",
+  "documents": [],
+  "private": true,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q27",
+  "category": "hard_table",
+  "question": "What's the estimated cost for the chimney repair?",
+  "expected_document": "Home/Repair estimate.pdf",
+  "expected_page": 1,
+  "answer": "$807.81",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q28",
+  "category": "hard_text_layer",
+  "question": "What's the late fee in the scanned account letter?",
+  "expected_document": "Scans/Scanned account letter.pdf",
+  "expected_page": 1,
+  "answer": "$65.09",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q29",
+  "category": "hard_table",
+  "question": "What does the quote say the soffit costs?",
+  "expected_document": "Home/Quote 1.pdf",
+  "expected_page": 1,
+  "answer": "$759.63",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q30",
+  "category": "hard_table",
+  "question": "What does the quote say the fence costs?",
+  "expected_document": "Home/Quote 2.pdf",
+  "expected_page": 1,
+  "answer": "$666.17",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q31",
+  "category": "hard_chart",
+  "question": "What value does the water use chart show for Survey 0?",
+  "expected_document": "Home/Water use chart.pdf",
+  "expected_page": 1,
+  "answer": "21",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q32",
+  "category": "fact",
+  "question": "What is the monthly charge in my internet contract?",
+  "expected_document": "Finance/Internet contract.pdf",
+  "expected_page": 2,
+  "answer": "$986.21",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q33",
+  "category": "find",
+  "question": "Pull up my internet contract",
+  "expected_document": "Finance/Internet contract.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q34",
+  "category": "fact",
+  "question": "What is the joining fee in my gym agreement?",
+  "expected_document": "Finance/Gym agreement.pdf",
+  "expected_page": 2,
+  "answer": "$1,785.00",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q35",
+  "category": "find",
+  "question": "Pull up my gym agreement",
+  "expected_document": "Finance/Gym agreement.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q36",
+  "category": "fact",
+  "question": "What is the security deposit in my storage rental?",
+  "expected_document": "Finance/Storage rental.pdf",
+  "expected_page": 2,
+  "answer": "$1,347.17",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q37",
+  "category": "find",
+  "question": "Pull up my storage rental",
+  "expected_document": "Finance/Storage rental.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q38",
+  "category": "fact",
+  "question": "What is the crown cost in my dentist estimate?",
+  "expected_document": "Finance/Dentist estimate.pdf",
+  "expected_page": 2,
+  "answer": "$1,049.24",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q39",
+  "category": "find",
+  "question": "Pull up my dentist estimate",
+  "expected_document": "Finance/Dentist estimate.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q40",
+  "category": "fact",
+  "question": "What is the vaccine charge in my vet invoice?",
+  "expected_document": "Finance/Vet invoice.pdf",
+  "expected_page": 2,
+  "answer": "$2,124.80",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q41",
+  "category": "find",
+  "question": "Pull up my vet invoice",
+  "expected_document": "Finance/Vet invoice.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q42",
+  "category": "fact",
+  "question": "What is the term fee in my tuition letter?",
+  "expected_document": "Finance/Tuition letter.pdf",
+  "expected_page": 2,
+  "answer": "$1,078.68",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q43",
+  "category": "find",
+  "question": "Pull up my tuition letter",
+  "expected_document": "Finance/Tuition letter.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q44",
+  "category": "fact",
+  "question": "What is the packing charge in my moving quote?",
+  "expected_document": "Finance/Moving quote.pdf",
+  "expected_page": 2,
+  "answer": "$278.32",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q45",
+  "category": "multi",
+  "question": "Which of these two costs more, and by how much?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Internet contract.pdf",
+   "Finance/Gym agreement.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Internet contract.pdf": "$986.21",
+   "Finance/Gym agreement.pdf": "$1,785.00"
+  },
+  "answer_facts": [
+   "$798.79"
+  ]
+ },
+ {
+  "id": "q46",
+  "category": "multi",
+  "question": "Which of these two costs more, and by how much?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Storage rental.pdf",
+   "Finance/Dentist estimate.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Storage rental.pdf": "$1,347.17",
+   "Finance/Dentist estimate.pdf": "$1,049.24"
+  },
+  "answer_facts": [
+   "$297.93"
+  ]
+ },
+ {
+  "id": "q47",
+  "category": "multi",
+  "question": "Which of these two costs more, and by how much?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Vet invoice.pdf",
+   "Finance/Tuition letter.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Vet invoice.pdf": "$2,124.80",
+   "Finance/Tuition letter.pdf": "$1,078.68"
+  },
+  "answer_facts": [
+   "$1,046.12"
+  ]
+ },
+ {
+  "id": "q48",
+  "category": "multi",
+  "question": "Which of these two costs more, and by how much?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Moving quote.pdf",
+   "Finance/Solar proposal.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Moving quote.pdf": "$278.32",
+   "Finance/Solar proposal.pdf": "$2,083.88"
+  },
+  "answer_facts": [
+   "$1,805.56"
+  ]
+ },
+ {
+  "id": "q49",
+  "category": "multi",
+  "question": "Which of these two costs more, and by how much?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Garage repair order.pdf",
+   "Finance/Piano service note.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Garage repair order.pdf": "$1,563.05",
+   "Finance/Piano service note.pdf": "$2,069.19"
+  },
+  "answer_facts": [
+   "$506.14"
+  ]
+ },
+ {
+  "id": "q50",
+  "category": "unanswerable",
+  "question": "What's the serial number of my boat?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q51",
+  "category": "unanswerable",
+  "question": "When does my passport expire?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q52",
+  "category": "unanswerable",
+  "question": "What's my gym membership fee?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q53",
+  "category": "unanswerable",
+  "question": "Who is my dentist?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q54",
+  "category": "unanswerable",
+  "question": "What did I pay for the piano?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q55",
+  "category": "near_miss",
+  "question": "Does the umbrella policy cover flood damage?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q56",
+  "category": "near_miss",
+  "question": "What's the late fee on my bank statements?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q57",
+  "category": "near_miss",
+  "question": "What does the roof report say about solar panels?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q58",
+  "category": "near_miss",
+  "question": "How much was the deposit on the cordless drill?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q59",
+  "category": "near_miss",
+  "question": "What's the interest rate on my bank statement?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q60",
+  "category": "near_miss",
+  "question": "What does the energy audit say about the swimming pool?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q61",
+  "category": "near_miss",
+  "question": "Does the warranty booklet list a roadside assistance number?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ },
+ {
+  "id": "q62",
+  "category": "near_miss",
+  "question": "What's the cancellation fee on my renters policy?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": []
+ }
+]

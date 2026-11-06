@@ -1,0 +1,53 @@
+# Formats the staged files, then runs the checks for the part that changed,
+# including a change to that part's configuration.
+glob_matcher: doublestar
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: python
+      group:
+        piped: true
+        jobs:
+          - run: uv run ruff format {staged_files}
+            glob: ["**/*.py"]
+            stage_fixed: true
+          - run: npm run check:python
+            glob:
+              - "{backend,agent,worker,evals,testing,data/build}/**"
+              - "*.py"
+              - "pyproject.toml"
+              - "uv.lock"
+              - "lefthook.yml"
+
+    - name: typescript
+      group:
+        piped: true
+        jobs:
+          - run: npx prettier --write -u {staged_files}
+            glob:
+              [
+                "{app,e2e,scripts}/**",
+                "*.config.*",
+                "package.json",
+                "tsconfig.json",
+              ]
+            stage_fixed: true
+          - run: npm run check:ts
+            glob:
+              - "{app,e2e,scripts}/**"
+              - "*.config.*"
+              - "package.json"
+              - "package-lock.json"
+              - "tsconfig.json"
+              - "lefthook.yml"
+
+    - name: scripts
+      glob: ["scripts/**", "package.json"]
+      run: npm run check:scripts
+
+    - name: rust
+      glob:
+        ["desktop/**/*.rs", "desktop/**/Cargo.toml", "desktop/**/Cargo.lock"]
+      run: npm run check:rust
+

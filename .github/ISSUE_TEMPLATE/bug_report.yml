@@ -1,0 +1,49 @@
+name: Bug report
+description: Something in SecureFolio doesn't work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please leave out anything from your own documents: names, amounts, file names or passages. For a security problem, don't open an issue; see SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what happened, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen again
+      description: Steps, ideally with the synthetic library from `npm run seed`.
+  - type: input
+    id: version
+    attributes:
+      label: SecureFolio version or commit
+    validations:
+      required: true
+  - type: input
+    id: mac
+    attributes:
+      label: Mac and macOS version
+      placeholder: MacBook Pro M3, 36 GB, macOS 26.1
+    validations:
+      required: true
+  - type: dropdown
+    id: answers
+    attributes:
+      label: Who answers, if it's about Ask
+      options:
+        - Not about Ask
+        - Anthropic
+        - OpenAI
+        - OpenRouter
+        - Local model through Ollama
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Anything relevant from the app's log, with document text removed.
+      render: text

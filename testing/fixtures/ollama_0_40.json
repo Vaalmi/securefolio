@@ -1,0 +1,351 @@
+{
+  "about": "Recorded from Ollama 0.40.14 on this Mac on 2026-11-05: /api/tags, /api/show for each model (its capabilities and details only; the license, modelfile, template and tensor fields are left out for size), and /api/ps with gemma4:e2b-it-qat loaded. nomic-embed-text was pulled for this, as the embedding-only model. The two models in `by_hand` aren't on this Mac, a text-only model and one on Ollama's servers; they're written in the same shapes, and the tests add them to the recording.",
+  "ollama_version": "0.40.14",
+  "tags": {
+    "models": [
+      {
+        "name": "nomic-embed-text:latest",
+        "model": "nomic-embed-text:latest",
+        "modified_at": "2026-11-05T14:42:15.155120152-05:00",
+        "size": 274302450,
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "nomic-bert",
+          "families": [
+            "nomic-bert"
+          ],
+          "parameter_size": "137M",
+          "quantization_level": "F16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      },
+      {
+        "name": "gemma4:26b",
+        "model": "gemma4:26b",
+        "modified_at": "2026-11-01T07:08:21.899058863-05:00",
+        "size": 16146867483,
+        "digest": "48eb98ec778c163d87f69d735fcdd79e345063af9af4685613fd018ae5debf5e",
+        "details": {
+          "parent_model": "",
+          "format": "safetensors",
+          "family": "",
+          "families": null,
+          "parameter_size": "",
+          "quantization_level": "",
+          "runner": "mlx"
+        },
+        "capabilities": [
+          "completion",
+          "vision",
+          "tools",
+          "thinking"
+        ]
+      },
+      {
+        "name": "gemma4:e4b",
+        "model": "gemma4:e4b",
+        "modified_at": "2026-10-15T17:38:07.499364983-04:00",
+        "size": 6583656505,
+        "digest": "dc35e8d9c6061baa6f0fa870975ab6932e2542b579b13ea0f199fa4bb7300c9c",
+        "details": {
+          "parent_model": "gemma4-validation-20260929:e4b-imatrix-attention-q6-q8-draft2",
+          "format": "gguf",
+          "family": "gemma4",
+          "families": [
+            "gemma4"
+          ],
+          "parameter_size": "7.5B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 2560,
+          "runner": "llamacpp"
+        },
+        "capabilities": [
+          "completion",
+          "vision",
+          "audio",
+          "tools",
+          "thinking"
+        ]
+      },
+      {
+        "name": "gemma4:e2b-it-qat",
+        "model": "gemma4:e2b-it-qat",
+        "modified_at": "2026-10-15T17:38:04.458081118-04:00",
+        "size": 4336358185,
+        "digest": "07ea59a474013479c8b6b802bef095c40e964a1d776ba02f264c0e30e1aede0c",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma4",
+          "families": [
+            "gemma4"
+          ],
+          "parameter_size": "4.6B",
+          "quantization_level": "Q4_0",
+          "context_length": 131072,
+          "embedding_length": 1536,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "completion",
+          "vision",
+          "audio",
+          "tools",
+          "thinking"
+        ]
+      },
+      {
+        "name": "qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "modified_at": "2026-10-15T17:38:04.03149008-04:00",
+        "size": 3324173934,
+        "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+        "details": {
+          "parent_model": "model.gguf",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "4.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 2560,
+          "runner": "llamacpp"
+        },
+        "capabilities": [
+          "completion",
+          "vision",
+          "tools",
+          "thinking"
+        ]
+      },
+      {
+        "name": "gemma4:31b",
+        "model": "gemma4:31b",
+        "modified_at": "2026-04-11T22:55:42.77759142-04:00",
+        "size": 19868981791,
+        "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma4",
+          "families": [
+            "gemma4"
+          ],
+          "parameter_size": "31.3B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 5376,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "completion",
+          "vision",
+          "tools",
+          "thinking"
+        ]
+      }
+    ]
+  },
+  "show": {
+    "nomic-embed-text:latest": {
+      "capabilities": [
+        "embedding"
+      ],
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "nomic-bert",
+        "families": [
+          "nomic-bert"
+        ],
+        "parameter_size": "137M",
+        "quantization_level": "F16"
+      }
+    },
+    "gemma4:26b": {
+      "capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ],
+      "details": {
+        "parent_model": "",
+        "format": "safetensors",
+        "family": "gemma4",
+        "families": null,
+        "parameter_size": "26.2B",
+        "quantization_level": "nvfp4",
+        "runner": "mlx"
+      }
+    },
+    "gemma4:e4b": {
+      "capabilities": [
+        "completion",
+        "vision",
+        "audio",
+        "tools",
+        "thinking"
+      ],
+      "details": {
+        "parent_model": "gemma4-validation-20260929:e4b-imatrix-attention-q6-q8-draft2",
+        "format": "gguf",
+        "family": "gemma4",
+        "families": [
+          "gemma4"
+        ],
+        "parameter_size": "7.5B",
+        "quantization_level": "Q4_K_M",
+        "runner": "llamacpp"
+      }
+    },
+    "gemma4:e2b-it-qat": {
+      "capabilities": [
+        "completion",
+        "vision",
+        "audio",
+        "tools",
+        "thinking"
+      ],
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "gemma4",
+        "families": [
+          "gemma4"
+        ],
+        "parameter_size": "4.6B",
+        "quantization_level": "Q4_0"
+      }
+    },
+    "qwen3.5:4b": {
+      "capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ],
+      "details": {
+        "parent_model": "model.gguf",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "4.2B",
+        "quantization_level": "Q4_K_M",
+        "runner": "llamacpp"
+      }
+    },
+    "gemma4:31b": {
+      "capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ],
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "gemma4",
+        "families": [
+          "gemma4"
+        ],
+        "parameter_size": "31.3B",
+        "quantization_level": "Q4_K_M"
+      }
+    }
+  },
+  "ps": {
+    "models": [
+      {
+        "name": "gemma4:e2b-it-qat",
+        "model": "gemma4:e2b-it-qat",
+        "size": 408388893,
+        "digest": "07ea59a474013479c8b6b802bef095c40e964a1d776ba02f264c0e30e1aede0c",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma4",
+          "families": [
+            "gemma4"
+          ],
+          "parameter_size": "4.6B",
+          "quantization_level": "Q4_0"
+        },
+        "expires_at": "2026-11-05T14:47:26.945022-05:00",
+        "size_vram": 408388893,
+        "context_length": 32768,
+        "runner": "llamacpp"
+      }
+    ]
+  },
+  "by_hand": {
+    "tags": [
+      {
+        "name": "llama3.2:3b",
+        "model": "llama3.2:3b",
+        "modified_at": "2026-11-05T14:00:00-05:00",
+        "size": 2019393189,
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "3.2B",
+          "quantization_level": "Q4_K_M"
+        }
+      },
+      {
+        "name": "gpt-oss:120b-cloud",
+        "model": "gpt-oss:120b-cloud",
+        "remote_model": "gpt-oss:120b",
+        "remote_host": "https://ollama.com:443",
+        "modified_at": "2026-11-05T14:00:00-05:00",
+        "size": 384,
+        "digest": "569662207105dd2d5cd2d7a0d1f6b2a0e5b2e7f3c4d5a6b7c8d9e0f1a2b3c4d5",
+        "details": {
+          "parent_model": "",
+          "format": "",
+          "family": "gptoss",
+          "families": [
+            "gptoss"
+          ],
+          "parameter_size": "116.8B",
+          "quantization_level": "MXFP4"
+        }
+      }
+    ],
+    "show": {
+      "llama3.2:3b": {
+        "capabilities": [
+          "completion",
+          "tools"
+        ],
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "3.2B",
+          "quantization_level": "Q4_K_M"
+        }
+      }
+    }
+  }
+}

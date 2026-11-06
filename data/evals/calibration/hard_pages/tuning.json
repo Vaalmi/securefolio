@@ -1,0 +1,1094 @@
+[
+ {
+  "file": "table_borderless_digital.pdf",
+  "page": 1,
+  "kind": "table",
+  "reasons": [
+   "weak_table"
+  ],
+  "expected": {
+   "cells": [
+    [
+     "Estimate 0",
+     "Repair 1",
+     "Payment 2",
+     "Survey 3"
+    ],
+    [
+     "Contract",
+     "5886.59",
+     "804.84",
+     "8259.27"
+    ],
+    [
+     "Filing",
+     "3642.36",
+     "7963.88",
+     "3489.42"
+    ],
+    [
+     "Warranty",
+     "1162.32",
+     "3176.20",
+     "1465.56"
+    ],
+    [
+     "Maintenance",
+     "8813.46",
+     "3149.60",
+     "5351.30"
+    ],
+    [
+     "Garage",
+     "6627.54",
+     "3422.08",
+     "7057.59"
+    ],
+    [
+     "Reserve",
+     "3479.14",
+     "5392.85",
+     "4389.50"
+    ],
+    [
+     "Policy",
+     "6224.29",
+     "6939.09",
+     "6638.95"
+    ],
+    [
+     "Harbor",
+     "6865.00",
+     "7613.27",
+     "8776.12"
+    ]
+   ]
+  }
+ },
+ {
+  "file": "table_merged_digital.pdf",
+  "page": 1,
+  "kind": "table",
+  "reasons": [
+   "weak_table"
+  ],
+  "expected": {
+   "cells": [
+    [
+     "Group",
+     "",
+     "Totals",
+     ""
+    ],
+    [
+     "Tenant 0",
+     "Notice 1",
+     "Quarter 2",
+     "Coverage 3"
+    ],
+    [
+     "Maintenance",
+     "2480.51",
+     "5953.83",
+     "9333.60"
+    ],
+    [
+     "Notice",
+     "8176.65",
+     "5110.23",
+     "8702.87"
+    ],
+    [
+     "Repair",
+     "107.10",
+     "1090.04",
+     "9441.44"
+    ],
+    [
+     "Contract",
+     "7256.15",
+     "9929.58",
+     "2308.87"
+    ],
+    [
+     "Notice",
+     "3300.94",
+     "8977.57",
+     "2294.10"
+    ],
+    [
+     "Invoice",
+     "5120.43",
+     "6154.08",
+     "986.70"
+    ]
+   ]
+  }
+ },
+ {
+  "file": "table_clean_digital.pdf",
+  "page": 1,
+  "kind": "table",
+  "reasons": [],
+  "expected": {
+   "cells": [
+    [
+     "Survey 0",
+     "Invoice 1",
+     "Quarter 2",
+     "Warranty 3"
+    ],
+    [
+     "Payment",
+     "6972.14",
+     "8601.40",
+     "4013.12"
+    ],
+    [
+     "Quarter",
+     "2894.01",
+     "241.81",
+     "6489.78"
+    ],
+    [
+     "Warranty",
+     "9338.05",
+     "",
+     "4486.60"
+    ],
+    [
+     "Harbor",
+     "3217.70",
+     "9727.68",
+     "5176.42"
+    ],
+    [
+     "Account",
+     "2201.36",
+     "5671.86",
+     "5979.51"
+    ],
+    [
+     "Statement",
+     "900.95",
+     "3621.66",
+     "1096.27"
+    ],
+    [
+     "Invoice",
+     "1983.18",
+     "5621.15",
+     "6070.03"
+    ],
+    [
+     "Warranty",
+     "3326.86",
+     "5979.65",
+     "9018.26"
+    ]
+   ]
+  }
+ },
+ {
+  "file": "table_borderless_scan.pdf",
+  "page": 1,
+  "kind": "table_scan",
+  "reasons": [
+   "weak_table"
+  ],
+  "expected": {
+   "cells": [
+    [
+     "Tenant 0",
+     "Payment 1",
+     "Warranty 2",
+     "Reserve 3"
+    ],
+    [
+     "Maintenance",
+     "673.31",
+     "822.74",
+     "5623.94"
+    ],
+    [
+     "Roof",
+     "7198.56",
+     "855.34",
+     "9066.90"
+    ],
+    [
+     "Payment",
+     "561.98",
+     "7631.79",
+     "964.01"
+    ],
+    [
+     "Tenant",
+     "7416.85",
+     "4501.98",
+     "2360.62"
+    ],
+    [
+     "Ledger",
+     "1018.04",
+     "4367.77",
+     "1995.88"
+    ],
+    [
+     "Coverage",
+     "7378.43",
+     "8536.93",
+     "1198.18"
+    ],
+    [
+     "Audit",
+     "6844.13",
+     "4354.00",
+     "3917.45"
+    ],
+    [
+     "Payment",
+     "8720.12",
+     "3816.93",
+     "3160.83"
+    ]
+   ]
+  }
+ },
+ {
+  "file": "table_merged_scan.pdf",
+  "page": 1,
+  "kind": "table_scan",
+  "reasons": [
+   "weak_table"
+  ],
+  "expected": {
+   "cells": [
+    [
+     "Group",
+     "",
+     "Totals",
+     ""
+    ],
+    [
+     "Balance 0",
+     "Payment 1",
+     "Roof 2",
+     "Budget 3"
+    ],
+    [
+     "Inspection",
+     "8385.29",
+     "1730.75",
+     "8652.01"
+    ],
+    [
+     "Renewal",
+     "8341.16",
+     "9461.84",
+     "7890.16"
+    ],
+    [
+     "Deposit",
+     "1820.05",
+     "7355.78",
+     "9360.91"
+    ],
+    [
+     "Repair",
+     "9881.11",
+     "4521.51",
+     "2204.89"
+    ],
+    [
+     "Balance",
+     "1917.36",
+     "8705.07",
+     "1587.38"
+    ],
+    [
+     "Reserve",
+     "3863.21",
+     "6373.83",
+     "9158.48"
+    ]
+   ]
+  }
+ },
+ {
+  "file": "table_clean_scan.pdf",
+  "page": 1,
+  "kind": "table_scan",
+  "reasons": [],
+  "expected": {
+   "cells": [
+    [
+     "Balance 0",
+     "Premium 1",
+     "Reserve 2",
+     "Statement 3"
+    ],
+    [
+     "Roof",
+     "3967.60",
+     "3994.25",
+     "6694.19"
+    ],
+    [
+     "Filing",
+     "2700.63",
+     "7203.62",
+     "3183.35"
+    ],
+    [
+     "Maintenance",
+     "455.96",
+     "",
+     "640.28"
+    ],
+    [
+     "Reserve",
+     "8622.33",
+     "558.96",
+     "6156.16"
+    ],
+    [
+     "Quarter",
+     "9720.84",
+     "6060.99",
+     "7515.78"
+    ],
+    [
+     "Survey",
+     "4332.07",
+     "7436.85",
+     "4955.11"
+    ],
+    [
+     "Notice",
+     "354.47",
+     "7913.05",
+     "6306.05"
+    ],
+    [
+     "Schedule",
+     "938.29",
+     "52.48",
+     "2065.62"
+    ]
+   ]
+  }
+ },
+ {
+  "file": "table_across.pdf",
+  "page": 1,
+  "kind": "table",
+  "reasons": [
+   "weak_table"
+  ],
+  "expected": {
+   "cells": [
+    [
+     "Warranty 0",
+     "Quarter 1",
+     "Schedule 2"
+    ],
+    [
+     "Receipt",
+     "3524.87",
+     "9776.36"
+    ],
+    [
+     "Repair",
+     "6519.17",
+     "2701.66"
+    ],
+    [
+     "Harbor",
+     "8004.38",
+     "3797.53"
+    ],
+    [
+     "Roof",
+     "8620.05",
+     "892.67"
+    ],
+    [
+     "Deposit",
+     "185.96",
+     "8036.36"
+    ],
+    [
+     "Warranty",
+     "6119.79",
+     "4742.17"
+    ],
+    [
+     "Schedule",
+     "7873.31",
+     "2245.98"
+    ],
+    [
+     "Warranty",
+     "1058.49",
+     "1669.79"
+    ],
+    [
+     "Maintenance",
+     "7900.12",
+     "8878.07"
+    ],
+    [
+     "Roof",
+     "7444.34",
+     "5674.48"
+    ],
+    [
+     "Notice",
+     "1263.71",
+     "3838.96"
+    ],
+    [
+     "Repair",
+     "8837.65",
+     "6846.94"
+    ],
+    [
+     "Tenant",
+     "2843.88",
+     "902.47"
+    ],
+    [
+     "Ledger",
+     "9582.13",
+     "218.21"
+    ],
+    [
+     "Quarter",
+     "2603.67",
+     "2078.71"
+    ],
+    [
+     "Ledger",
+     "4716.67",
+     "9298.74"
+    ],
+    [
+     "Roof",
+     "4049.70",
+     "9237.93"
+    ],
+    [
+     "Inspection",
+     "1440.24",
+     "2309.06"
+    ],
+    [
+     "Contract",
+     "3085.60",
+     "1965.77"
+    ],
+    [
+     "Invoice",
+     "7910.63",
+     "5007.23"
+    ],
+    [
+     "Invoice",
+     "3051.20",
+     "8186.54"
+    ],
+    [
+     "Audit",
+     "985.21",
+     "5883.09"
+    ],
+    [
+     "Estimate",
+     "4119.22",
+     "85.00"
+    ],
+    [
+     "Renewal",
+     "623.19",
+     "4383.29"
+    ],
+    [
+     "Survey",
+     "2620.92",
+     "6718.31"
+    ],
+    [
+     "Garage",
+     "3260.41",
+     "2415.98"
+    ],
+    [
+     "Survey",
+     "9527.42",
+     "5751.89"
+    ],
+    [
+     "Statement",
+     "5239.28",
+     "9403.38"
+    ],
+    [
+     "Reserve",
+     "4692.66",
+     "6928.20"
+    ],
+    [
+     "Harbor",
+     "2395.91",
+     "191.48"
+    ]
+   ],
+   "pages": 2
+  }
+ },
+ {
+  "file": "chart_bar_0.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "bar",
+   "values": {
+    "Budget 0": 33,
+    "Tenant 1": 42,
+    "Receipt 2": 37
+   },
+   "full_scale": 100
+  }
+ },
+ {
+  "file": "chart_bar_1.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "bar",
+   "values": {
+    "Reserve 0": 26,
+    "Notice 1": 74,
+    "Filing 2": 86
+   },
+   "full_scale": 100
+  }
+ },
+ {
+  "file": "chart_bar_2.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "bar",
+   "values": {
+    "Repair 0": 10,
+    "Harbor 1": 32,
+    "Receipt 2": 16,
+    "Reserve 3": 59,
+    "Policy 4": 56
+   },
+   "full_scale": 100
+  }
+ },
+ {
+  "file": "chart_line_0.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "line",
+   "values": {
+    "Notice 0": 91,
+    "Account 1": 95,
+    "Audit 2": 40,
+    "Warranty 3": 49
+   },
+   "full_scale": 100
+  }
+ },
+ {
+  "file": "chart_line_1.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "line",
+   "values": {
+    "Balance 0": 54,
+    "Policy 1": 83,
+    "Coverage 2": 51,
+    "Schedule 3": 18
+   },
+   "full_scale": 100
+  }
+ },
+ {
+  "file": "chart_line_2.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "line",
+   "values": {
+    "Roof 0": 75,
+    "Invoice 1": 46,
+    "Budget 2": 44
+   },
+   "full_scale": 100
+  }
+ },
+ {
+  "file": "chart_pie_0.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "pie",
+   "values": {
+    "Harbor 0": 57,
+    "Renewal 1": 82,
+    "Filing 2": 53,
+    "Reserve 3": 28
+   },
+   "full_scale": 220
+  }
+ },
+ {
+  "file": "chart_pie_1.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "pie",
+   "values": {
+    "Maintenance 0": 31,
+    "Renewal 1": 19,
+    "Policy 2": 49
+   },
+   "full_scale": 99
+  }
+ },
+ {
+  "file": "chart_pie_2.pdf",
+  "page": 1,
+  "kind": "chart",
+  "reasons": [],
+  "expected": {
+   "chart": "pie",
+   "values": {
+    "Garage 0": 68,
+    "Estimate 1": 53,
+    "Statement 2": 22,
+    "Coverage 3": 61
+   },
+   "full_scale": 204
+  }
+ },
+ {
+  "file": "figure_with_text.pdf",
+  "page": 1,
+  "kind": "figure",
+  "reasons": [
+   "pictures_over_half"
+  ],
+  "expected": {
+   "text": "Audit maintenance ledger coverage tenant."
+  }
+ },
+ {
+  "file": "two_column_sidebar.pdf",
+  "page": 1,
+  "kind": "layout",
+  "reasons": [],
+  "expected": {}
+ },
+ {
+  "file": "bad_garbled_0.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Audit renewal contract roof contract reserve deposit policy warranty quarter schedule quarter. Quarter tenant premium tenant renewal payment filing harbor renewal survey account budget. Notice renewal premium deposit tenant maintenance filing budget inspection maintenance estimate budget. Audit notice garage policy renewal quarter premium maintenance budget balance account receipt. Inspection schedule survey payment tenant budget inspection deposit quarter survey repair notice. Warranty account ledger quarter invoice harbor policy contract statement policy estimate harbor. Maintenance reserve contract coverage contract deposit policy reserve inspection invoice estimate contract. Ledger account notice roof audit coverage premium account schedule quarter maintenance quarter. Policy inspection audit coverage premium audit policy warranty survey garage tenant invoice. Payment roof quarter contract estimate tenant garage contract garage roof inspection filing. Garage renewal inspection notice tenant audit harbor deposit premium roof schedule repair. Statement budget warranty policy repair deposit account quarter tenant audit renewal repair. Schedule inspection filing estimate audit inspection notice policy renewal invoice inspection survey. Harbor estimate maintenance deposit reserve invoice filing policy contract contract survey garage. Repair contract contract tenant ledger maintenance audit quarter reserve roof budget repair. Deposit contract balance audit balance premium schedule renewal filing ledger repair premium. Maintenance receipt warranty quarter roof repair quarter renewal warranty schedule inspection contract. Receipt warranty receipt balance budget schedule contract estimate statement harbor invoice tenant. Reserve schedule notice estimate budget garage statement audit renewal audit budget maintenance. Maintenance filing inspection ledger budget statement coverage survey inspection deposit account coverage. Survey deposit premium audit premium renewal policy payment balance account ledger policy. Premium balance premium garage quarter audit quarter roof estimate quarter roof repair. Warranty coverage survey schedule balance invoice estimate contract maintenance balance audit invoice. Receipt garage coverage receipt tenant audit statement inspection maintenance repair invoice filing. Budget balance ledger payment filing notice deposit inspection notice contract reserve budget. Contract payment receipt receipt policy reserve tenant garage premium notice coverage tenant. Premium filing audit filing garage invoice audit warranty roof schedule renewal roof. Maintenance reserve contract receipt notice garage ledger survey survey quarter schedule quarter."
+  }
+ },
+ {
+  "file": "bad_wrong_1.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Coverage survey harbor budget schedule contract harbor account renewal maintenance notice invoice. Filing policy filing schedule warranty harbor statement tenant statement balance premium quarter. Receipt tenant roof estimate coverage account deposit estimate tenant account payment coverage. Renewal garage invoice invoice repair filing survey quarter warranty survey statement notice. Receipt survey warranty harbor ledger coverage roof premium invoice audit ledger ledger. Notice premium garage payment receipt survey budget renewal tenant balance premium policy. Garage contract inspection estimate renewal survey policy survey receipt harbor budget quarter. Harbor ledger tenant survey survey maintenance maintenance deposit inspection contract receipt account. Quarter schedule receipt filing notice coverage survey budget audit budget schedule repair. Contract invoice schedule reserve contract repair ledger renewal notice roof garage budget. Notice maintenance policy premium premium quarter budget deposit filing premium harbor contract. Harbor maintenance quarter statement policy invoice invoice tenant quarter schedule renewal inspection. Schedule tenant filing repair harbor invoice repair deposit reserve harbor inspection renewal. Reserve statement account quarter roof estimate quarter account payment warranty harbor reserve. Deposit schedule invoice reserve account policy estimate reserve maintenance quarter notice coverage. Maintenance ledger tenant budget balance maintenance maintenance statement renewal statement audit payment. Contract maintenance balance premium budget policy account ledger payment renewal repair tenant. Budget maintenance coverage schedule budget warranty budget garage ledger receipt warranty account. Filing budget ledger harbor filing deposit premium tenant invoice maintenance quarter renewal. Filing balance reserve reserve maintenance estimate inspection premium budget quarter warranty premium. Account repair reserve quarter maintenance coverage repair ledger invoice roof warranty quarter. Harbor repair ledger roof budget quarter inspection warranty payment survey roof ledger. Payment deposit premium receipt balance audit budget notice audit reserve premium garage. Repair estimate notice notice filing premium warranty receipt audit reserve receipt reserve. Receipt invoice schedule audit harbor estimate survey audit receipt budget audit payment. Maintenance balance estimate maintenance balance budget harbor maintenance tenant policy garage maintenance. Repair ledger invoice payment deposit contract survey ledger statement deposit audit garage. Tenant tenant estimate account filing ledger audit statement statement receipt receipt roof."
+  }
+ },
+ {
+  "file": "bad_partial_2.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Coverage coverage repair coverage budget estimate policy ledger coverage payment policy renewal. Garage policy inspection invoice invoice account policy repair coverage repair policy maintenance. Invoice statement warranty notice maintenance statement account contract inspection roof invoice premium. Renewal deposit invoice payment audit notice account account account inspection deposit reserve. Statement ledger inspection inspection ledger reserve invoice repair notice tenant repair receipt. Budget roof quarter maintenance ledger budget statement tenant schedule garage schedule payment. Contract ledger receipt contract ledger deposit tenant garage harbor survey premium roof. Policy invoice invoice warranty estimate ledger contract repair renewal statement ledger filing. Inspection harbor audit deposit ledger survey notice account renewal garage survey premium. Harbor premium schedule inspection tenant deposit inspection quarter audit inspection quarter invoice. Harbor invoice ledger renewal balance notice notice deposit audit filing premium account. Premium repair schedule notice tenant filing statement notice contract renewal policy deposit. Warranty coverage receipt account repair garage survey receipt premium balance policy payment. Reserve budget budget schedule premium estimate schedule inspection garage maintenance inspection ledger. Balance maintenance coverage deposit filing tenant notice schedule roof filing garage repair. Receipt ledger balance maintenance notice garage account deposit roof invoice balance statement. Premium roof budget ledger warranty reserve policy statement policy harbor policy premium. Renewal premium renewal survey statement account warranty tenant statement contract ledger inspection. Schedule roof estimate survey notice schedule estimate contract audit inspection warranty coverage. Inspection ledger warranty harbor invoice renewal receipt filing premium statement inspection premium. Maintenance audit statement quarter schedule contract maintenance deposit inspection quarter renewal deposit. Inspection filing maintenance policy ledger tenant invoice filing tenant warranty renewal survey. Garage account filing roof tenant policy schedule receipt reserve payment survey tenant. Quarter contract notice inspection contract reserve inspection warranty warranty tenant filing coverage. Filing coverage receipt notice survey policy renewal audit maintenance budget reserve tenant. Coverage receipt estimate estimate repair inspection schedule premium contract ledger invoice policy. Account statement filing contract quarter coverage roof audit repair deposit receipt roof. Warranty estimate inspection receipt renewal payment receipt repair survey garage budget notice."
+  }
+ },
+ {
+  "file": "bad_garbled_3.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Deposit payment reserve invoice filing account tenant renewal repair inspection statement maintenance. Estimate maintenance statement invoice budget renewal harbor maintenance survey garage account renewal. Coverage schedule estimate receipt warranty maintenance repair estimate survey ledger premium contract. Survey maintenance tenant payment statement quarter warranty filing premium inspection warranty ledger. Policy notice balance balance estimate warranty receipt coverage renewal harbor receipt harbor. Repair payment audit audit payment reserve quarter payment ledger repair reserve survey. Deposit maintenance estimate receipt account filing account invoice policy coverage schedule policy. Estimate filing renewal notice quarter account invoice filing ledger quarter account contract. Harbor filing invoice warranty renewal coverage maintenance harbor schedule estimate filing premium. Contract filing roof estimate renewal audit notice policy renewal quarter invoice quarter. Survey maintenance statement schedule account deposit policy survey filing filing garage coverage. Contract filing contract inspection balance invoice statement notice premium balance maintenance contract. Receipt maintenance renewal premium tenant quarter roof statement filing harbor schedule reserve. Warranty policy payment estimate audit repair payment survey garage warranty premium roof. Budget estimate renewal garage payment harbor tenant survey account invoice payment renewal. Coverage warranty notice audit ledger garage reserve ledger budget inspection account notice. Invoice invoice tenant contract warranty premium audit contract garage filing tenant roof. Renewal payment quarter balance maintenance tenant account notice account audit premium estimate. Warranty survey invoice repair estimate quarter ledger garage deposit contract warranty estimate. Account notice reserve quarter account balance coverage receipt roof policy audit premium. Ledger policy reserve notice estimate statement schedule reserve deposit statement policy garage. Reserve schedule coverage quarter policy coverage reserve reserve tenant filing account survey. Inspection renewal ledger budget tenant deposit audit quarter coverage policy roof renewal. Statement payment repair reserve roof payment payment receipt audit balance quarter invoice. Renewal policy payment harbor roof survey tenant harbor premium warranty account deposit. Harbor roof schedule statement harbor maintenance notice repair repair inspection roof ledger. Notice schedule deposit garage contract repair tenant warranty roof filing maintenance account. Reserve warranty filing renewal renewal harbor ledger policy renewal reserve deposit budget."
+  }
+ },
+ {
+  "file": "bad_wrong_4.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Coverage invoice harbor budget schedule schedule estimate account notice budget coverage statement. Balance estimate harbor reserve notice filing balance notice contract survey garage warranty. Estimate estimate contract quarter renewal ledger quarter deposit filing audit audit invoice. Quarter premium account maintenance estimate reserve reserve payment invoice contract ledger premium. Schedule roof estimate roof schedule schedule reserve garage estimate invoice harbor repair. Account estimate policy schedule payment renewal payment ledger roof receipt schedule roof. Account garage maintenance audit contract receipt inspection receipt reserve premium garage inspection. Schedule budget warranty audit payment inspection notice payment maintenance schedule schedule ledger. Policy renewal premium policy roof survey estimate premium schedule invoice receipt survey. Receipt warranty balance quarter inspection receipt estimate renewal harbor coverage statement payment. Warranty budget budget filing account account statement statement maintenance quarter receipt statement. Repair coverage schedule coverage policy audit payment survey invoice estimate payment schedule. Harbor audit harbor payment renewal premium filing estimate ledger roof premium warranty. Statement renewal estimate contract repair garage coverage inspection coverage estimate ledger filing. Filing filing premium quarter roof premium repair balance invoice reserve repair notice. Policy receipt audit tenant contract garage quarter harbor contract roof garage contract. Tenant quarter schedule premium quarter ledger receipt reserve repair invoice quarter survey. Contract audit account tenant schedule reserve estimate policy estimate garage balance schedule. Coverage receipt garage schedule statement account quarter schedule payment garage repair balance. Maintenance audit receipt account payment coverage filing statement schedule premium audit payment. Deposit roof deposit warranty harbor roof roof ledger tenant payment contract quarter. Contract reserve estimate premium warranty inspection payment survey quarter receipt deposit tenant. Schedule balance harbor receipt audit premium balance deposit notice estimate statement payment. Statement reserve maintenance balance harbor maintenance garage filing account garage maintenance filing. Payment warranty inspection contract statement renewal account roof budget deposit schedule invoice. Harbor notice warranty account coverage maintenance roof coverage filing garage roof garage. Coverage receipt budget policy renewal schedule roof reserve garage premium schedule filing. Premium coverage account renewal filing notice balance audit invoice schedule budget roof."
+  }
+ },
+ {
+  "file": "bad_partial_5.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Deposit harbor balance budget maintenance premium audit estimate roof ledger audit inspection. Repair roof ledger filing roof inspection policy repair tenant deposit roof schedule. Contract roof payment tenant receipt balance statement invoice ledger invoice invoice notice. Invoice inspection roof repair garage deposit roof payment roof schedule payment quarter. Inspection tenant roof contract filing estimate repair deposit inspection notice survey balance. Tenant inspection ledger renewal account account statement audit premium coverage maintenance budget. Premium schedule repair deposit notice schedule contract budget audit quarter schedule repair. Tenant roof contract policy deposit renewal coverage harbor survey policy premium statement. Quarter premium tenant audit ledger payment survey coverage coverage account ledger warranty. Repair renewal schedule warranty ledger roof premium filing coverage premium policy filing. Repair warranty garage repair invoice coverage payment payment audit warranty roof account. Filing quarter estimate receipt repair deposit notice inspection budget inspection maintenance schedule. Warranty warranty inspection notice deposit survey schedule harbor contract ledger maintenance tenant. Balance invoice account quarter warranty balance deposit harbor maintenance receipt audit renewal. Roof balance balance reserve tenant maintenance policy payment quarter balance maintenance quarter. Premium warranty garage maintenance ledger invoice contract premium notice harbor quarter roof. Audit quarter roof warranty coverage notice invoice receipt maintenance ledger balance notice. Garage roof reserve policy contract account contract reserve harbor account ledger schedule. Maintenance receipt audit premium receipt contract reserve reserve survey payment harbor roof. Account reserve harbor audit repair budget contract account notice tenant renewal maintenance. Maintenance renewal coverage tenant statement quarter harbor warranty contract reserve garage audit. Ledger account balance repair repair reserve maintenance filing receipt survey estimate receipt. Budget notice reserve reserve schedule maintenance contract roof invoice balance invoice policy. Audit ledger premium statement receipt ledger garage reserve premium reserve payment balance. Payment survey harbor coverage account policy maintenance reserve contract invoice receipt filing. Deposit maintenance quarter deposit contract statement premium quarter contract renewal schedule quarter. Quarter statement reserve coverage filing harbor quarter audit invoice inspection inspection balance. Ledger account balance harbor account account statement quarter premium receipt account inspection."
+  }
+ },
+ {
+  "file": "bad_garbled_6.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Harbor ledger survey renewal payment garage account premium harbor warranty notice warranty. Account reserve premium payment invoice estimate statement budget inspection notice coverage receipt. Repair quarter invoice ledger invoice roof quarter budget coverage account audit contract. Account coverage quarter receipt schedule tenant deposit balance payment estimate filing premium. Statement garage audit warranty reserve roof payment roof audit reserve harbor budget. Payment payment maintenance estimate premium coverage inspection notice deposit maintenance budget quarter. Renewal repair repair harbor garage account account premium quarter inspection balance renewal. Harbor survey notice quarter contract budget premium policy warranty ledger receipt policy. Roof statement payment balance reserve garage tenant quarter reserve balance schedule audit. Premium repair warranty survey coverage statement payment invoice account filing repair renewal. Reserve schedule tenant schedule quarter notice estimate budget balance survey contract premium. Payment budget tenant inspection notice reserve account inspection garage roof schedule contract. Renewal account statement estimate quarter quarter policy estimate roof invoice filing balance. Invoice audit coverage reserve survey survey deposit survey estimate budget tenant coverage. Account roof reserve invoice renewal repair statement policy coverage maintenance balance renewal. Notice harbor balance payment filing renewal survey deposit budget survey filing roof. Account budget schedule statement inspection survey balance reserve balance roof statement maintenance. Premium ledger harbor receipt payment contract audit maintenance filing renewal statement filing. Audit policy roof statement ledger estimate statement harbor warranty quarter inspection warranty. Renewal repair garage quarter tenant notice policy contract receipt deposit invoice premium. Schedule contract balance invoice reserve maintenance reserve invoice audit estimate survey garage. Tenant harbor coverage payment reserve policy harbor coverage deposit coverage balance estimate. Premium inspection deposit quarter schedule quarter contract premium receipt ledger filing renewal. Budget maintenance invoice premium warranty filing inspection account audit notice survey receipt. Quarter estimate tenant statement maintenance payment inspection reserve premium balance repair roof. Coverage reserve contract reserve premium inspection roof invoice audit tenant account notice. Audit statement survey survey schedule renewal receipt ledger audit budget notice roof. Budget tenant tenant contract roof estimate notice filing renewal payment maintenance statement."
+  }
+ },
+ {
+  "file": "bad_wrong_7.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Deposit coverage tenant budget repair deposit invoice maintenance garage balance invoice filing. Survey invoice payment contract notice policy warranty quarter receipt garage filing maintenance. Account premium budget harbor payment contract reserve ledger estimate balance policy tenant. Schedule receipt payment reserve account budget quarter notice budget roof inspection survey. Invoice audit quarter harbor estimate inspection survey survey harbor coverage policy warranty. Notice quarter balance balance survey receipt warranty warranty balance maintenance inspection schedule. Inspection estimate payment repair policy deposit maintenance balance account coverage garage premium. Garage reserve statement harbor quarter coverage policy statement survey deposit deposit policy. Roof coverage premium premium notice roof notice maintenance harbor survey renewal policy. Repair policy roof repair deposit repair payment account balance schedule balance deposit. Warranty ledger schedule coverage warranty statement deposit inspection deposit premium estimate maintenance. Reserve coverage survey estimate quarter survey premium balance policy policy statement inspection. Audit repair renewal survey statement warranty estimate statement contract notice repair estimate. Notice harbor invoice coverage invoice contract maintenance balance premium invoice tenant coverage. Premium harbor coverage schedule statement deposit balance deposit reserve renewal garage harbor. Audit inspection harbor inspection filing ledger inspection coverage ledger ledger roof estimate. Repair harbor estimate roof repair premium premium account balance renewal coverage account. Repair coverage warranty budget tenant audit policy contract reserve repair premium harbor. Schedule roof account maintenance estimate inspection notice balance estimate filing reserve estimate. Coverage warranty harbor policy reserve contract quarter contract inspection harbor quarter warranty. Account repair renewal garage policy filing coverage survey maintenance roof account estimate. Balance notice receipt premium repair policy tenant budget maintenance budget notice policy. Maintenance premium repair ledger filing ledger survey invoice filing tenant deposit roof. Invoice estimate survey estimate contract account inspection inspection quarter reserve account receipt. Contract coverage notice quarter maintenance payment roof garage survey maintenance invoice receipt. Coverage statement balance audit estimate statement warranty payment policy warranty estimate invoice. Estimate balance policy deposit statement coverage tenant maintenance budget harbor reserve deposit. Deposit notice budget repair tenant garage survey schedule coverage tenant quarter budget."
+  }
+ },
+ {
+  "file": "bad_partial_8.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Harbor inspection roof renewal survey schedule budget harbor renewal garage survey budget. Balance statement statement balance payment inspection receipt ledger notice statement deposit statement. Quarter balance budget quarter account budget payment estimate filing policy reserve budget. Statement maintenance roof tenant reserve audit receipt policy account warranty policy filing. Quarter balance quarter payment contract budget payment maintenance notice maintenance filing receipt. Filing schedule tenant maintenance account garage account receipt harbor repair account payment. Invoice estimate coverage estimate invoice maintenance roof tenant warranty filing statement coverage. Estimate schedule payment survey coverage payment premium inspection notice policy ledger statement. Garage payment invoice coverage ledger garage policy quarter harbor balance payment warranty. Repair quarter schedule harbor repair audit policy garage budget survey inspection roof. Warranty inspection budget deposit survey survey account garage balance receipt harbor reserve. Coverage budget budget harbor warranty deposit warranty deposit statement balance invoice quarter. Receipt contract roof garage roof policy tenant statement renewal filing maintenance ledger. Maintenance garage repair invoice garage deposit harbor repair statement coverage payment reserve. Warranty audit ledger maintenance roof account estimate account estimate maintenance maintenance invoice. Audit budget premium filing tenant maintenance audit garage inspection maintenance contract estimate. Garage survey tenant schedule renewal garage schedule invoice estimate repair renewal filing. Premium contract statement budget policy garage schedule repair schedule balance invoice maintenance. Coverage renewal policy filing statement balance schedule garage reserve payment repair estimate. Notice warranty notice invoice roof inspection account quarter deposit filing tenant contract. Policy statement coverage renewal payment renewal statement account repair statement account coverage. Inspection premium inspection invoice reserve balance warranty deposit contract coverage harbor ledger. Account contract receipt budget policy roof repair premium contract audit reserve coverage. Warranty deposit tenant filing receipt garage statement audit coverage roof ledger reserve. Tenant repair harbor deposit coverage contract balance budget coverage maintenance audit audit. Policy survey inspection ledger reserve inspection statement notice contract ledger statement invoice. Survey inspection schedule premium budget statement coverage renewal warranty filing invoice coverage. Statement reserve payment premium quarter statement estimate policy reserve statement balance survey."
+  }
+ },
+ {
+  "file": "bad_garbled_9.pdf",
+  "page": 1,
+  "kind": "bad_text_layer",
+  "reasons": [
+   "bad_text_layer"
+  ],
+  "expected": {
+   "text": "Maintenance ledger filing audit payment warranty contract receipt warranty account warranty invoice. Filing repair coverage notice warranty premium warranty notice deposit invoice receipt roof. Reserve inspection reserve harbor warranty quarter reserve premium premium schedule quarter repair. Maintenance repair roof account repair premium contract survey invoice tenant notice inspection. Payment quarter audit repair statement account coverage coverage estimate garage reserve garage. Statement inspection statement coverage roof harbor receipt audit balance estimate reserve receipt. Receipt estimate inspection budget tenant contract notice repair deposit harbor tenant schedule. Audit repair deposit inspection premium contract invoice warranty invoice reserve schedule inspection. Tenant renewal inspection inspection tenant premium statement harbor premium survey policy roof. Balance budget contract coverage invoice account survey schedule policy statement garage maintenance. Premium warranty estimate receipt balance deposit budget invoice roof ledger account budget. Notice audit audit schedule schedule maintenance balance filing filing audit maintenance survey. Ledger balance roof contract reserve inspection filing maintenance account estimate schedule garage. Garage survey audit filing schedule ledger inspection balance reserve renewal warranty survey. Roof estimate harbor contract balance coverage survey schedule notice policy invoice renewal. Quarter filing tenant harbor invoice schedule policy estimate reserve quarter quarter deposit. Maintenance ledger maintenance roof schedule account quarter filing inspection survey renewal garage. Coverage coverage receipt reserve roof budget tenant garage budget deposit balance statement. Invoice account garage harbor warranty maintenance tenant budget deposit inspection survey invoice. Estimate estimate renewal tenant balance filing budget budget survey quarter maintenance warranty. Reserve garage notice roof harbor inspection invoice roof tenant quarter budget invoice. Receipt repair balance survey schedule tenant contract warranty statement tenant notice coverage. Roof balance schedule schedule repair warranty schedule harbor garage notice quarter inspection. Statement survey tenant balance roof statement invoice policy tenant deposit statement tenant. Receipt invoice renewal tenant survey receipt tenant tenant statement payment policy budget. Balance receipt invoice payment invoice contract estimate statement deposit notice balance roof. Roof deposit harbor survey survey receipt audit budget notice estimate receipt schedule. Notice inspection roof contract estimate coverage inspection balance contract garage quarter audit."
+  }
+ },
+ {
+  "file": "good_0.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Notice reserve warranty warranty maintenance account filing payment reserve audit payment budget. Roof inspection coverage account deposit renewal repair roof premium audit estimate payment. Premium policy ledger inspection tenant receipt reserve statement notice invoice statement estimate. Garage harbor audit maintenance tenant estimate policy garage notice roof harbor budget. Premium tenant filing budget survey schedule quarter tenant repair roof receipt statement. Repair policy invoice tenant warranty receipt contract renewal garage harbor quarter schedule. Contract filing quarter contract invoice schedule garage payment quarter roof account garage. Deposit reserve policy maintenance budget statement schedule maintenance warranty receipt schedule statement. Estimate payment roof payment deposit inspection reserve budget ledger statement policy inspection. Audit schedule filing audit balance audit invoice payment audit account quarter deposit. Premium ledger filing balance account balance policy budget policy notice harbor harbor. Deposit quarter harbor premium deposit deposit premium schedule filing quarter tenant inspection. Balance schedule roof roof maintenance schedule statement contract quarter premium reserve statement. Invoice invoice receipt renewal audit coverage audit filing harbor ledger maintenance deposit. Garage premium balance maintenance inspection invoice contract receipt deposit inspection receipt notice. Garage survey notice filing maintenance survey reserve filing contract statement account coverage. Reserve budget notice account invoice tenant invoice estimate survey repair survey warranty. Survey coverage renewal schedule deposit audit ledger tenant policy balance deposit ledger. Survey policy policy garage deposit garage filing budget inspection premium coverage budget. Tenant harbor account contract maintenance ledger warranty balance roof notice statement budget. Warranty renewal payment audit contract schedule tenant harbor balance audit premium invoice. Coverage receipt filing renewal coverage maintenance inspection payment survey payment maintenance statement. Receipt payment policy quarter account audit coverage maintenance audit reserve inspection filing. Notice budget coverage renewal invoice garage schedule warranty statement statement account tenant. Maintenance harbor garage statement receipt budget tenant harbor repair filing budget estimate. Roof estimate inspection inspection ledger premium audit coverage receipt renewal receipt survey. Audit account statement roof renewal tenant survey schedule quarter coverage premium coverage. Payment invoice estimate estimate maintenance policy account policy renewal balance schedule contract."
+  }
+ },
+ {
+  "file": "good_1.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Policy tenant budget premium survey quarter notice filing invoice warranty statement survey. Account account filing ledger premium deposit warranty premium notice schedule renewal contract. Filing renewal contract payment payment account filing invoice renewal payment repair receipt. Warranty estimate notice repair repair contract estimate policy quarter survey reserve deposit. Repair premium inspection receipt schedule repair contract budget estimate invoice invoice notice. Renewal garage roof repair garage warranty receipt roof coverage premium quarter notice. Maintenance premium reserve repair maintenance survey renewal renewal account renewal inspection survey. Maintenance maintenance deposit warranty budget notice premium premium estimate filing payment contract. Roof survey audit harbor audit inspection warranty renewal invoice filing tenant account. Repair payment survey budget ledger harbor receipt budget warranty payment filing balance. Roof roof contract contract balance deposit balance deposit balance premium filing invoice. Estimate maintenance policy roof roof audit garage maintenance budget reserve deposit receipt. Coverage notice payment quarter roof balance quarter estimate reserve ledger receipt filing. Garage garage statement deposit statement contract inspection estimate receipt schedule tenant garage. Garage garage reserve roof account repair policy maintenance audit payment contract policy. Premium harbor deposit filing invoice receipt harbor reserve policy repair warranty premium. Invoice inspection filing balance maintenance deposit deposit ledger maintenance garage account schedule. Schedule roof payment roof warranty roof statement statement notice tenant notice ledger. Schedule estimate repair roof repair policy audit estimate garage invoice garage estimate. Filing roof reserve invoice quarter harbor statement survey account premium repair deposit. Harbor account balance warranty contract inspection schedule contract premium filing filing inspection. Survey maintenance estimate account ledger coverage tenant repair account deposit warranty estimate. Audit tenant repair reserve warranty invoice account invoice harbor receipt premium ledger. Payment policy survey audit quarter budget quarter inspection contract account tenant ledger. Renewal deposit tenant receipt reserve invoice garage premium statement statement warranty notice. Budget renewal coverage warranty receipt invoice garage garage premium renewal renewal premium. Reserve schedule renewal invoice coverage filing invoice premium contract budget harbor warranty. Estimate quarter schedule invoice statement repair warranty inspection estimate statement renewal premium."
+  }
+ },
+ {
+  "file": "good_2.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Repair invoice harbor filing notice coverage quarter policy contract survey payment premium. Receipt renewal schedule ledger garage maintenance roof receipt renewal balance account contract. Garage receipt maintenance audit payment reserve coverage harbor payment inspection contract reserve. Roof renewal reserve renewal schedule estimate maintenance account inspection balance reserve warranty. Schedule statement warranty quarter payment maintenance quarter repair premium survey renewal invoice. Budget deposit quarter coverage filing reserve schedule statement notice quarter estimate invoice. Payment schedule repair inspection ledger estimate ledger ledger balance payment survey renewal. Filing payment schedule inspection policy tenant warranty filing estimate schedule deposit receipt. Invoice policy reserve coverage receipt survey contract repair renewal schedule premium survey. Quarter garage receipt repair audit estimate budget account policy policy filing notice. Statement statement budget receipt maintenance renewal warranty inspection repair schedule roof estimate. Audit account repair repair harbor warranty harbor invoice warranty roof filing premium. Balance contract premium warranty harbor maintenance payment audit garage contract garage garage. Warranty balance reserve invoice contract ledger maintenance receipt invoice estimate receipt receipt. Roof warranty coverage invoice contract inspection audit schedule renewal payment warranty harbor. Policy quarter ledger notice maintenance tenant garage renewal invoice account warranty filing. Renewal schedule tenant premium survey deposit premium quarter renewal payment deposit maintenance. Payment statement maintenance renewal coverage statement policy deposit roof invoice invoice tenant. Account schedule balance harbor quarter payment garage policy reserve audit schedule survey. Deposit warranty contract notice payment notice audit filing notice roof policy receipt. Coverage reserve premium payment contract roof coverage statement roof roof ledger contract. Deposit budget notice ledger premium reserve payment maintenance schedule deposit renewal survey. Receipt premium repair contract garage garage audit maintenance notice roof quarter premium. Repair audit statement renewal warranty premium quarter roof quarter deposit balance balance. Coverage warranty balance inspection audit repair account filing invoice deposit statement premium. Contract ledger payment audit tenant filing ledger budget notice deposit filing policy. Harbor warranty payment payment contract ledger warranty invoice maintenance estimate garage audit. Receipt account garage reserve receipt balance invoice contract audit warranty schedule statement."
+  }
+ },
+ {
+  "file": "good_3.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Renewal repair contract garage inspection reserve estimate garage quarter repair filing invoice. Premium roof survey filing receipt estimate roof schedule receipt garage reserve premium. Notice reserve quarter schedule roof garage notice coverage balance inspection tenant deposit. Estimate repair statement inspection estimate inspection contract roof deposit account warranty balance. Audit notice warranty repair notice invoice contract payment repair estimate statement repair. Deposit invoice filing policy policy balance ledger repair notice survey contract inspection. Maintenance inspection receipt statement maintenance garage renewal notice coverage account policy audit. Harbor maintenance inspection schedule garage maintenance tenant balance maintenance garage survey survey. Policy filing statement repair payment maintenance deposit filing roof roof roof balance. Harbor renewal budget harbor schedule quarter budget payment warranty tenant account receipt. Premium account balance quarter notice harbor survey inspection quarter warranty repair budget. Schedule contract balance repair inspection premium schedule payment budget roof deposit survey. Policy reserve filing coverage maintenance repair payment account coverage premium budget account. Receipt invoice budget coverage premium deposit balance harbor estimate policy statement budget. Policy filing repair estimate balance deposit survey warranty account contract payment harbor. Quarter repair schedule invoice quarter audit survey schedule maintenance renewal invoice ledger. Balance repair filing survey contract audit policy notice repair receipt quarter warranty. Receipt premium budget reserve contract roof budget tenant payment filing account filing. Deposit garage account quarter estimate statement warranty harbor renewal ledger budget warranty. Coverage ledger budget inspection policy roof repair warranty tenant payment tenant survey. Estimate account notice schedule renewal coverage schedule account statement budget schedule notice. Reserve survey harbor reserve filing estimate renewal harbor audit ledger balance payment. Payment account garage repair inspection quarter schedule schedule reserve estimate receipt invoice. Premium invoice payment harbor reserve policy premium account reserve survey garage balance. Roof balance schedule premium audit schedule inspection notice notice renewal payment quarter. Survey invoice survey harbor reserve repair survey ledger renewal premium ledger premium. Tenant renewal schedule ledger receipt account estimate ledger invoice invoice estimate roof. Invoice renewal contract statement coverage contract statement budget garage receipt roof harbor."
+  }
+ },
+ {
+  "file": "good_4.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Harbor payment invoice statement reserve coverage estimate warranty ledger warranty schedule schedule. Warranty deposit renewal statement audit renewal statement inspection reserve policy statement audit. Statement reserve invoice policy renewal renewal reserve statement statement quarter invoice premium. Survey harbor filing harbor audit policy quarter policy deposit inspection coverage roof. Notice invoice maintenance payment deposit budget account inspection renewal receipt coverage payment. Ledger audit statement account roof budget invoice maintenance balance warranty audit payment. Maintenance schedule estimate warranty premium filing budget filing roof deposit coverage budget. Invoice ledger renewal coverage balance invoice notice maintenance payment payment estimate contract. Renewal survey payment roof harbor invoice premium premium invoice contract estimate schedule. Filing garage maintenance balance tenant contract invoice balance notice renewal maintenance repair. Tenant reserve warranty ledger account premium garage deposit renewal notice roof ledger. Garage policy statement receipt repair balance premium schedule roof maintenance survey invoice. Receipt coverage warranty warranty coverage balance contract renewal coverage policy contract maintenance. Budget statement coverage roof quarter coverage deposit warranty garage statement filing contract. Policy contract reserve deposit notice notice repair maintenance contract garage harbor maintenance. Policy survey survey maintenance budget survey payment notice harbor deposit balance policy. Tenant roof tenant coverage garage filing premium receipt policy policy policy renewal. Roof budget statement filing tenant receipt ledger ledger tenant receipt quarter estimate. Warranty filing harbor audit policy notice maintenance contract harbor inspection contract deposit. Budget ledger renewal deposit harbor ledger reserve inspection premium tenant account warranty. Survey warranty survey quarter payment filing estimate notice harbor inspection deposit budget. Roof estimate harbor schedule harbor tenant maintenance audit maintenance receipt notice payment. Maintenance contract balance audit account filing survey budget coverage notice coverage receipt. Premium maintenance maintenance harbor balance quarter renewal warranty notice ledger deposit garage. Payment tenant harbor warranty tenant payment receipt filing filing invoice receipt schedule. Warranty garage renewal statement premium estimate statement payment quarter warranty budget estimate. Balance survey invoice notice warranty survey contract survey filing inspection policy maintenance. Premium balance payment payment account warranty quarter account survey budget deposit invoice."
+  }
+ },
+ {
+  "file": "good_5.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Policy warranty notice schedule garage filing warranty estimate receipt ledger renewal schedule. Tenant filing policy survey tenant policy balance estimate garage payment balance inspection. Contract reserve garage inspection warranty premium statement filing inspection deposit ledger renewal. Coverage survey deposit quarter coverage account garage contract ledger survey survey deposit. Budget premium coverage coverage premium budget warranty payment survey balance premium quarter. Ledger repair ledger warranty audit harbor filing maintenance inspection budget survey contract. Maintenance estimate maintenance filing maintenance maintenance receipt schedule premium harbor audit maintenance. Receipt quarter invoice tenant repair balance premium invoice tenant ledger account receipt. Inspection statement coverage survey quarter schedule coverage coverage harbor contract receipt schedule. Payment estimate policy maintenance maintenance receipt ledger garage payment garage estimate filing. Tenant audit receipt garage filing invoice deposit estimate estimate reserve policy payment. Account inspection survey premium receipt invoice account receipt renewal premium audit balance. Harbor payment estimate statement policy statement contract invoice maintenance contract coverage invoice. Account contract schedule audit notice balance survey quarter repair estimate repair budget. Coverage ledger estimate harbor premium quarter policy notice deposit account budget coverage. Policy garage reserve maintenance renewal premium tenant audit reserve payment repair maintenance. Renewal harbor invoice garage estimate harbor deposit contract policy payment garage repair. Renewal notice coverage balance statement survey roof contract survey policy filing reserve. Budget contract roof receipt receipt estimate schedule renewal inspection estimate account payment. Warranty premium premium estimate audit policy repair policy harbor contract payment maintenance. Ledger survey policy budget policy garage quarter inspection harbor renewal deposit deposit. Coverage contract contract policy coverage budget roof quarter schedule account inspection maintenance. Audit statement notice receipt contract balance quarter roof notice harbor garage estimate. Maintenance maintenance renewal renewal account balance harbor filing reserve warranty estimate policy. Estimate schedule premium garage notice ledger repair estimate repair policy contract maintenance. Roof quarter budget budget balance ledger renewal contract budget harbor budget payment. Contract invoice receipt garage maintenance roof audit account policy balance contract policy. Contract harbor roof roof receipt statement roof budget budget renewal estimate audit."
+  }
+ },
+ {
+  "file": "good_6.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Deposit policy deposit renewal renewal schedule balance repair maintenance account invoice survey. Maintenance repair coverage roof balance coverage estimate payment reserve coverage coverage warranty. Reserve coverage balance inspection maintenance audit repair harbor repair filing account filing. Tenant invoice contract repair budget survey schedule notice warranty schedule warranty maintenance. Tenant receipt survey payment premium roof deposit survey policy coverage tenant statement. Budget ledger contract statement harbor receipt renewal receipt schedule statement audit warranty. Payment tenant warranty tenant filing account contract estimate filing coverage balance schedule. Estimate warranty invoice garage harbor garage payment garage garage coverage receipt ledger. Filing inspection roof survey filing garage statement deposit estimate quarter notice quarter. Receipt maintenance invoice filing reserve roof garage invoice maintenance audit repair ledger. Deposit contract budget statement estimate invoice harbor budget garage balance survey policy. Garage invoice policy account notice quarter budget survey ledger roof contract harbor. Estimate receipt filing warranty account quarter audit schedule statement deposit premium survey. Roof maintenance inspection filing warranty warranty schedule ledger roof survey coverage roof. Policy reserve ledger tenant budget warranty harbor account repair notice account contract. Renewal schedule notice ledger receipt harbor quarter invoice warranty inspection survey deposit. Maintenance budget ledger schedule notice inspection reserve maintenance schedule tenant coverage statement. Inspection contract tenant tenant deposit quarter estimate warranty invoice reserve reserve statement. Repair warranty statement warranty roof quarter notice survey filing statement survey payment. Premium inspection reserve payment inspection garage quarter invoice survey schedule statement account. Roof premium invoice contract harbor invoice reserve estimate survey survey quarter ledger. Budget coverage deposit receipt audit renewal maintenance premium maintenance filing policy policy. Reserve garage premium filing maintenance estimate audit estimate harbor balance audit statement. Coverage survey repair notice premium audit maintenance harbor filing contract maintenance deposit. Coverage budget renewal ledger policy quarter inspection tenant repair schedule payment invoice. Harbor coverage schedule quarter notice balance estimate policy roof tenant contract warranty. Contract deposit notice garage contract balance estimate tenant quarter audit policy renewal. Inspection policy repair inspection maintenance tenant receipt balance premium statement coverage account."
+  }
+ },
+ {
+  "file": "good_7.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Deposit invoice deposit premium ledger reserve schedule statement balance ledger inspection garage. Warranty tenant coverage warranty survey survey inspection maintenance premium budget survey roof. Balance coverage filing statement reserve audit reserve roof harbor audit ledger balance. Schedule payment policy contract policy estimate estimate tenant balance statement coverage roof. Estimate garage maintenance notice budget contract survey quarter estimate audit repair coverage. Balance invoice estimate harbor statement audit account inspection quarter warranty estimate repair. Estimate ledger harbor budget quarter filing policy quarter renewal renewal survey deposit. Estimate garage maintenance survey renewal coverage coverage quarter balance audit estimate payment. Renewal schedule filing audit maintenance warranty notice statement filing balance reserve premium. Reserve audit ledger policy estimate contract quarter repair ledger balance schedule balance. Estimate payment survey reserve ledger payment coverage reserve balance garage reserve schedule. Notice roof receipt deposit survey ledger warranty roof roof filing harbor warranty. Budget tenant balance ledger repair schedule filing tenant payment deposit schedule contract. Statement notice inspection statement roof contract repair receipt tenant notice account policy. Budget contract account audit budget estimate coverage balance garage maintenance quarter repair. Payment quarter roof coverage roof warranty statement quarter warranty policy coverage contract. Schedule payment statement receipt audit inspection budget policy policy payment coverage warranty. Inspection filing payment filing quarter policy roof notice receipt payment contract budget. Contract renewal audit inspection garage filing coverage statement reserve audit inspection payment. Survey payment statement harbor filing filing survey harbor survey ledger budget tenant. Warranty policy coverage account harbor repair policy estimate inspection filing maintenance premium. Reserve coverage filing coverage maintenance harbor budget contract filing estimate repair receipt. Receipt coverage quarter premium roof audit survey account tenant receipt reserve deposit. Renewal invoice balance statement survey harbor reserve estimate deposit premium premium contract. Audit contract coverage budget estimate schedule tenant ledger balance inspection balance coverage. Estimate tenant invoice reserve warranty premium balance premium inspection schedule garage reserve. Renewal deposit payment notice reserve payment balance premium inspection maintenance roof invoice. Ledger warranty inspection warranty audit tenant garage receipt notice contract garage deposit."
+  }
+ },
+ {
+  "file": "good_8.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Policy account maintenance inspection filing garage estimate warranty quarter audit receipt receipt. Audit survey receipt invoice receipt payment payment garage maintenance renewal policy reserve. Reserve inspection tenant tenant contract ledger filing quarter estimate warranty tenant tenant. Estimate balance repair repair ledger budget coverage harbor survey balance receipt survey. Harbor survey receipt deposit quarter contract deposit payment premium audit repair roof. Survey maintenance budget maintenance maintenance contract payment quarter warranty garage filing inspection. Payment inspection contract harbor payment harbor survey garage policy reserve reserve inspection. Estimate coverage schedule reserve filing deposit survey roof maintenance schedule tenant repair. Premium survey schedule account ledger schedule schedule premium audit audit statement balance. Inspection tenant contract policy schedule budget audit deposit payment account tenant invoice. Invoice statement deposit balance policy repair premium warranty budget ledger statement harbor. Ledger warranty statement premium receipt quarter filing premium contract roof maintenance ledger. Maintenance balance reserve statement renewal renewal roof garage receipt garage repair filing. Schedule maintenance audit coverage policy repair warranty warranty invoice quarter statement repair. Renewal account budget statement account ledger audit contract harbor account quarter notice. Schedule estimate ledger contract warranty reserve notice coverage policy budget reserve schedule. Filing coverage quarter notice harbor audit invoice quarter budget roof notice garage. Roof maintenance audit account inspection invoice reserve coverage garage invoice contract ledger. Warranty receipt audit warranty premium balance schedule payment maintenance roof garage warranty. Budget warranty estimate audit quarter account renewal account contract balance warranty renewal. Coverage survey survey garage filing balance payment deposit coverage balance statement quarter. Invoice account schedule statement invoice repair harbor deposit reserve statement payment renewal. Payment warranty budget balance inspection harbor harbor reserve account renewal receipt coverage. Roof contract receipt invoice ledger roof roof ledger contract warranty deposit budget. Inspection payment budget ledger statement contract survey garage policy ledger ledger survey. Harbor survey repair tenant policy notice schedule account maintenance maintenance tenant ledger. Warranty maintenance budget notice audit coverage contract ledger payment premium survey audit. Balance notice account contract policy repair statement receipt reserve harbor invoice tenant."
+  }
+ },
+ {
+  "file": "good_9.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Estimate survey budget estimate harbor roof reserve balance estimate filing estimate payment. Receipt renewal contract estimate audit renewal filing contract deposit garage account account. Policy payment receipt invoice contract repair ledger inspection renewal survey estimate contract. Filing schedule audit balance inspection account tenant receipt balance budget receipt warranty. Receipt invoice coverage filing contract payment maintenance audit deposit ledger contract garage. Deposit premium budget receipt repair account harbor warranty premium quarter budget maintenance. Audit garage deposit payment budget audit estimate harbor tenant balance estimate contract. Account notice filing inspection warranty audit renewal garage repair contract repair renewal. Premium policy filing audit maintenance garage account harbor contract statement garage premium. Audit roof roof schedule contract receipt roof maintenance garage warranty schedule premium. Ledger budget invoice audit budget survey notice harbor warranty notice account audit. Repair harbor estimate contract budget roof account reserve estimate budget roof budget. Notice repair quarter harbor payment payment receipt tenant notice deposit estimate quarter. Reserve tenant quarter payment inspection survey warranty statement premium statement inspection invoice. Statement harbor repair reserve audit payment quarter budget payment statement renewal balance. Warranty estimate inspection invoice invoice estimate repair repair policy survey quarter filing. Tenant quarter reserve audit repair policy budget statement estimate coverage statement statement. Payment ledger tenant ledger filing policy account statement premium deposit reserve tenant. Receipt budget contract deposit budget repair renewal premium premium contract ledger notice. Account audit payment roof deposit filing maintenance payment ledger receipt repair payment. Garage coverage maintenance garage budget statement invoice schedule coverage statement policy premium. Inspection contract reserve estimate roof coverage balance inspection inspection deposit filing statement. Policy schedule maintenance invoice quarter contract garage warranty coverage payment policy account. Balance invoice quarter maintenance receipt garage receipt renewal contract filing quarter premium. Coverage ledger filing audit harbor repair warranty balance notice statement invoice quarter. Ledger repair deposit premium contract tenant budget contract estimate ledger estimate renewal. Harbor balance deposit garage contract policy account policy contract repair warranty maintenance. Contract garage premium audit budget schedule ledger garage coverage payment ledger policy."
+  }
+ },
+ {
+  "file": "good_10.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Roof contract garage filing notice coverage policy balance schedule maintenance schedule statement. Balance notice schedule balance ledger ledger warranty reserve maintenance roof ledger notice. Warranty payment survey coverage coverage tenant account harbor filing coverage survey garage. Coverage repair schedule schedule survey balance coverage quarter renewal premium account audit. Invoice schedule schedule deposit harbor reserve premium notice renewal quarter deposit harbor. Account repair inspection garage audit schedule receipt warranty quarter renewal budget receipt. Payment filing inspection ledger deposit harbor audit account survey invoice premium inspection. Warranty schedule harbor renewal renewal maintenance garage warranty account contract inspection renewal. Premium premium filing harbor notice statement inspection garage harbor estimate roof harbor. Audit notice notice warranty audit maintenance estimate roof schedule maintenance budget balance. Payment statement tenant statement deposit estimate warranty tenant reserve tenant receipt statement. Renewal balance warranty policy estimate survey deposit renewal harbor premium policy renewal. Warranty warranty quarter garage coverage quarter quarter deposit premium contract receipt balance. Warranty tenant coverage repair balance premium budget policy policy receipt receipt roof. Inspection receipt statement invoice deposit renewal audit policy budget inspection survey survey. Survey garage account account payment repair estimate roof inspection budget garage maintenance. Statement deposit notice filing notice reserve warranty premium inspection premium roof budget. Garage ledger estimate renewal payment coverage schedule receipt audit maintenance invoice warranty. Notice budget policy policy warranty warranty estimate statement harbor maintenance payment premium. Contract statement premium repair audit reserve budget ledger notice renewal account balance. Filing receipt notice garage garage garage garage deposit quarter survey roof notice. Maintenance coverage schedule policy coverage repair contract schedule deposit tenant garage budget. Premium balance budget garage invoice coverage policy reserve coverage inspection receipt roof. Warranty account garage contract filing balance filing maintenance balance deposit harbor balance. Warranty premium account renewal garage schedule notice roof account tenant filing contract. Reserve coverage contract payment contract schedule coverage contract policy statement payment account. Balance payment tenant schedule reserve coverage ledger repair roof account coverage filing. Schedule ledger contract balance estimate premium receipt budget garage account contract maintenance."
+  }
+ },
+ {
+  "file": "good_11.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Roof payment deposit roof balance reserve payment quarter estimate statement budget filing. Maintenance tenant estimate deposit reserve audit policy deposit inspection coverage quarter survey. Maintenance maintenance reserve premium deposit ledger policy renewal invoice account schedule renewal. Repair repair garage receipt coverage deposit notice garage statement contract coverage schedule. Reserve inspection receipt policy coverage coverage contract inspection payment audit ledger account. Coverage contract survey tenant repair ledger schedule premium account inspection invoice coverage. Tenant warranty invoice garage quarter renewal invoice warranty tenant maintenance invoice receipt. Garage maintenance contract audit filing payment reserve budget repair statement premium survey. Premium repair payment coverage coverage filing account statement harbor invoice maintenance receipt. Tenant statement account statement deposit premium estimate payment budget filing budget schedule. Deposit invoice survey payment account maintenance tenant schedule quarter notice renewal survey. Deposit budget warranty balance harbor receipt deposit audit budget survey garage balance. Balance garage invoice premium premium statement balance inspection harbor deposit budget roof. Receipt reserve contract statement coverage renewal ledger roof notice deposit receipt estimate. Warranty quarter notice receipt contract premium balance maintenance quarter contract filing roof. Quarter reserve inspection contract renewal notice schedule balance roof schedule notice harbor. Statement roof ledger roof notice repair ledger roof invoice statement deposit inspection. Maintenance premium balance warranty schedule harbor repair deposit harbor deposit filing repair. Deposit repair filing audit repair reserve maintenance filing invoice tenant contract statement. Contract invoice quarter repair inspection quarter audit warranty maintenance harbor coverage quarter. Renewal roof contract notice repair schedule coverage invoice harbor reserve garage schedule. Schedule coverage receipt renewal notice statement deposit premium account estimate harbor filing. Premium policy receipt contract notice estimate payment reserve balance premium harbor statement. Inspection inspection budget filing ledger receipt schedule policy garage garage balance warranty. Estimate receipt maintenance coverage invoice filing contract roof inspection roof balance harbor. Estimate budget deposit deposit harbor audit receipt deposit premium payment notice repair. Ledger audit policy policy inspection tenant filing statement quarter tenant harbor estimate. Deposit receipt audit balance filing estimate budget filing receipt repair policy repair."
+  }
+ },
+ {
+  "file": "good_12.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Balance garage filing payment audit warranty inspection invoice estimate quarter statement budget. Deposit quarter tenant schedule inspection repair warranty account premium garage notice coverage. Policy quarter repair contract maintenance estimate audit harbor roof contract garage invoice. Policy maintenance audit survey filing budget schedule garage reserve schedule coverage estimate. Account ledger ledger coverage survey invoice warranty reserve inspection roof ledger coverage. Policy contract account quarter account payment premium harbor harbor notice ledger quarter. Coverage account filing roof tenant policy maintenance garage ledger premium notice survey. Filing account survey ledger invoice audit coverage maintenance payment maintenance filing survey. Statement warranty statement maintenance garage estimate budget repair maintenance receipt maintenance reserve. Reserve deposit maintenance audit statement filing payment policy renewal renewal garage receipt. Estimate filing ledger policy maintenance coverage tenant estimate harbor policy premium harbor. Balance schedule warranty maintenance reserve invoice ledger ledger coverage coverage inspection audit. Quarter budget renewal reserve garage contract tenant premium harbor statement reserve invoice. Invoice policy repair statement notice invoice audit budget repair renewal account budget. Filing renewal schedule receipt maintenance garage payment maintenance renewal estimate tenant account. Notice statement payment maintenance schedule estimate maintenance estimate inspection coverage maintenance notice. Filing statement harbor statement invoice repair tenant estimate reserve balance payment audit. Invoice survey tenant balance quarter deposit policy repair coverage receipt statement invoice. Warranty garage statement notice premium statement budget garage deposit notice repair coverage. Policy quarter deposit filing schedule contract maintenance contract roof invoice policy warranty. Contract schedule contract maintenance survey coverage reserve policy account account roof deposit. Roof coverage filing warranty schedule tenant contract harbor statement policy premium coverage. Survey payment coverage audit deposit statement maintenance garage receipt warranty warranty receipt. Balance audit notice reserve schedule balance survey garage invoice roof account estimate. Invoice payment coverage garage statement garage roof audit policy quarter account statement. Budget policy renewal budget budget roof balance account filing policy premium statement. Inspection policy audit quarter reserve payment quarter premium quarter survey balance coverage. Garage schedule tenant ledger account reserve survey survey policy invoice budget renewal."
+  }
+ },
+ {
+  "file": "good_13.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Payment payment roof contract harbor harbor receipt coverage garage audit invoice budget. Warranty policy estimate invoice renewal reserve harbor tenant invoice quarter payment repair. Filing contract payment survey receipt quarter notice garage ledger harbor notice premium. Budget receipt garage deposit payment renewal invoice reserve invoice inspection coverage maintenance. Receipt premium receipt audit reserve ledger harbor renewal premium quarter budget repair. Statement notice repair quarter warranty coverage contract statement invoice deposit warranty premium. Account renewal harbor filing ledger payment statement premium policy reserve invoice policy. Maintenance notice harbor balance premium maintenance inspection account deposit reserve budget receipt. Premium audit inspection filing quarter survey policy reserve deposit audit audit notice. Garage policy reserve audit contract inspection ledger ledger budget harbor notice maintenance. Reserve contract deposit renewal warranty roof balance account renewal ledger budget statement. Garage audit contract warranty receipt repair repair balance roof statement warranty survey. Coverage repair schedule tenant notice budget quarter roof warranty maintenance repair statement. Quarter account warranty coverage policy renewal ledger policy reserve deposit balance warranty. Premium survey repair premium notice maintenance filing warranty survey repair repair estimate. Maintenance budget garage policy budget notice receipt budget audit statement garage policy. Ledger garage schedule ledger filing garage tenant audit inspection ledger roof schedule. Budget repair invoice coverage renewal invoice schedule contract survey estimate coverage budget. Tenant repair premium ledger survey account repair premium statement quarter payment balance. Renewal budget harbor roof balance budget statement repair statement inspection warranty invoice. Tenant reserve deposit premium balance policy contract ledger schedule maintenance policy ledger. Survey garage payment harbor repair budget balance coverage premium contract schedule estimate. Filing notice coverage harbor warranty contract invoice balance harbor roof schedule roof. Estimate statement filing notice survey garage statement audit ledger roof invoice harbor. Filing garage payment roof policy premium estimate payment payment reserve warranty invoice. Coverage warranty roof survey receipt reserve notice receipt notice account coverage harbor. Deposit premium renewal quarter roof renewal contract budget garage account account ledger. Ledger premium renewal policy quarter reserve reserve inspection notice contract warranty invoice."
+  }
+ },
+ {
+  "file": "good_14.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Policy reserve reserve survey receipt budget audit harbor statement warranty repair roof. Harbor contract filing harbor premium budget audit quarter quarter budget budget harbor. Maintenance balance renewal inspection survey deposit payment reserve filing maintenance renewal estimate. Harbor contract garage payment statement statement policy account filing estimate schedule deposit. Contract ledger roof survey roof ledger account roof policy maintenance roof coverage. Reserve warranty audit harbor filing reserve budget quarter maintenance policy maintenance reserve. Premium contract statement payment coverage policy inspection invoice budget warranty premium estimate. Garage repair coverage warranty garage roof contract notice repair renewal invoice repair. Inspection inspection receipt repair garage account ledger audit repair balance ledger payment. Notice contract account schedule balance reserve maintenance contract coverage contract policy balance. Maintenance quarter filing garage deposit balance policy ledger deposit estimate policy statement. Reserve policy schedule inspection maintenance policy account reserve harbor estimate estimate account. Ledger reserve ledger ledger filing notice policy roof schedule quarter renewal filing. Deposit renewal budget contract schedule inspection repair warranty account notice account survey. Renewal quarter deposit quarter maintenance maintenance audit budget tenant deposit premium reserve. Estimate payment payment ledger statement quarter schedule filing notice inspection contract account. Repair coverage coverage filing garage inspection deposit garage deposit invoice audit policy. Policy budget quarter maintenance policy payment contract ledger budget schedule notice coverage. Policy payment ledger payment filing coverage estimate budget balance contract ledger account. Ledger payment inspection warranty budget statement receipt filing estimate coverage audit receipt. Deposit premium reserve receipt estimate ledger balance policy account statement payment notice. Contract survey survey payment survey warranty premium filing invoice statement garage survey. Estimate filing notice ledger warranty balance roof estimate invoice policy survey ledger. Ledger inspection roof notice garage filing schedule notice harbor balance tenant audit. Warranty statement quarter receipt quarter payment ledger contract policy repair reserve garage. Reserve notice payment renewal invoice tenant maintenance invoice policy tenant renewal account. Estimate schedule coverage statement garage audit reserve payment inspection audit statement receipt. Deposit balance warranty budget roof inspection account account garage harbor notice statement."
+  }
+ },
+ {
+  "file": "good_15.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Policy premium premium roof invoice notice audit statement invoice balance quarter policy. Premium budget deposit estimate statement tenant warranty balance budget inspection renewal tenant. Balance garage renewal payment ledger payment roof balance notice contract ledger premium. Quarter budget tenant receipt notice ledger receipt repair renewal notice roof balance. Warranty maintenance receipt repair repair notice tenant receipt reserve inspection renewal notice. Audit deposit account contract account premium premium estimate harbor budget contract filing. Filing payment repair audit schedule ledger account tenant premium maintenance coverage audit. Inspection quarter schedule warranty roof estimate reserve schedule contract balance policy renewal. Maintenance notice statement warranty roof survey survey roof budget garage account warranty. Deposit repair schedule schedule account account garage tenant payment quarter maintenance premium. Coverage ledger statement receipt warranty coverage roof quarter deposit balance policy coverage. Balance account payment harbor balance premium schedule premium roof audit survey deposit. Tenant statement receipt payment account policy schedule budget roof ledger deposit account. Schedule quarter schedule garage notice deposit garage audit contract balance deposit budget. Harbor audit receipt premium invoice deposit receipt inspection harbor garage account survey. Receipt receipt harbor deposit schedule schedule garage garage notice account notice coverage. Tenant balance estimate policy balance statement premium policy filing receipt audit budget. Deposit renewal balance warranty reserve filing roof payment maintenance schedule notice roof. Quarter inspection maintenance repair harbor tenant premium premium schedule receipt balance reserve. Inspection maintenance statement receipt payment maintenance ledger account budget contract garage tenant. Policy garage repair roof survey balance contract notice quarter estimate deposit audit. Ledger tenant contract quarter estimate deposit tenant policy coverage warranty receipt balance. Schedule schedule notice estimate contract roof premium statement contract estimate deposit payment. Invoice premium account balance filing ledger budget tenant inspection inspection contract estimate. Ledger survey account audit payment budget invoice coverage policy audit notice deposit. Audit repair contract harbor roof maintenance receipt audit payment payment repair roof. Payment inspection schedule maintenance receipt renewal repair quarter balance audit tenant inspection. Reserve garage inspection quarter premium receipt warranty harbor invoice survey warranty account."
+  }
+ },
+ {
+  "file": "good_16.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Quarter survey receipt coverage audit filing renewal survey payment tenant payment account. Statement warranty filing maintenance roof maintenance account contract premium contract schedule schedule. Survey deposit coverage inspection warranty garage repair notice garage ledger tenant coverage. Premium payment ledger balance ledger survey survey survey schedule budget reserve coverage. Maintenance invoice coverage receipt deposit coverage maintenance budget warranty account premium schedule. Receipt inspection harbor warranty balance deposit maintenance account inspection coverage payment payment. Warranty tenant premium coverage invoice invoice survey reserve audit maintenance notice schedule. Garage renewal quarter schedule harbor harbor contract contract inspection account statement harbor. Contract balance coverage garage deposit survey premium deposit garage repair tenant premium. Contract notice account balance payment audit renewal repair balance payment receipt coverage. Quarter inspection inspection garage deposit repair estimate coverage policy quarter reserve audit. Schedule schedule maintenance renewal renewal reserve contract premium roof audit garage coverage. Inspection contract budget balance renewal roof schedule inspection repair balance quarter filing. Reserve budget statement receipt invoice budget harbor quarter invoice warranty payment account. Quarter warranty policy contract ledger harbor receipt renewal survey premium harbor statement. Warranty payment roof coverage premium estimate coverage account notice tenant repair maintenance. Deposit maintenance contract notice statement garage balance contract maintenance payment garage tenant. Ledger schedule payment maintenance budget maintenance harbor filing survey renewal notice maintenance. Roof ledger invoice balance contract balance notice repair payment payment roof garage. Renewal schedule survey harbor garage schedule tenant garage inspection quarter maintenance roof. Balance schedule schedule budget filing repair roof budget notice harbor ledger payment. Harbor budget statement harbor deposit budget ledger roof account harbor contract audit. Tenant estimate garage balance coverage estimate statement policy repair receipt premium payment. Tenant maintenance repair repair payment account maintenance harbor account ledger payment budget. Schedule coverage harbor tenant filing repair warranty roof receipt statement schedule tenant. Contract ledger inspection audit notice notice contract reserve schedule policy renewal account. Maintenance roof account deposit budget deposit balance estimate ledger reserve schedule garage. Reserve repair account quarter deposit payment coverage filing invoice tenant survey receipt."
+  }
+ },
+ {
+  "file": "good_17.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Deposit roof audit filing filing renewal payment repair coverage budget roof audit. Notice garage estimate estimate schedule statement renewal receipt payment ledger statement inspection. Warranty ledger premium repair coverage filing roof schedule maintenance deposit harbor invoice. Repair repair filing coverage premium survey warranty reserve inspection garage inspection balance. Filing notice quarter filing survey statement notice ledger statement survey harbor garage. Repair inspection policy statement audit notice ledger premium budget account repair roof. Invoice statement payment payment audit warranty repair account garage harbor invoice balance. Harbor inspection premium tenant harbor reserve coverage receipt renewal account balance reserve. Repair invoice maintenance quarter notice warranty repair inspection quarter contract inspection filing. Deposit repair renewal coverage contract maintenance audit quarter reserve schedule statement payment. Invoice inspection repair coverage survey contract payment notice invoice payment inspection quarter. Invoice statement notice survey account contract repair schedule ledger premium deposit harbor. Garage filing balance filing warranty filing tenant maintenance payment harbor renewal tenant. Schedule premium policy receipt roof maintenance warranty payment quarter schedule ledger roof. Warranty garage payment estimate inspection contract maintenance estimate balance coverage repair renewal. Renewal policy estimate reserve coverage premium statement filing quarter estimate ledger account. Receipt receipt estimate audit contract balance payment inspection invoice invoice repair harbor. Invoice balance invoice garage notice survey filing quarter balance ledger ledger harbor. Reserve reserve premium estimate payment receipt harbor roof roof statement contract notice. Maintenance ledger survey premium statement roof schedule policy maintenance inspection invoice premium. Garage deposit survey repair balance maintenance coverage coverage ledger reserve coverage budget. Coverage maintenance warranty statement maintenance receipt deposit reserve payment balance schedule repair. Roof estimate tenant repair receipt budget inspection harbor schedule payment statement filing. Reserve garage inspection filing audit repair roof survey harbor survey estimate payment. Renewal audit statement roof inspection garage ledger filing account statement filing inspection. Coverage contract survey filing deposit maintenance account account renewal policy account survey. Receipt maintenance estimate renewal budget tenant estimate repair inspection budget inspection receipt. Audit deposit reserve harbor reserve schedule invoice filing balance schedule tenant tenant."
+  }
+ },
+ {
+  "file": "good_18.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Audit estimate coverage harbor warranty notice survey inspection harbor premium balance coverage. Account statement audit reserve garage notice ledger tenant statement roof budget invoice. Premium harbor account statement renewal deposit audit ledger receipt balance harbor balance. Reserve estimate payment ledger coverage renewal renewal schedule renewal reserve audit warranty. Schedule harbor renewal schedule ledger filing tenant receipt schedule audit budget repair. Reserve deposit schedule survey premium schedule receipt harbor statement invoice inspection roof. Budget invoice roof ledger contract ledger account reserve repair schedule payment inspection. Warranty premium policy estimate statement coverage estimate deposit budget budget balance statement. Survey roof renewal premium payment statement coverage payment balance estimate audit account. Maintenance garage invoice policy schedule statement repair audit policy quarter survey invoice. Invoice renewal schedule filing deposit harbor audit receipt quarter invoice maintenance quarter. Notice ledger survey contract filing contract tenant premium statement policy policy invoice. Deposit policy maintenance reserve audit payment deposit balance harbor audit premium survey. Deposit coverage quarter audit invoice roof schedule payment reserve schedule survey notice. Garage inspection quarter quarter tenant premium premium survey budget renewal invoice account. Budget tenant receipt policy warranty audit filing maintenance budget account policy roof. Premium balance invoice harbor maintenance invoice contract budget coverage roof garage inspection. Renewal account budget invoice account coverage contract notice reserve contract ledger budget. Garage schedule account schedule policy reserve account reserve inspection estimate warranty garage. Deposit reserve contract survey survey reserve premium policy policy invoice reserve deposit. Ledger account notice balance deposit statement garage roof survey renewal premium premium. Repair repair balance tenant contract balance garage premium schedule premium warranty notice. Premium premium notice inspection notice survey renewal contract premium renewal account harbor. Filing estimate payment maintenance reserve garage balance quarter maintenance budget reserve roof. Maintenance payment filing renewal tenant payment budget quarter warranty reserve payment warranty. Account harbor harbor policy repair quarter quarter coverage balance policy contract schedule. Inspection quarter contract audit roof roof notice deposit budget audit garage contract. Policy receipt warranty audit policy garage warranty garage deposit repair payment schedule."
+  }
+ },
+ {
+  "file": "good_19.pdf",
+  "page": 1,
+  "kind": "good_text_layer",
+  "reasons": [],
+  "expected": {
+   "text": "Deposit reserve audit premium notice repair audit audit audit repair harbor payment. Account reserve inspection invoice contract maintenance estimate reserve balance garage account balance. Estimate invoice garage premium tenant ledger balance budget statement audit audit maintenance. Inspection inspection reserve harbor deposit policy reserve survey tenant statement roof schedule. Coverage policy account contract invoice reserve coverage premium repair filing survey schedule. Account warranty inspection audit invoice balance inspection estimate contract garage repair statement. Garage budget notice policy policy statement quarter harbor quarter deposit policy quarter. Maintenance account policy harbor schedule audit inspection balance statement budget survey reserve. Maintenance inspection notice ledger receipt warranty contract ledger garage receipt inspection ledger. Coverage budget reserve account contract schedule harbor filing renewal repair renewal audit. Audit invoice warranty repair renewal warranty budget inspection filing schedule warranty contract. Tenant filing inspection ledger coverage policy garage deposit schedule estimate quarter inspection. Policy warranty premium survey account receipt deposit filing coverage inspection premium ledger. Roof budget deposit estimate tenant estimate deposit policy schedule filing reserve budget. Harbor estimate notice invoice warranty deposit premium roof contract maintenance audit budget. Garage filing survey premium coverage statement ledger budget schedule budget contract maintenance. Schedule invoice repair warranty ledger roof harbor maintenance survey estimate estimate premium. Schedule renewal quarter statement inspection contract repair policy budget tenant policy notice. Contract policy survey repair reserve maintenance statement deposit balance contract contract payment. Warranty warranty harbor tenant renewal deposit budget ledger quarter inspection inspection estimate. Inspection balance statement premium filing audit estimate coverage renewal warranty payment filing. Quarter premium estimate warranty audit estimate coverage filing deposit notice repair balance. Coverage invoice invoice policy estimate garage schedule payment estimate renewal premium account. Repair coverage balance statement payment renewal survey survey notice garage estimate ledger. Account warranty premium roof deposit contract payment roof account deposit premium reserve. Receipt contract coverage ledger statement deposit schedule survey schedule reserve deposit ledger. Harbor invoice roof harbor ledger warranty repair balance coverage tenant coverage renewal. Receipt tenant roof quarter ledger maintenance audit contract estimate maintenance renewal inspection."
+  }
+ },
+ {
+  "file": "repeated_phrases.pdf",
+  "page": 1,
+  "kind": "grounding",
+  "reasons": [],
+  "expected": {
+   "phrase": "Harbor harbor estimate renewal balance estimate.",
+   "precision": "element"
+  }
+ },
+ {
+  "file": "reordered_cells.pdf",
+  "page": 1,
+  "kind": "grounding",
+  "reasons": [],
+  "expected": {
+   "cells": [
+    [
+     "Filing 0",
+     "Survey 1",
+     "Maintenance 2"
+    ],
+    [
+     "Warranty",
+     "4074.33",
+     "6434.01"
+    ],
+    [
+     "Garage",
+     "635.65",
+     "6972.13"
+    ],
+    [
+     "Budget",
+     "260.81",
+     "971.33"
+    ],
+    [
+     "Garage",
+     "7646.04",
+     "526.62"
+    ],
+    [
+     "Renewal",
+     "5711.49",
+     "1372.39"
+    ],
+    [
+     "Contract",
+     "9941.11",
+     "9344.97"
+    ],
+    [
+     "Budget",
+     "2859.22",
+     "6291.84"
+    ],
+    [
+     "Maintenance",
+     "7751.88",
+     "9451.34"
+    ]
+   ],
+   "precision": "element"
+  }
+ },
+ {
+  "file": "rotated_90.pdf",
+  "page": 1,
+  "kind": "transformed",
+  "reasons": [],
+  "expected": {
+   "phrase": "Premium harbor estimate maintenance repair premium inspection renewal notice.",
+   "precision": "words",
+   "rotate": 90,
+   "crop": null
+  }
+ },
+ {
+  "file": "cropped.pdf",
+  "page": 1,
+  "kind": "transformed",
+  "reasons": [],
+  "expected": {
+   "phrase": "Premium harbor estimate maintenance repair premium inspection renewal notice.",
+   "precision": "words",
+   "rotate": 0,
+   "crop": [
+    36,
+    100,
+    576,
+    760
+   ]
+  }
+ }
+]

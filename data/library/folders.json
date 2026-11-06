@@ -1,0 +1,7 @@
+{
+ "Home": "standard",
+ "Finance": "standard",
+ "Scans": "standard",
+ "Medical": "private",
+ "Taxes": "private"
+}

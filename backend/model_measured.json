@@ -1,0 +1,21 @@
+{
+  "about": "Models the evaluation has measured as the Answer model, written by `npm run eval -- --model <id> --record` on the synthetic evaluation set. A model not here is shown as not measured.",
+  "models": {
+    "anthropic:claude-sonnet-5-5": {
+      "measured_on": "2026-11-02",
+      "recall_at_10": 0.9787,
+      "citation_precision": 0.9756,
+      "answers_correct": 0.9787,
+      "unanswerable": 1.0,
+      "source": "evals/baseline.json, v2.0's evaluation"
+    },
+    "openai:gpt-6.1-sol": {
+      "measured_on": "2026-11-06",
+      "recall_at_10": 0.9787234042553191,
+      "citation_precision": 0.9767441860465116,
+      "answers_correct": 0.9787234042553191,
+      "unanswerable": 0.8666666666666667,
+      "source": "npm run eval -- --model openai:gpt-6.1-sol --record"
+    }
+  }
+}

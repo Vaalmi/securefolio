@@ -1,0 +1,15 @@
+name: Idea
+description: Something SecureFolio could do.
+labels: [idea]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you're trying to do
+      description: The problem, in your own words, before any solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help

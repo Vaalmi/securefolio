@@ -1,0 +1,11 @@
+SecureFolio
+Copyright 2026 Vaalmika Platforms Inc.
+
+Published and maintained by Vaalmi (https://github.com/Vaalmi).
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+SecureFolio depends on, and a built SecureFolio.app bundles, third-party software
+under its own licenses. THIRD_PARTY_NOTICES.md lists the main parts and the
+models SecureFolio downloads. The build doesn't yet gather every bundled part's
+license and notice files into the app, so no built app is distributed.

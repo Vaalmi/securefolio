@@ -1,0 +1,104 @@
+{
+ "Home/Plain text.pdf": {
+  "kind": "pdf",
+  "page": 1
+ },
+ "Scans/Scanned letter.pdf": {
+  "kind": "pdf",
+  "page": 1
+ },
+ "Scans/Mixed pages.pdf": {
+  "kind": "pdf",
+  "page": 2,
+  "text": "scanned second"
+ },
+ "Home/Rotated page.pdf": {
+  "kind": "pdf",
+  "page": 1,
+  "rotate": 90,
+  "text": "quartz"
+ },
+ "Home/Cropped page.pdf": {
+  "kind": "pdf",
+  "page": 1,
+  "text": "quartz"
+ },
+ "Finance/Locked statement.pdf": {
+  "status": "skipped_password",
+  "password": "fixture-pass"
+ },
+ "Finance/Locked memo.docx": {
+  "status": "skipped_password",
+  "password": "fixture-pass"
+ },
+ "Home/Moving plan.docx": {
+  "kind": "anchor",
+  "text": "marker fennel"
+ },
+ "Home/Budget deck.pptx": {
+  "kind": "slide",
+  "slide": 2,
+  "text": "marker sage2"
+ },
+ "Finance/Household budget.xlsx": {
+  "kind": "sheet",
+  "sheet": "Bills",
+  "range": "A3:C3",
+  "text": "Marker thyme"
+ },
+ "Finance/Transactions.csv": {
+  "kind": "sheet",
+  "sheet": "Sheet1",
+  "range": "A2:C2",
+  "text": "Marker dill"
+ },
+ "Home/Moving checklist.md": {
+  "kind": "lines",
+  "start": 5,
+  "end": 5,
+  "text": "marker clove"
+ },
+ "Home/Plain note.txt": {
+  "kind": "lines",
+  "start": 4,
+  "end": 4,
+  "text": "marker anise"
+ },
+ "Home/Saved page.html": {
+  "kind": "anchor",
+  "anchor": "#p1",
+  "text": "marker sorrel"
+ },
+ "Home/Lease email.eml": {
+  "kind": "message",
+  "message": 2,
+  "text": "marker tarragon"
+ },
+ "Scans/Screenshot.png": {
+  "kind": "pdf",
+  "page": 1,
+  "text": "marker borage"
+ },
+ "Scans/Photo.jpeg": {
+  "kind": "pdf",
+  "page": 1,
+  "text": "marker borage"
+ },
+ "Scans/Phone photo.heic": {
+  "kind": "pdf",
+  "page": 1,
+  "text": "marker borage"
+ },
+ "Scans/Web image.webp": {
+  "kind": "pdf",
+  "page": 1,
+  "text": "marker borage"
+ },
+ "Home/Unknown format.xyz": {
+  "status": "skipped_unsupported"
+ },
+ "Scans/In the cloud.pdf": {
+  "status": "not_downloaded",
+  "stand_in": "dataless"
+ }
+}

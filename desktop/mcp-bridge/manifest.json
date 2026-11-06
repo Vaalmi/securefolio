@@ -1,0 +1,21 @@
+{
+  "manifest_version": "0.3",
+  "name": "securefolio",
+  "display_name": "SecureFolio",
+  "version": "2.0.0",
+  "description": "Search your private SecureFolio library, read passages and open documents. Read-only. Private folders never appear.",
+  "author": { "name": "Vaalmi", "url": "https://github.com/Vaalmi" },
+  "license": "Apache-2.0",
+  "server": {
+    "type": "binary",
+    "entry_point": "server/securefolio-mcp",
+    "mcp_config": { "command": "${__dirname}/server/securefolio-mcp", "args": [] }
+  },
+  "tools": [
+    { "name": "search_library", "description": "Search the library for passages" },
+    { "name": "read_passage", "description": "Read a passage and its neighbors" },
+    { "name": "get_document", "description": "Get a document's card and details" },
+    { "name": "list_collections", "description": "List the collections" }
+  ],
+  "compatibility": { "platforms": ["darwin"] }
+}

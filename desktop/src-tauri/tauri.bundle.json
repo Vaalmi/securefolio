@@ -1,0 +1,10 @@
+{
+  "bundle": {
+    "resources": {
+      "../../.cache/bundle/python/": "python/",
+      "../../.cache/bundle/code/": "code/",
+      "../../.cache/bundle/securefolio-mcp": "securefolio-mcp",
+      "../../.cache/bundle/securefolio.mcpb": "securefolio.mcpb"
+    }
+  }
+}

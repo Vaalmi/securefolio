@@ -1,0 +1,95 @@
+[project]
+name = "securefolio"
+version = "0.1.0"
+requires-python = ">=3.13"
+license = "Apache-2.0"
+dependencies = []
+
+[dependency-groups]
+app = [
+    "alembic>=1.16",
+    "anthropic>=0.60",
+    "docling>=2.145",
+    "fastapi>=0.162.0",
+    "httpx>=0.28.1",
+    "keyring>=25",
+    "lancedb>=0.41",
+    "langchain>=1.4.7",
+    "langchain-anthropic>=1.7.6",
+    "langchain-ollama>=1.0",
+    "langchain-openai>=1.7.4",
+    "langgraph>=1.2.19",
+    "langgraph-checkpoint-sqlite>=3.1.3",
+    "lxml>=5",
+    "mcp>=2.3.0",
+    "mlx>=0.25; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "mlx-vlm>=0.7.0; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "msoffcrypto-tool>=5.4",
+    "numpy>=2",
+    "ocrmac>=1.0.1; sys_platform == 'darwin'",
+    "openai>=3.46.0",
+    "openpyxl>=3.1",
+    "pandas>=2",
+    "pillow>=11",
+    "pillow-heif>=1",
+    "psutil>=7",
+    "pypdf>=6",
+    "python-pptx>=1",
+    "rapidfuzz>=3.14.6",
+    "send2trash>=2.1.0",
+    "sentence-transformers>=6.2.0",
+    "sqlalchemy>=2.1.6",
+    "uvicorn>=0.54.0",
+    "watchfiles>=1.3.0",
+]
+dev = [
+    "apted>=1.0.3",
+    "matplotlib>=3.10",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-xdist>=3.8.0",
+    "python-docx>=1.2",
+    "reportlab>=4.4",
+    "ruff>=0.17.2",
+]
+
+[tool.uv]
+# `uv sync` installs every group; the app group is checked on its own.
+default-groups = "all"
+
+[tool.ruff]
+include = ["backend/**/*.py", "agent/**/*.py", "worker/**/*.py", "evals/**/*.py", "testing/**/*.py", "data/build/**/*.py", "scripts/**/*.py", "*.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "SIM", "UP", "PL", "S", "PT", "FAST", "C90", "PLR1702"]
+preview = true
+explicit-preview-rules = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"*/tests/*" = ["S101", "PLR2004", "S603"]
+"testing/test_*.py" = ["S101", "PLR2004"]
+"conftest.py" = ["S101"]
+"data/build/test_*.py" = ["S101", "PLR2004"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend", "agent", "worker", "evals", "testing", "data/build"]
+markers = ["real_models: runs real models on this Mac, never in the checks"]
+pythonpath = ["."]
+addopts = "--import-mode=importlib --cov --cov-report=term-missing -m 'not real_models'"
+
+[tool.coverage.run]
+core = "sysmon"
+source = ["backend", "agent", "worker", "evals"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+fail_under = 80
+
+[tool.pyright]
+include = ["backend", "agent", "worker", "evals", "testing", "conftest.py", "api_rules.py"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.13"

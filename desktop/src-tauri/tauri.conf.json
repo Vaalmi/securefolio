@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SecureFolio",
+  "version": "2.0.0",
+  "identifier": "com.vaalmi.securefolio",
+  "build": {
+    "frontendDist": "../../app/dist",
+    "devUrl": "http://127.0.0.1:5173"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: blob:",
+        "font-src": "'self'",
+        "connect-src": "'self' ipc: http://ipc.localhost http://127.0.0.1:*",
+        "worker-src": "'self' blob:",
+        "object-src": "'none'",
+        "base-uri": "'none'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "copyright": "Copyright 2026 Vaalmika Platforms Inc.",
+    "license": "Apache-2.0",
+    "targets": [
+      "app"
+    ],
+    "icon": [
+      "icons/icon.icns",
+      "icons/icon.png"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "13.0",
+      "signingIdentity": "-",
+      "entitlements": "SecureFolio.entitlements"
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "securefolio",
+          "docsynth"
+        ]
+      }
+    }
+  }
+}
