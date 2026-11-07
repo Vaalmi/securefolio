@@ -1,8 +1,10 @@
-// Builds the tests' vault from data/library, then starts the backend (and through it
-// a worker with stand-in models).
+// Builds the tests' vault from data/library, starts the stand-in models, and once they
+// listen, the backend (and through it a worker).
 import { spawn, spawnSync } from "node:child_process";
 import { rmSync } from "node:fs";
 import { resolve } from "node:path";
+
+import { stubPorts, waitForPorts } from "./stubs-ready.mjs";
 
 const VAULT = "e2e/.vault";
 const IN_THE_CLOUD = resolve("data/library/Scans/In the cloud.pdf");
@@ -30,6 +32,12 @@ const stubs = spawn("uv", ["run", "-m", "testing.e2e_stubs"], {
   stdio: "inherit",
   env,
 });
+try {
+  await waitForPorts(stubPorts(env));
+} catch (error) {
+  stubs.kill("SIGTERM");
+  throw error;
+}
 const backend = spawn("uv", ["run", "-m", "backend.main"], {
   stdio: "inherit",
   env,
