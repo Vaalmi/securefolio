@@ -10,7 +10,12 @@ export default defineConfig({
   reporter: "list",
   // The tests share one vault, so they run one at a time.
   workers: 1,
-  use: { baseURL: APP },
+  // On CI, a failed test keeps its trace and screenshot, which the workflow uploads.
+  use: {
+    baseURL: APP,
+    trace: process.env.CI ? "retain-on-failure" : "off",
+    screenshot: process.env.CI ? "only-on-failure" : "off",
+  },
   webServer: [
     {
       command: "node e2e/start-backend.mjs",

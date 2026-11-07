@@ -153,6 +153,10 @@ test("a new sort or filter starts at the top, even from deep in the list", async
 });
 
 test("20,000 rows scroll with no dropped frames", async ({ page }) => {
+  // Frame timing needs real graphics: CI's runners are virtual machines without a
+  // GPU, where a frame takes 100 ms or more whatever the app does. It runs in every
+  // `npm run check` on a Mac, at the same limit.
+  test.skip(Boolean(process.env.CI), "frame timing needs a real GPU");
   const total = 20_000;
   await page.route("**/api/library?*", async (route) => {
     const url = new URL(route.request().url());

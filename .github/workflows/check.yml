@@ -61,3 +61,11 @@ jobs:
       - run: npm run check:bundle
       - run: npm run check:scripts
       - run: npm run e2e
+
+      # A failed e2e test's trace and screenshot, from the synthetic library only.
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-results-${{ matrix.os }}
+          path: e2e/test-results
+          retention-days: 14

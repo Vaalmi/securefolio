@@ -90,6 +90,10 @@ export default defineConfig(
   {
     files: ["e2e/**/*.ts"],
     extends: [playwright.configs["flat/recommended"]],
+    // A test may skip itself where it can't hold, with its reason; never outright.
+    rules: {
+      "playwright/no-skipped-test": ["warn", { allowConditional: true }],
+    },
   },
   prettier,
 );

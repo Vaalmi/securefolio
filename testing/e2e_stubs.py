@@ -123,8 +123,11 @@ def ollama_reply(path: str, body: dict[str, Any]) -> dict[str, Any]:
     if path == "/api/ps":
         return {"models": []}
     content = "The local model says so [1]."
-    if body.get("format"):
-        content = json.dumps(_local_json(body["format"]))
+    asked = body.get("format")
+    if asked == "json":  # a picture, read with a prompt rather than a schema
+        content = json.dumps({"kind": "figure", "description": "A figure."})
+    elif asked:
+        content = json.dumps(_local_json(asked))
     return {
         "model": body.get("model", "stub"),
         "message": {"role": "assistant", "content": content},
