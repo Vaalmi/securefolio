@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import time
 from collections.abc import AsyncIterator
 from typing import Annotated, Any, Literal
 
@@ -14,6 +15,8 @@ from backend.dependencies import AppToken
 
 router = APIRouter()
 WAIT_SECONDS = 0.5
+# How long a stopped run may go without its closing event before its stream ends.
+CLOSING_GRACE_SECONDS = 5
 FINISHED = (threads.COMPLETED, threads.STOPPED, threads.FAILED, threads.SUPERSEDED)
 Mode = Literal["standard", "deep", "private"]
 
@@ -166,20 +169,40 @@ async def stop_thread(thread_id: str, request: Request, _: AppToken) -> Empty:
     return Empty()
 
 
+def _ended(run: dict[str, Any], sent: int) -> bool:
+    """Whether a run that has stopped has had its closing event sent: a run moves to its
+    last state first and writes `done`, or a pause's card, just after."""
+    closing = "card" if run["state"] == threads.PAUSED else "done"
+    newest = threads.last_event(run["id"])
+    return newest is not None and newest[1] == closing and newest[0] <= sent
+
+
 async def run_stream(service: Any, run_id: str, after: int) -> AsyncIterator[str]:
-    """Everything since `after`, then live. Reattaching just asks with a later id."""
+    """Everything since `after`, then live, until the run's closing event has been sent.
+    Reattaching just asks with a later id."""
     last = after
+    stopped_at: float | None = None
     while True:
         rows = await asyncio.to_thread(threads.events_after, run_id, last)
         for row in rows:
             last = row["id"]
             data = json.dumps(row["data"])
             yield f"id: {last}\nevent: {row['event']}\ndata: {data}\n\n"
+        if rows:
+            stopped_at = None
+            continue
         run = await asyncio.to_thread(threads.get_run, run_id)
-        if not rows and run["state"] in (*FINISHED, threads.PAUSED):
-            return
-        if not rows:
-            await service.wait_for_event(run_id, WAIT_SECONDS)
+        if run["state"] not in (*FINISHED, threads.PAUSED):
+            stopped_at = None  # running again, as after a pause's card is answered
+        else:
+            # Stopped with nothing new: done once its closing event is out, or once a
+            # run that stopped without writing one has had its grace.
+            if stopped_at is None:
+                stopped_at = time.monotonic()
+            late = time.monotonic() - stopped_at > CLOSING_GRACE_SECONDS
+            if late or await asyncio.to_thread(_ended, run, last):
+                return
+        await service.wait_for_event(run_id, WAIT_SECONDS)
 
 
 @router.get("/runs/{run_id}/events", operation_id="follow_run")

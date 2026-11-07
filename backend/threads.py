@@ -602,6 +602,18 @@ def events_after(run_id: str, after: int) -> list[dict[str, Any]]:
         return [dict(row) for row in rows]
 
 
+def last_event(run_id: str) -> tuple[int, str] | None:
+    """A run's newest event, its id and name, if it has any."""
+    with database.read() as connection:
+        row = connection.execute(
+            sa.select(run_events.c.id, run_events.c.event)
+            .where(run_events.c.run_id == run_id)
+            .order_by(run_events.c.id.desc())
+            .limit(1)
+        ).first()
+    return (row.id, row.event) if row else None
+
+
 def clear_events(run_id: str) -> None:
     with database.write() as connection:
         connection.execute(run_events.delete().where(run_events.c.run_id == run_id))

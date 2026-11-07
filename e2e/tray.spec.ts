@@ -93,6 +93,8 @@ test("Skipped lists what a scan marked with no job, with its reason", async ({
 test("the indexing line reads from the queue, and Cancel stops a job", async ({
   page,
 }) => {
+  // Up to 30 s for the line to show and `queueDrained`'s own 60 s for 300 files.
+  test.setTimeout(120_000);
   const folder = fixtureFolder("cancel");
   const slow = `${FIXTURES}/slow`;
   writeFileSync(slow, "");
