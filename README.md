@@ -16,6 +16,14 @@
 </p>
 
 <p align="center">
+  <a href="https://youtu.be/yVMF5ZuwJko">
+    <img src=".github/assets/demo-video.jpg" alt="Watch the SecureFolio video on YouTube: what it does, how it works, and a demo on a test library of made-up documents (6:48)" width="720">
+  </a>
+  <br>
+  <sub><a href="https://youtu.be/yVMF5ZuwJko">Watch the demo</a> (6:48): what it does, how it works inside, and a demo on a test library of made-up documents.</sub>
+</p>
+
+<p align="center">
   <a href="#what-it-does">What it does</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#privacy">Privacy</a> ·
