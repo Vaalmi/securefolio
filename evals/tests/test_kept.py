@@ -2,10 +2,10 @@
 each row holds the answer as written, what it was handed, and its times."""
 
 import asyncio
-import threading
 import time
 from functools import partial
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -100,32 +100,40 @@ def test_only_finished_runs_are_read_back(tmp_path):
 
 
 def test_the_times_come_from_the_runs_events(monkeypatch):
-    # Events land at known moments; each time is read to within 50 ms of them.
-    events: list[dict] = []
-    state = {"state": "running"}
+    # Events land at known moments on a clock of the test's own, which only the
+    # polling's sleep moves on, so each time is read to within one poll of its
+    # event, however slow the machine running the test.
+    clock = {"now": 0.0}
+    landing = ((0.1, "step"), (0.3, "token"))
+    finished_at = 0.5
 
-    def land() -> None:
-        for at, name in ((0.1, "step"), (0.3, "token"), (0.5, None)):
-            time.sleep(at - (time.monotonic() - begun))
-            if name is None:
-                state["state"] = "completed"
-            else:
-                events.append({"id": len(events) + 1, "event": name, "data": {}})
+    def events_after(_run, after):
+        landed = [name for at, name in landing if at <= clock["now"]]
+        return [
+            {"id": i + 1, "event": name, "data": {}} for i, name in enumerate(landed)
+        ][after:]
 
+    def get_run(_run):
+        return {"state": "completed" if clock["now"] >= finished_at else "running"}
+
+    def sleep(seconds):
+        clock["now"] += seconds
+
+    monkeypatch.setattr(run.threads, "events_after", events_after)
+    monkeypatch.setattr(run.threads, "get_run", get_run)
     monkeypatch.setattr(
-        run.threads, "events_after", lambda _r, after: [e for e in events[after:]]
+        run, "time", SimpleNamespace(monotonic=lambda: clock["now"], sleep=sleep)
     )
-    monkeypatch.setattr(run.threads, "get_run", lambda _r: state)
-    begun = time.monotonic()
-    threading.Thread(target=land).start()
-    times = run._timed("run", begun)  # noqa: SLF001
-    for name, at in (("first_step_ms", 100), ("first_words_ms", 300)):
+    times = run._timed("run", 0.0)  # noqa: SLF001
+    poll_ms = round(run.POLL_SECONDS * 1000)
+    for name, at in (
+        ("first_step_ms", 100),
+        ("first_words_ms", 300),
+        ("complete_ms", 500),
+    ):
         measured = times[name]
         assert measured is not None
-        assert abs(measured - at) <= 50
-    complete = times["complete_ms"]
-    assert complete is not None
-    assert abs(complete - 500) <= 50
+        assert at <= measured <= at + poll_ms, (name, measured)
 
 
 def test_a_run_that_never_finishes_has_no_complete_time(monkeypatch):

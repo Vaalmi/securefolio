@@ -127,17 +127,22 @@ def test_watching_a_real_folder_hints_a_new_file(tmp_path, monkeypatch):
     stop = threading.Event()
     thread = threading.Thread(target=watcher.run, args=(stop,), daemon=True)
     thread.start()
-    threading.Event().wait(0.5)
-    (folder / "new.txt").write_text("a new file")
+    # A file written before the watcher has started is never reported, and on a
+    # busy machine it may start late: the file is written again each second until a
+    # hint names it, for 30 seconds at most.
     found: list[str] = []
-    for _ in range(50):
-        job = jobs.claim()
-        if job:
-            found += job["payload"]["paths"]
-            jobs.succeed(job["id"])
+    for attempt in range(30):
+        (folder / "new.txt").write_text(f"a new file, written {attempt + 1} times")
+        for _ in range(10):
+            job = jobs.claim()
+            if job:
+                found += job["payload"]["paths"]
+                jobs.succeed(job["id"])
+            if any(path.endswith("new.txt") for path in found):
+                break
+            threading.Event().wait(0.1)
         if any(path.endswith("new.txt") for path in found):
             break
-        threading.Event().wait(0.1)
     stop.set()
     thread.join(5)
     assert any(path.endswith("new.txt") for path in found)
