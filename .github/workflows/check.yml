@@ -29,7 +29,10 @@ jobs:
         # main and manual runs. A public repo's runners are free: both, always.
         os: ${{ fromJSON(github.event.repository.private && github.event_name == 'pull_request' && '["ubuntu-latest"]' || '["ubuntu-latest", "macos-latest"]') }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    # The Python tests take about 40 minutes on a hosted runner, where the
+    # evaluation's tests each index the synthetic library; 60 left macOS no
+    # time for the end-to-end tests.
+    timeout-minutes: 90
     env:
       CI: true
     steps:
