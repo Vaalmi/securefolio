@@ -83,3 +83,23 @@ def test_a_chosen_model_no_longer_listed_says_so(no_keys, app_client):
     assert gone["listed"] is False
     assert gone["input_usd"] == pytest.approx(0.1), "its last price"
     assert GPT_OSS not in ids(found["deep"]), "offered only where it's chosen"
+
+
+def test_a_measured_models_scores_come_with_it_and_name_their_judge(
+    no_keys, app_client
+):
+    """Settings shows them under the Answers and Deep models, from
+    `backend/model_measured.json`."""
+    found, _ = tasks(app_client)
+    by_id = {m["id"]: m for m in found["answer"]["models"]}
+    sonnet = by_id[SONNET]["scores"]
+    assert sonnet["measured_on"] == "2026-11-14"
+    assert sonnet["questions"] == 60
+    assert sonnet["judged"] is True
+    assert sonnet["judge_name"] == "Claude Opus 5.5"
+    assert {"answers_correct", "citation_precision", "unanswerable"} <= set(sonnet)
+    assert sonnet["answerable_refused"] == 0.0
+    assert by_id["openai:gpt-6.1-sol"]["scores"]["unanswerable"] == 0.8
+    for unmeasured in ("anthropic:claude-opus-5-5", "openai:gpt-6-luna"):
+        assert by_id[unmeasured]["scores"] is None
+        assert by_id[unmeasured]["measured"] is False

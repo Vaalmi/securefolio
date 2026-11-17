@@ -455,7 +455,7 @@ def remember_capabilities(tag: str, digest: str, found: list[str]) -> None:
     _capabilities[tag] = (digest, [str(name) for name in found])
 
 
-def _digest(tag: str) -> str | None:
+def digest(tag: str) -> str | None:
     """The digest Ollama's last list gave this tag; None when it isn't listed."""
     for model in _ollama["models"]:
         if model["name"] == tag:
@@ -467,7 +467,7 @@ def capabilities(tag: str) -> list[str] | None:
     """What Ollama said this model can do, for the version it lists now; None until
     Ollama has answered for that version."""
     found = _capabilities.get(tag)
-    if found is None or found[0] != _digest(tag):
+    if found is None or found[0] != digest(tag):
         return None
     return list(found[1])
 

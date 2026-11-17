@@ -284,10 +284,12 @@ class TestNoKnownPrice:
         assert openrouter.requests == []
         assert self.refused_for_price()["purpose"] == purpose
 
-    def test_the_judge(self, library, anthropic, keys, monkeypatch):
-        monkeypatch.setattr(models, "JUDGE_MODEL", "anthropic:claude-retired-1")
+    def test_the_judge(self, library, anthropic, keys):
         cited = models.Cited("T", "words", "passage", "d", states.STANDARD)
-        with pytest.raises(models.CloudRefused):
+        with (
+            models.judged_by("anthropic:claude-retired-1"),
+            pytest.raises(models.CloudRefused),
+        ):
             models.judge_sentence("A claim.", [cited], None)
         assert anthropic.requests == []
         assert self.refused_for_price()["purpose"] == "eval_judge"
@@ -449,15 +451,12 @@ class TestTheRoute:
         route = app_client.get("/api/ask/route", params={"thread": thread}).json()
         assert route["local"] is True
 
-    def test_a_blocked_question_is_refused_with_its_reason(self, mixed, app_client):
+    def test_a_blocked_question_finds_passages_with_its_reason(self, mixed, app_client):
         settings.put(settings.MODEL_ANSWER, UNPRICED)
-        thread = new_thread(app_client)
-        made = app_client.post(
-            f"/api/threads/{thread}/messages",
-            json={"text": "When?", "mode": "standard"},
-        )
-        assert made.status_code == 409
-        assert "No known price" in made.json()["detail"]
+        found = ask(app_client, new_thread(app_client), "When?")
+        passages = found["messages"][-1]["answer"]
+        assert passages["kind"] == "passages"
+        assert "No known price" in passages["reason"]
 
 
 class TestConnectivity:
@@ -673,21 +672,19 @@ class TestTheHelperRoute:
 
 
 class TestOllamaNotRunning:
-    def test_a_question_only_local_ai_can_answer_is_refused(
+    def test_a_question_only_local_ai_can_answer_finds_passages(
         self, lease, monkeypatch, app_client
     ):
         # No key anywhere, and nothing listening where Ollama should be.
         monkeypatch.setenv(STUB_OLLAMA_ENV, f"http://127.0.0.1:{free_port()}")
-        monkeypatch.setattr(agent_service, "OLLAMA_FRESH_SECONDS", 0.0)
+        monkeypatch.setattr(agent_service.models, "OLLAMA_FRESH_SECONDS", 0.0)
         route = app_client.get("/api/ask/route").json()
         assert route["blocked"]
         assert "Ollama" in route["blocked"]
-        made = app_client.post(
-            f"/api/threads/{new_thread(app_client)}/messages",
-            json={"text": "When is the rent due?", "mode": "standard"},
-        )
-        assert made.status_code == 409
-        assert "Ollama" in made.json()["detail"]
+        found = ask(app_client, new_thread(app_client), "When is the rent due?")
+        passages = found["messages"][-1]["answer"]
+        assert passages["kind"] == "passages"
+        assert "Ollama" in passages["reason"]
 
 
 class TestTheDeepConsent:
@@ -1513,9 +1510,9 @@ class TestRoutingOffTheLoop:
         monkeypatch.setattr(agent_service.Service, "start", start)
         found = ask(app_client, new_thread(app_client), "When is the rent due?")
         assert found["messages"][-1]["answer"]["model"] == "openai:gpt-6.1-sol"
-        assert before_start
-        assert providers.OPENAI in before_start[0]
-        # Nor while the run prepares, routing again.
+        assert before_start == [[]], "the run routes, once it has started"
+        assert providers.OPENAI in asked
+        # Nor while the run prepares and routes.
         assert providers.ANTHROPIC not in asked
 
     def test_no_connection_is_tried_before_the_run_starts(
@@ -1568,17 +1565,16 @@ class TestRoutingOffTheLoop:
         assert made.status_code == 200
         assert refreshed == []
 
-    def test_a_question_nothing_can_answer_is_still_refused_at_once(
+    def test_a_question_nothing_can_answer_finds_passages_with_no_network(
         self, lease, monkeypatch, app_client
     ):
-        # No key anywhere, and no Ollama: refused before the run, with no network.
+        # No key anywhere, and no Ollama: passages found on this Mac, never a
+        # refusal.
         monkeypatch.setenv(STUB_OLLAMA_ENV, f"http://127.0.0.1:{free_port()}")
-        monkeypatch.setattr(agent_service, "OLLAMA_FRESH_SECONDS", 0.0)
-        made = app_client.post(
-            f"/api/threads/{new_thread(app_client)}/messages",
-            json={"text": "When is the rent due?", "mode": "standard"},
-        )
-        assert made.status_code == 409
+        monkeypatch.setattr(agent_service.models, "OLLAMA_FRESH_SECONDS", 0.0)
+        thread = new_thread(app_client)
+        found = ask(app_client, thread, "When is the rent due?")
+        assert found["messages"][-1]["answer"]["kind"] == "passages"
 
     def test_the_ask_box_still_learns_whether_deep_goes_to_the_cloud(
         self, lease, keys, app_client
@@ -1603,9 +1599,6 @@ class TestRoutingOffTheLoop:
         monkeypatch.setattr(policy, "route", spy)
         local.reply = ollama_reply
         thread = new_thread(app_client)
-        app_client.post(
-            f"/api/threads/{thread}/messages",
-            json={"text": "When is the rent due?", "mode": "private"},
-        )
-        assert on_loop
-        assert on_loop[0] is False
+        ask(app_client, thread, "When is the rent due?", "private")
+        assert on_loop, "the run routes"
+        assert not any(on_loop), "and never on the event loop"

@@ -4,11 +4,21 @@ provider."""
 
 import asyncio
 import base64
+import contextlib
 import json
+import logging
 import os
 import threading
 import time
-from collections.abc import Awaitable, Callable, Iterable
+from collections import Counter
+from collections.abc import (
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Iterable,
+    Iterator,
+    Sequence,
+)
 from dataclasses import dataclass, field
 from typing import Any, cast
 from urllib.parse import urlsplit
@@ -22,10 +32,17 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from agent import api, prompts
 
+logger = logging.getLogger(__name__)
+
 DEFAULT_OLLAMA = "http://127.0.0.1:11434"
 LOCAL_ANSWER_TOKENS = 3000  # thinking included, or one answer can run for minutes
 LOCAL_ANSWER_TEMPERATURE = 0.2
 LOCAL_KEEP_ALIVE = "30m"  # loading it again costs most of 10 s
+# Set on every local call, so every Mac gets the same size, not whatever Ollama picks.
+LOCAL_CONTEXT = 32768
+# api.count_tokens counts with the embedder's tokenizer, not the local model's, so a
+# local prompt is fitted to this much less than its context.
+FIT_MARGIN = 0.15
 TIMEOUT_SECONDS = 600
 READY_TIMEOUT_SECONDS = 2
 PICTURE_PROMPT = (
@@ -67,6 +84,7 @@ ID_STATUSES = (400, 401, 403)  # how a key that needs its workspace or project s
 JUDGE_MODEL = "anthropic:claude-opus-5-5"
 JUDGE_MAX_TOKENS = 1024
 BACKGROUND = (api.Purpose.MEMORY, api.Purpose.CARD)  # these stop at the cap
+type Sized = Callable[[httpx.Request], None] | None  # sees a request as it leaves
 
 
 class KeyRefused(Exception):
@@ -81,12 +99,41 @@ class CloudRefused(Exception):
     """Policy said no at the moment of sending. Nothing was sent."""
 
 
+class OverLimit(CloudRefused):
+    """The request's ceiling would take the run past its spending limit, so it wasn't
+    sent. A kind of refusal, so a run that meets it fails with this as its reason."""
+
+
 class NoConnection(Exception):
     """No connection could be made, so nothing was sent."""
 
 
 class LocalNotReady(Exception):
     """The local model isn't there to answer."""
+
+
+class HelperCut(Exception):
+    """A local helper's prose ended at its length or time limit, or came back empty:
+    there's nothing to keep."""
+
+
+@dataclass(frozen=True)
+class Limit:
+    tokens: int  # thinking included, as Ollama counts it
+    seconds: float
+
+
+# Each local helper's limits. Planning holds up the question, so it's short; a card
+# thinks, in the background. A call cut at its limit returns what an unreadable reply
+# does. The answer itself keeps its own tokens and no deadline.
+HELPER_LIMITS = {
+    api.Purpose.REWRITE: Limit(1024, 20),
+    api.Purpose.SUMMARY: Limit(1024, 60),
+    api.Purpose.MEMORY: Limit(1024, 60),
+    api.Purpose.CARD: Limit(4000, 180),
+}
+CUT = "cut"  # a call's outcome when its limit ended it
+_cuts: Counter[str] = Counter()  # this process's, by purpose, for the log
 
 
 class NotLoopback(ValueError):
@@ -140,6 +187,246 @@ class Task:
     # The cloud model, and the local tag, each read once by the caller; else read now.
     model: str | None = None
     local_tag: str | None = None
+
+
+# Each model call while the evaluation records them: counts and times, never text.
+_calls: list[dict[str, Any]] | None = None
+_calls_lock = threading.Lock()
+
+
+@contextlib.contextmanager
+def recording_calls() -> Iterator[None]:
+    """For the evaluation only: every model call in this process is recorded until
+    the block ends. Nothing is recorded outside one."""
+    global _calls  # noqa: PLW0603  one switch for the process, as the evaluation runs
+    _calls = []
+    try:
+        yield
+    finally:
+        _calls = None
+
+
+def take_calls(thread_id: str | None) -> list[dict[str, Any]]:
+    """The records of one thread's calls, which are then no longer kept. None is the
+    calls made outside any thread, as the evaluation's judge makes when it judges a
+    kept run again."""
+    with _calls_lock:
+        if _calls is None:
+            return []
+        found = [call for call in _calls if call["thread_id"] == thread_id]
+        _calls[:] = [call for call in _calls if call["thread_id"] != thread_id]
+    return found
+
+
+# The evaluation's spending limit, for the process, while it runs: what its calls have
+# really cost, and the ceiling of each call still out. Outside a run there is none.
+@dataclass
+class _Limit:
+    usd: float
+    spent: float = 0.0
+    out: dict[int, float] = field(default_factory=dict)  # each call's ceiling
+    reached: bool = False  # once a request is refused for it, every later one is
+
+
+_limit: _Limit | None = None
+_limit_lock = threading.Lock()
+_holds = iter(range(1, 1 << 62))
+LIMITED = "This run has a spending limit, which can't bound this request."
+
+
+@contextlib.contextmanager
+def spending_limit(usd: float) -> Iterator[None]:
+    """For the evaluation only: no cloud request in this process goes while its
+    ceiling, added to what the run has spent and the ceilings of the calls still out,
+    would pass `usd`."""
+    global _limit  # noqa: PLW0603  one limit for the process, as the evaluation runs
+    _limit = _Limit(usd)
+    try:
+        yield
+    finally:
+        _limit = None
+
+
+def limit_reached() -> bool:
+    """Whether a request was refused for the limit, so the run must stop."""
+    with _limit_lock:
+        return _limit is not None and _limit.reached
+
+
+# The evaluation's judge, and the providers a run may send to: for the process, while
+# it runs. Outside a run, the judge is Claude Opus 5.5 and any provider may be sent to.
+_judge = JUDGE_MODEL
+_providers: tuple[str, ...] | None = None
+ONLY_PROVIDERS = "This run sends only to {}."
+
+
+@contextlib.contextmanager
+def judged_by(model: str) -> Iterator[None]:
+    """For the evaluation only: the model that judges this process's run."""
+    global _judge  # noqa: PLW0603  one judge for the process, as the evaluation runs
+    before, _judge = _judge, model
+    try:
+        yield
+    finally:
+        _judge = before
+
+
+def judge_model() -> str:
+    return _judge
+
+
+@contextlib.contextmanager
+def only_providers(providers: tuple[str, ...] | None) -> Iterator[None]:
+    """For the evaluation only: no cloud request in this process goes to a provider
+    not named. None names every one."""
+    global _providers  # noqa: PLW0603  one rule for the process, as the evaluation runs
+    before, _providers = _providers, providers
+    try:
+        yield
+    finally:
+        _providers = before
+
+
+def provider_allowed(model_id: str) -> bool:
+    """Whether a run may send to this model: any local one, and a cloud one whose
+    provider the run names."""
+    if model_id == api.LOCAL or model_id.startswith("local:"):
+        return True
+    return _providers is None or api.providers.split(model_id)[0] in _providers
+
+
+def _over(usd: float) -> str:
+    return f"This run reached its spending limit of ${usd:.2f}."
+
+
+def ceiling(sent_bytes: int, max_tokens: int, price: api.Price) -> float:
+    """The most a request can cost: no tokenizer makes a token of less than a byte,
+    so its input is at most the bytes of the request as it leaves, its instructions,
+    messages and schema in the provider's own JSON; and its output at most its
+    reserve."""
+    return api.cost_at(price, sent_bytes, max_tokens)
+
+
+def _hold(request: httpx.Request, max_tokens: int, price: api.Price) -> int | None:
+    """On a limited run, a request is held at its ceiling, as it leaves, until it's
+    settled. One that would pass the limit is refused, and so is every request after
+    it; one whose size can't be read is refused too."""
+    with _limit_lock:
+        limit = _limit
+        if limit is None:
+            return None
+        try:
+            most = ceiling(len(request.content), max_tokens, price)
+        except httpx.RequestNotRead as unread:
+            raise CloudRefused(LIMITED) from unread
+        if limit.reached or limit.spent + sum(limit.out.values()) + most > limit.usd:
+            limit.reached = True
+            raise OverLimit(_over(limit.usd))
+        hold = next(_holds)
+        limit.out[hold] = most
+        return hold
+
+
+def _held(
+    max_tokens: int, price: api.Price
+) -> tuple[Callable[[httpx.Request], None], list[int | None], list[CloudRefused]]:
+    """The hook that holds a request at its ceiling as it leaves, the holds it made,
+    and the refusal, if it refused one."""
+    holds: list[int | None] = []
+    refused: list[CloudRefused] = []
+
+    def hold(request: httpx.Request) -> None:
+        try:
+            holds.append(_hold(request, max_tokens, price))
+        except CloudRefused as limited:
+            refused.append(limited)
+            raise
+
+    return hold, holds, refused
+
+
+def _settle(holds: list[int | None], cost: float) -> None:
+    """A held request's real cost: what it was billed, or nothing if it never went.
+    A request that may have gone with no answer is never settled, so it stays counted
+    at its ceiling."""
+    with _limit_lock:
+        if _limit is None:
+            return
+        for hold in holds:
+            if hold is not None and _limit.out.pop(hold, None) is not None:
+                _limit.spent += cost
+                cost = 0.0  # one request a call; any earlier attempt went for nothing
+
+
+def _refused_when_limited(model: str, purpose: Any, named: list[str]) -> None:
+    """A request the limit's gate doesn't see never goes on a limited run."""
+    with _limit_lock:
+        limited = _limit is not None
+    if limited:
+        api.log_refused(model, purpose, named, LIMITED)
+        raise CloudRefused(LIMITED)
+
+
+@contextlib.asynccontextmanager
+async def _recorded(
+    thread_id: str | None, purpose: Any, model: str
+) -> AsyncIterator[dict[str, Any]]:
+    """One call's record: what it was for, the model as it ran, how long it took, its
+    tokens, its cost, and how it ended."""
+    entry: dict[str, Any] = {
+        "thread_id": thread_id,
+        "purpose": str(getattr(purpose, "value", purpose)),
+        "model": model,
+        "started_at": time.time(),
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "outcome": "sent",
+    }
+    began = time.monotonic()
+    try:
+        yield entry
+    except CloudRefused:
+        entry["outcome"] = "refused"
+        raise
+    except Exception:
+        entry["outcome"] = "failed"
+        raise
+    except BaseException:
+        entry["outcome"] = "stopped"
+        raise
+    finally:
+        entry["duration_ms"] = round((time.monotonic() - began) * 1000)
+        with _calls_lock:
+            if _calls is not None:
+                _calls.append(entry)
+
+
+def _count(entry: dict[str, Any], message: Any, cost: float = 0.0) -> None:
+    usage = _usage_of(message)
+    entry.update(
+        input_tokens=usage["input_tokens"],
+        output_tokens=usage["output_tokens"],
+        cost_usd=cost,
+    )
+
+
+@dataclass(frozen=True)
+class Fit:
+    """How a local answer's prompt was fitted to the context: its size as counted, and
+    how many passages were left out. Counts only, as the records carry."""
+
+    counted: int
+    dropped: int
+
+
+@dataclass(frozen=True)
+class CallOf:
+    """What a local call is recorded under, while the evaluation records calls."""
+
+    thread_id: str | None = None
+    purpose: Any = api.Purpose.ANSWER
+    fit: Fit | None = None  # a local answer's prompt, as it was fitted
 
 
 def _ollama_url() -> str:
@@ -209,6 +496,31 @@ def _ask_what_is_loaded(url: str) -> None:
     )
 
 
+def local_setup(tag: str) -> dict[str, Any]:
+    """For the evaluation's record: Ollama's own account of a local model as it runs,
+    its version, the model's build and parameters, and the context Ollama gave it once
+    loaded. What Ollama doesn't say is left out, never guessed."""
+    found: dict[str, Any] = {"tag": tag}
+    try:
+        url = _ollama_url()
+        with _ollama_client(READY_TIMEOUT_SECONDS) as client:
+            found["ollama"] = client.get(f"{url}/api/version").json().get("version")
+            shown = client.post(f"{url}/api/show", json={"model": tag}).json()
+            loaded = client.get(f"{url}/api/ps").json().get("models") or []
+    except (NotLoopback, httpx.HTTPError, ValueError, AttributeError):
+        return {**found, "unavailable": True}
+    found["details"] = shown.get("details")
+    found["parameters"] = shown.get("parameters")
+    found["modified_at"] = shown.get("modified_at")
+    info = shown.get("model_info") or {}
+    found["trained_context"] = next(
+        (v for k, v in info.items() if k.endswith(".context_length")), None
+    )
+    running = [m for m in loaded if isinstance(m, dict) and m.get("name") == tag]
+    found["loaded_context"] = running[0].get("context_length") if running else None
+    return found
+
+
 def _listed(model: dict[str, Any]) -> dict[str, Any]:
     """One of Ollama's models, as SecureFolio keeps it. A model on Ollama's servers is
     marked remote, by Ollama's own mark or its name, and is never used as local."""
@@ -231,6 +543,17 @@ def refresh_ollama_list() -> None:
     ):
         return
     ollama_status()
+
+
+OLLAMA_FRESH_SECONDS = 5.0
+
+
+def refresh_ollama_if_stale() -> None:
+    """Ollama's list for policy to read, asked at most every few seconds."""
+    listed = api.ollama_listed_at()
+    if listed is not None and time.time() - listed < OLLAMA_FRESH_SECONDS:
+        return
+    refresh_ollama_list()
 
 
 NO_SUCH_MODEL = "Ollama has no model called {tag}. Check the name on ollama.com."
@@ -312,6 +635,7 @@ def read_picture(image_png: bytes, tag: str | None = None) -> dict[str, Any]:
                 "format": "json",
                 "think": False,
                 "keep_alive": LOCAL_KEEP_ALIVE,
+                "options": {"num_ctx": LOCAL_CONTEXT},
                 "messages": [
                     {
                         "role": "user",
@@ -350,15 +674,22 @@ def _workspace_fields(chosen: str | None = None) -> dict[str, Any]:
     return _scope_fields(api.providers.ANTHROPIC, chosen)
 
 
-def _client_fields(model: Any, gate: Callable[[], None]) -> dict[str, Any]:
+def _client_fields(
+    model: Any, gate: Callable[[], None], sized: Sized = None
+) -> dict[str, Any]:
     """The model's own clients, asking `gate` as each request goes out, so nothing is
-    sent on an answer older than the send itself. LangChain has no setting for this."""
+    sent on an answer older than the send itself, then `sized`, which sees the request
+    as it leaves. LangChain has no setting for this."""
 
-    def before_send(_request: httpx.Request) -> None:
+    def before_send(request: httpx.Request) -> None:
         gate()
+        if sized is not None:
+            sized(request)
 
-    async def before_send_async(_request: httpx.Request) -> None:
+    async def before_send_async(request: httpx.Request) -> None:
         await asyncio.to_thread(gate)
+        if sized is not None:
+            await asyncio.to_thread(sized, request)
 
     params = model._client_params  # noqa: SLF001
     return {
@@ -377,15 +708,21 @@ def _client_fields(model: Any, gate: Callable[[], None]) -> dict[str, Any]:
     }
 
 
-def _hooked(gate: Callable[[], None], sdk: Any = openai) -> tuple[Any, Any]:
-    """The SDK's own clients, asking `gate` as each request goes out. Each SDK takes
-    only its own client type."""
+def _hooked(
+    gate: Callable[[], None], sdk: Any = openai, sized: Sized = None
+) -> tuple[Any, Any]:
+    """The SDK's own clients, asking `gate` as each request goes out, then `sized`,
+    which sees the request as it leaves. Each SDK takes only its own client type."""
 
-    def before_send(_request: Any) -> None:
+    def before_send(request: Any) -> None:
         gate()
+        if sized is not None:
+            sized(request)
 
-    async def before_send_async(_request: Any) -> None:
+    async def before_send_async(request: Any) -> None:
         await asyncio.to_thread(gate)
+        if sized is not None:
+            await asyncio.to_thread(sized, request)
 
     return (
         sdk.DefaultHttpxClient(event_hooks={"request": [before_send]}),
@@ -404,12 +741,16 @@ def _hooked_plain(gate: Callable[[], None]) -> httpx.Client:
 
 
 def _openai_model(
-    model_id: str, max_tokens: int, gate: Callable[[], None], streaming: bool = False
+    model_id: str,
+    max_tokens: int,
+    gate: Callable[[], None],
+    streaming: bool = False,
+    sized: Sized = None,
 ) -> Any:
     """OpenAI, or OpenRouter, which speaks OpenAI's API at its own address. No host
     preference is sent to OpenRouter: the owner's account settings decide."""
     provider, name = api.providers.split(model_id)
-    client, async_client = _hooked(gate)
+    client, async_client = _hooked(gate, sized=sized)
     fields: dict[str, Any] = {"stream_usage": True} if streaming else {}
     fields["base_url"] = api.address_of(provider)
     fields.update(_scope_fields(provider))
@@ -430,17 +771,25 @@ def _openai_model(
 
 
 def build_cloud(
-    model_id: str, max_tokens: int, gate: Callable[[], None], streaming: bool = False
+    model_id: str,
+    max_tokens: int,
+    gate: Callable[[], None],
+    streaming: bool = False,
+    sized: Sized = None,
 ) -> Any:
     """The chat model for a provider:model id, gated as each request leaves."""
     provider, name = api.providers.split(model_id)
     if provider == api.providers.ANTHROPIC:
-        return _anthropic_model(name, max_tokens, gate, streaming)
-    return _openai_model(model_id, max_tokens, gate, streaming)
+        return _anthropic_model(name, max_tokens, gate, streaming, sized)
+    return _openai_model(model_id, max_tokens, gate, streaming, sized)
 
 
 def _anthropic_model(
-    model: str, max_tokens: int, gate: Callable[[], None], streaming: bool = False
+    model: str,
+    max_tokens: int,
+    gate: Callable[[], None],
+    streaming: bool = False,
+    sized: Sized = None,
 ) -> Any:
     fields: dict[str, Any] = {}
     if streaming:
@@ -456,7 +805,7 @@ def _anthropic_model(
         max_retries=0,
         **fields,
     )
-    built.__dict__.update(_client_fields(built, gate))
+    built.__dict__.update(_client_fields(built, gate, sized))
     return built
 
 
@@ -472,7 +821,9 @@ def _local_model(
     tag = tag or local_tag(job)  # a run's or job's own, read once; else the job's now
     if not tag_listed(tag):
         raise LocalNotReady(NO_LOCAL_MODEL)
-    fields: dict[str, Any] = {"num_predict": max_tokens} if max_tokens else {}
+    fields: dict[str, Any] = {"num_ctx": LOCAL_CONTEXT}
+    if max_tokens:
+        fields["num_predict"] = max_tokens
     if temperature is not None:
         fields["temperature"] = temperature
     return init_chat_model(
@@ -511,6 +862,16 @@ def _estimate(call: CloudCall, parts: list[api.Part], price: api.Price) -> float
     return api.cost_at(price, sent_tokens(call, parts), call.max_tokens)
 
 
+def _billed_in_full(message: Any, usage: dict[str, int]) -> bool:
+    """Whether a reply's usage is what it was billed: it reached its stop reason,
+    which Anthropic sends with the final usage, and OpenAI before it, and it carries
+    usage. A stream that ended short of either, Anthropic's keeping only the count it
+    began with, is billed for more than it says, so its ceiling stays counted."""
+    said = getattr(message, "response_metadata", None) or {}
+    stopped = said.get("stop_reason") or said.get("finish_reason")
+    return bool(stopped) and usage["input_tokens"] > 0
+
+
 def _usage_of(message: Any) -> dict[str, int]:
     usage = getattr(message, "usage_metadata", None) or {}
     return {
@@ -547,6 +908,8 @@ def _gate_for(
 
     def gate() -> None:
         reason = api.refusal(parts, call.thread_id)
+        if reason is None and not provider_allowed(call.model):
+            reason = ONLY_PROVIDERS.format(", ".join(_providers or ()))
         if reason is None and call.still_wanted and not call.still_wanted():
             reason = api.policy.STALE_PART
         if reason is not None:
@@ -597,10 +960,10 @@ def _settle_failure(failed: Exception, entry: int, refused: list[str]) -> Except
     return failed
 
 
-def _begin(call: CloudCall) -> tuple[list[api.Part], int]:
-    """Policy asked, and the attempt logged. In a thread of its own, as a write made on
-    the event loop would wait on the checkpointer's transaction, which waits on the
-    loop."""
+def _begin(call: CloudCall) -> tuple[list[api.Part], int, api.Price]:
+    """Policy asked, and the attempt logged, with the price read once. In a thread of
+    its own, as a write made on the event loop would wait on the checkpointer's
+    transaction, which waits on the loop."""
     parts = current_parts(call.parts, call.thread_id)
     named = _named_documents(parts)
     why = api.refusal(parts, call.thread_id)
@@ -623,7 +986,7 @@ def _begin(call: CloudCall) -> tuple[list[api.Part], int]:
         over = api.policy.OVER_CAP
         api.log_refused(call.model, call.purpose, named, over, call.thread_id)
         raise CloudRefused(over)
-    return parts, entry
+    return parts, entry, price
 
 
 async def ask_cloud(
@@ -643,32 +1006,49 @@ async def _send_once(
     call: CloudCall, on_text: Callable[[str], Awaitable[None]] | None
 ) -> Reply:
     provider = api.providers.split(call.model)[0]
-    if not api.policy.key_ready(provider):
-        raise NoConnection("no key")  # as with no network: the local model stands in
-    parts, entry = await asyncio.to_thread(_begin, call)
-    gate, refused = _gate_for(call, parts)
-    built = build_cloud(
-        call.model, call.max_tokens, gate, streaming=call.schema is None
-    )
-    messages = [
-        SystemMessage(cast("Any", _cached_system(call.system, call.model))),
-        *call.render(parts),
-    ]
-    try:
-        message = (
-            await _invoke_structured(built, messages, call.schema)
-            if call.schema
-            else await _stream(built, messages, on_text)
+    # Recorded from the key check on, so a call with no key, refused, or failing
+    # before it's sent keeps its record too.
+    async with _recorded(call.thread_id, call.purpose, call.model) as record:
+        if not api.policy.key_ready(provider):
+            # As with no network: a failed attempt, and the local model stands in.
+            raise NoConnection("no key")
+        parts, entry, price = await asyncio.to_thread(_begin, call)
+        gate, refused = _gate_for(call, parts)
+        hold, holds, limited = _held(call.max_tokens, price)
+        built = build_cloud(
+            call.model, call.max_tokens, gate, streaming=call.schema is None, sized=hold
         )
-    except CONNECTION_ERRORS as failed:
-        raise await asyncio.to_thread(
-            _settle_failure, failed, entry, refused
-        ) from failed
-    except STATUS_ERRORS as failed:
-        await asyncio.to_thread(api.log_rejected, entry, failed.status_code)
-        raise
-    usage = _usage_of(message)
-    spent = await asyncio.to_thread(api.log_sent, entry, call.model, usage)
+        messages = [
+            SystemMessage(cast("Any", _cached_system(call.system, call.model))),
+            *call.render(parts),
+        ]
+        try:
+            message = (
+                await _invoke_structured(built, messages, call.schema)
+                if call.schema
+                else await _stream(built, messages, on_text)
+            )
+        except CloudRefused as said:
+            # A hook's refusal that the SDK passed on as it was: nothing went.
+            await asyncio.to_thread(api.log_blocked, entry, str(said))
+            raise
+        except CONNECTION_ERRORS as failed:
+            if limited:  # the run's limit refused it as it left: nothing went
+                await asyncio.to_thread(api.log_blocked, entry, str(limited[0]))
+                raise limited[0] from failed
+            error = await asyncio.to_thread(_settle_failure, failed, entry, refused)
+            if error is not failed:  # refused at the gate, or never connected
+                _settle(holds, 0.0)
+            raise error from failed
+        except STATUS_ERRORS as failed:
+            await asyncio.to_thread(api.log_rejected, entry, failed.status_code)
+            _settle(holds, 0.0)
+            raise
+        usage = _usage_of(message)
+        spent = await asyncio.to_thread(api.log_sent, entry, call.model, usage)
+        if _billed_in_full(message, usage):
+            _settle(holds, spent)
+        _count(record, message, spent)
     return Reply(
         text=str(message.text),
         content=message.content,
@@ -702,23 +1082,36 @@ async def ask_local(
     user_text: str,
     on_text: Callable[[str], Awaitable[None]] | None = None,
     tag: str | None = None,
+    of: "CallOf | None" = None,
 ) -> Reply:
-    """An answer from the local model: the run's tag, read once as it began."""
+    """An answer from the local model: the run's tag, read once as it began. `of`
+    names the thread and purpose its call is recorded under."""
+    of = of or CallOf()
     tag = tag or local_tag()
-    built = _local_model(
-        LOCAL_ANSWER_TOKENS,
-        thinking=True,
-        temperature=LOCAL_ANSWER_TEMPERATURE,
-        tag=tag,
-    )
     messages = [SystemMessage(system), HumanMessage(user_text)]
-    message = await _stream(built, messages, on_text)
+    # Each attempt's record opens before its model is built, so a model Ollama no
+    # longer lists, or one that fails as it's built, is still a failed call.
+    async with _recorded(of.thread_id, of.purpose, tag) as record:
+        built = _local_model(
+            LOCAL_ANSWER_TOKENS,
+            thinking=True,
+            temperature=LOCAL_ANSWER_TEMPERATURE,
+            tag=tag,
+        )
+        _fitted(record, of)  # after: a model never built sent no prompt
+        message = await _stream(built, messages, on_text)
+        _count(record, message)
+        if _thought_to_the_limit(message):
+            record["outcome"] = "retried"
     if _thought_to_the_limit(message):
         # Not "no evidence": the model never got to answer. Nothing has been shown yet.
-        quick = _local_model(
-            LOCAL_ANSWER_TOKENS, temperature=LOCAL_ANSWER_TEMPERATURE, tag=tag
-        )
-        message = await _stream(quick, messages, on_text)
+        async with _recorded(of.thread_id, of.purpose, tag) as record:
+            quick = _local_model(
+                LOCAL_ANSWER_TOKENS, temperature=LOCAL_ANSWER_TEMPERATURE, tag=tag
+            )
+            _fitted(record, of)
+            message = await _stream(quick, messages, on_text)
+            _count(record, message)
     usage = _usage_of(message)
     return Reply(
         text=str(message.text),
@@ -727,6 +1120,13 @@ async def ask_local(
         model=tag,
         local=True,
     )
+
+
+def _fitted(record: dict[str, Any], of: CallOf) -> None:
+    """A fitted prompt's counts go with its call's record, beside the size Ollama
+    reports, so a run shows whether the margin held."""
+    if of.fit is not None:
+        record.update(prompt_counted=of.fit.counted, passages_dropped=of.fit.dropped)
 
 
 def _render_tagged(parts: list[api.Part]) -> list[Any]:
@@ -750,18 +1150,51 @@ def _parse_json(text: str) -> dict[str, Any]:
         return {}
 
 
+def _was_cut(record: dict[str, Any], purpose: api.Purpose, by: str) -> None:
+    """A helper's call ended at its limit: recorded, and counted in the log."""
+    record["outcome"] = CUT
+    _cuts[purpose.value] += 1
+    logger.info(
+        "a local helper was cut at its limit: %s",
+        json.dumps({"purpose": purpose.value, "by": by, "cut": _cuts[purpose.value]}),
+    )
+
+
+def _stopped_at_length(message: Any) -> bool:
+    return getattr(message, "response_metadata", {}).get("done_reason") == "length"
+
+
 async def _local_structured(task: Task, schema: dict[str, Any]) -> dict[str, Any]:
     # A card is written in the background, and nobody is waiting on its first word.
     thinking = task.purpose == api.Purpose.CARD
-    built = _local_model(
-        thinking=thinking, job=job_of(task.purpose), tag=task.local_tag
-    ).with_structured_output(schema, method="json_schema")
+    limit = HELPER_LIMITS[task.purpose]
     body = "\n".join(_tag(part) for part in task.parts)
-    try:
-        found = await built.ainvoke([SystemMessage(task.system), HumanMessage(body)])
-    except OutputParserException:
-        return {}  # a local model's reply that isn't the JSON asked for
-    return found if isinstance(found, dict) else {}
+    tag = task.local_tag or local_tag(job_of(task.purpose))
+    async with _recorded(task.thread_id, task.purpose, tag) as record:
+        built = _local_model(limit.tokens, thinking=thinking, tag=tag)
+        built = built.with_structured_output(
+            schema, method="json_schema", include_raw=True
+        )
+        try:
+            done = await asyncio.wait_for(
+                built.ainvoke([SystemMessage(task.system), HumanMessage(body)]),
+                limit.seconds,
+            )
+        except TimeoutError:
+            _was_cut(record, task.purpose, "time")
+            return {}  # as an unreadable reply: the question carries on
+        except OutputParserException:
+            record["outcome"] = "unreadable"
+            return {}  # a local model's reply that isn't the JSON asked for
+        _count(record, done["raw"])
+        if _stopped_at_length(done["raw"]):
+            _was_cut(record, task.purpose, "length")
+            return {}
+        found = done["parsed"]
+        if done.get("parsing_error") is not None or not isinstance(found, dict):
+            record["outcome"] = "unreadable"
+            return {}  # a local model's reply that isn't the JSON asked for
+    return found
 
 
 def _helper_model(task: Task) -> str:
@@ -799,11 +1232,39 @@ async def structured(
     return parsed if isinstance(parsed, dict) else _parse_json(reply.text)
 
 
+async def _local_text(task: Task) -> str:
+    """A local helper's prose in one call, without thinking or a retry, within its
+    limits. Cut at one, or empty, it raises `HelperCut`."""
+    limit = HELPER_LIMITS[task.purpose]
+    tag = task.local_tag or local_tag()
+    body = "\n".join(_tag(part) for part in task.parts)
+    text = ""
+    async with _recorded(task.thread_id, task.purpose, tag) as record:
+        built = _local_model(limit.tokens, tag=tag)
+        try:
+            message = await asyncio.wait_for(
+                built.ainvoke([SystemMessage(task.system), HumanMessage(body)]),
+                limit.seconds,
+            )
+        except TimeoutError:
+            _was_cut(record, task.purpose, "time")
+        else:
+            _count(record, message)
+            if _stopped_at_length(message):
+                _was_cut(record, task.purpose, "length")
+            else:
+                text = str(message.text).strip()
+                if not text:
+                    record["outcome"] = "unreadable"
+    if not text:
+        raise HelperCut
+    return text
+
+
 async def helper_text(task: Task) -> str:
     """A helper's prose, on its route: a summary."""
-    body = "\n".join(_tag(part) for part in task.parts)
     if _helper_is_local(task):
-        return (await ask_local(task.system, body, tag=task.local_tag)).text
+        return await _local_text(task)
     call = CloudCall(
         task.purpose,
         _helper_model(task),  # the caller's, read once, if it gave one
@@ -815,7 +1276,7 @@ async def helper_text(task: Task) -> str:
     try:
         return (await ask_cloud(call)).text
     except NoConnection:
-        return (await ask_local(task.system, body, tag=task.local_tag)).text
+        return await _local_text(task)
 
 
 def _image_block(provider: str, image_png: bytes) -> dict[str, Any]:
@@ -871,6 +1332,7 @@ def read_page_in_cloud(
         why = why or api.no_price(model)
         api.log_refused(model, PAGE_PURPOSE, [document_id], why)
         raise CloudRefused(why)
+    _refused_when_limited(model, PAGE_PURPOSE, [document_id])
     quote = api.Quote(price, api.page_estimate(price))
     entry = api.log_attempt(model, PAGE_PURPOSE, [document_id], quote)
     refused: list[str] = []
@@ -992,6 +1454,7 @@ def check_key(provider: str, key: str, scope_id: str | None = None) -> None:
     price = api.price_of(model)
     if price is None:  # each key test model is on the checked list, with its price
         raise CloudRefused(api.no_price(model))
+    _refused_when_limited(model, api.Purpose.KEY_TEST, [])
     quote = api.Quote(price, api.cost_at(price, 10, KEY_TEST_REPLY_TOKENS[provider]))
     entry = api.log_attempt(model, api.Purpose.KEY_TEST, [], quote)
     blocked: list[str] = []
@@ -1190,10 +1653,16 @@ class Cited:
 
 
 def _ask_judge(
-    system: str, body: str, cited: list[Cited], thread_id: str | None
+    system: str,
+    body: str,
+    cited: list[Cited],
+    thread_id: str | None,
+    rests_on: Sequence[str] = (),
 ) -> bool:
-    """Opus, on Standard evidence only: policy refuses the call for anything Private,
-    and for any sentence from a Private chat, whatever that sentence happens to cite."""
+    """The run's judge, on Standard evidence only: policy refuses the call for
+    anything Private, and for any sentence from a Private chat, whatever that sentence
+    happens to cite. `rests_on` names more documents the sentence rests on, read by
+    policy as they are when the call leaves, and sent nowhere."""
     parts = [
         api.Part(
             api.PartKind.EXCERPT,
@@ -1203,7 +1672,7 @@ def _ask_judge(
                 if any(c.sensitivity != api.STANDARD for c in cited)
                 else api.STANDARD
             ),
-            document_ids=sorted({c.document_id for c in cited}),
+            document_ids=sorted({c.document_id for c in cited} | set(rests_on)),
         )
     ]
 
@@ -1212,7 +1681,7 @@ def _ask_judge(
 
     call = CloudCall(
         api.Purpose.EVAL_JUDGE,
-        JUDGE_MODEL,
+        _judge,
         system,
         parts,
         render,
@@ -1225,7 +1694,12 @@ def _ask_judge(
 
 
 def judge_citation(
-    sentence: str, target: Cited, siblings: list[Cited], thread_id: str | None
+    sentence: str,
+    target: Cited,
+    siblings: list[Cited],
+    thread_id: str | None,
+    *,
+    rests_on: Sequence[str] = (),
 ) -> bool:
     """One citation of a sentence, against the words it points at."""
     also = "\n".join(
@@ -1237,16 +1711,24 @@ def judge_citation(
         f"<citation><title>{target.title}</title><words>{target.words}</words>"
         f"<passage>{target.passage}</passage></citation>\n{also}"
     )
-    return _ask_judge(prompts.load("judge"), body, [target, *siblings], thread_id)
+    cited = [target, *siblings]
+    return _ask_judge(prompts.load("judge"), body, cited, thread_id, rests_on)
 
 
-def judge_sentence(sentence: str, cited: list[Cited], thread_id: str | None) -> bool:
+def judge_sentence(
+    sentence: str,
+    cited: list[Cited],
+    thread_id: str | None,
+    *,
+    rests_on: Sequence[str] = (),
+) -> bool:
     """A sentence with no citation: a false one counts against the answer."""
     passages = "\n".join(
         f"<passage><title>{c.title}</title>{c.passage}</passage>" for c in cited
     )
     body = f"<sentence>{sentence}</sentence>\n{passages}"
-    return _ask_judge(prompts.load("judge_sentence"), body, cited, thread_id)
+    system = prompts.load("judge_sentence")
+    return _ask_judge(system, body, cited, thread_id, rests_on)
 
 
 def _card_system() -> str:
@@ -1344,6 +1826,10 @@ def submit_batch(
     provider's id, and the document ids that went. It goes with the model the batch was
     planned for, never the helper read again, by that model's provider's batch API."""
     model, submission_id = batch.model, batch.submission_id
+    try:
+        _refused_when_limited(model, api.Purpose.CARD, [i.document_id for i in items])
+    except CloudRefused as limited:
+        raise BatchRefused(str(limited)) from limited
     provider = _batch_provider(model)
     price = _batch_may_go(model, items)
     allowed = []

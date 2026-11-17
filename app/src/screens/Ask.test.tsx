@@ -475,6 +475,7 @@ describe("moving around a chat", () => {
     await userEvent.click(chip);
     const params = new URLSearchParams(window.location.hash.split("?")[1]);
     expect(params.getAll("panel")).toEqual(["1"]);
-    expect(params.get("cite")).toBe("m2-1");
+    // The chip names its sentence too, so the citation opens at its figures.
+    expect(params.get("cite")).toBe("m2-1-s0");
   });
 });

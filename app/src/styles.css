@@ -849,6 +849,92 @@ a {
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
 }
+.report {
+  scroll-margin-bottom: 230px;
+  gap: var(--s2);
+}
+.report fieldset {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--s4);
+}
+.report fieldset legend {
+  width: 100%;
+}
+.report-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s2) var(--s3);
+  align-items: start;
+}
+.report-fields .select {
+  width: 100%;
+}
+.found-article {
+  scroll-margin-bottom: 280px;
+}
+.unshown {
+  text-decoration: underline dotted var(--uncited-line);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.worked-tag {
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+.tip-wrap {
+  position: relative;
+  display: inline-flex;
+  vertical-align: 1px;
+}
+.tip-tag {
+  cursor: help;
+  background: none;
+  font: inherit;
+}
+.tip-tag:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.tip {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
+  z-index: 20;
+  width: max-content;
+  max-width: 300px;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--panel);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  line-height: 1.4;
+  box-shadow: var(--shadow);
+  white-space: normal;
+}
+/* A bridge the pointer crosses from the tag onto its explanation. */
+.tip::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 8px;
+}
+.tip.to-left {
+  left: auto;
+  right: 0;
+}
+/* Near the pane's top, below the tag, with its bridge above it. */
+.tip.below {
+  top: calc(100% + 6px);
+  bottom: auto;
+}
+.tip.below::after {
+  top: auto;
+  bottom: 100%;
+}
 .uncited-tag {
   display: inline-flex;
   align-items: center;
@@ -1735,6 +1821,44 @@ dl.meta dd {
   flex-direction: column;
   gap: 2px;
 }
+.setting-row.top {
+  align-items: flex-start;
+}
+.setting-row .select {
+  max-width: 100%;
+}
+/* A measured model's scores, under its row in Settings. */
+.scores {
+  display: grid;
+  gap: 4px;
+  margin-top: 2px;
+}
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 4px var(--s5);
+  margin: 0;
+}
+.score-grid div {
+  display: flex;
+  flex-direction: column;
+}
+.score-grid dt {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+.score-grid dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+.score-grid dd .under {
+  font-family: var(--font);
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+  margin-left: 4px;
+}
 @media (max-width: 959px) {
   .settings {
     grid-template-columns: 1fr;
@@ -2241,6 +2365,22 @@ table.table th.num {
   position: absolute;
   border: 2px solid rgba(180, 83, 9, 0.7);
   border-radius: 2px;
+}
+/* A cited sentence's figure, placed inside its passage's area: stronger than the
+   passage's own highlight. */
+.pdf-fig {
+  position: absolute;
+  background: rgba(180, 83, 9, 0.42);
+  box-shadow: inset 0 -2px 0 #92400e;
+  border-radius: 2px;
+}
+mark.hl-fig {
+  background: rgba(180, 83, 9, 0.42);
+  color: inherit;
+  box-shadow: inset 0 -2px 0 #92400e;
+  border-radius: 2px;
+  padding: 0 1px;
+  font-weight: 600;
 }
 .sheet-tabs button {
   background: none;

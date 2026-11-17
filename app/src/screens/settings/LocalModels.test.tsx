@@ -103,9 +103,10 @@ describe("Local models", () => {
     backend(models());
     open("/settings/local");
     await screen.findByLabelText("Model for Cards");
+    // Only answers are measured, so only their models say whether they were.
     expect(options("Model for Private and Offline answers")).toEqual([
-      "gemma4:26b · suggested",
-      "qwen3.5:9b",
+      "gemma4:26b · suggested · not measured",
+      "qwen3.5:9b · not measured",
     ]);
     expect(options("Model for Figures and charts")).toEqual([
       "gemma4:26b · suggested",

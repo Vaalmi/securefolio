@@ -135,3 +135,39 @@ def test_who_answers_is_decided_in_one_place():
             if isinstance(node, ast.FunctionDef) and node.name == "route":
                 # api.py only passes policy's decision on
                 assert relative in ("backend/policy.py", "agent/api.py"), relative
+
+
+def test_the_evaluation_reaches_the_judge_only_through_the_agent_service():
+    """The eval judge is a model call of the backend's own, reached through
+    backend/agent_service.py, never agent/models.py, as every model call of the
+    backend's is."""
+    judges = {"judge_citation", "judge_sentence", "judged_by", "judge_model"}
+    found = []
+    for relative, tree in sources():
+        if not relative.startswith("evals/"):
+            continue
+        # Every name agent/models.py goes by here, however it was imported.
+        aliases = {"models"}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module == "agent.models":
+                found += [
+                    f"{relative}:{node.lineno} from agent.models import {a.name}"
+                    for a in node.names
+                    if a.name in judges
+                ]
+            elif isinstance(node, ast.ImportFrom) and node.module == "agent":
+                aliases |= {
+                    a.asname or a.name for a in node.names if a.name == "models"
+                }
+            elif isinstance(node, ast.Import):
+                aliases |= {
+                    a.asname or a.name for a in node.names if a.name == "agent.models"
+                }
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.Attribute)
+                and node.attr in judges
+                and ast.unparse(node.value) in aliases
+            ):
+                found.append(f"{relative}:{node.lineno} {ast.unparse(node)}")
+    assert found == []

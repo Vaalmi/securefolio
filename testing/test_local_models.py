@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from backend import agent_service, model_store, settings
+from backend import agent_service, local_measured, model_store, settings, vault
 from backend.build_mode import STUB_OLLAMA_ENV
 from testing.stub_models import stub_ollama
 
@@ -35,7 +35,7 @@ def recorded(path: str, body: dict) -> dict:
 @pytest.fixture
 def ollama(library, monkeypatch):
     """This Mac's Ollama, answering as Ollama 0.40 does, freshly listed."""
-    monkeypatch.setattr(agent_service, "OLLAMA_FRESH_SECONDS", 0.0)
+    monkeypatch.setattr(agent_service.models, "OLLAMA_FRESH_SECONDS", 0.0)
     monkeypatch.setattr(model_store, "_capabilities", {}, raising=False)
     with stub_ollama() as stub:
         stub.reply = recorded
@@ -193,3 +193,58 @@ class TestNothingOnAGuess:
         )
         refused = app_client.patch("/api/settings", json={"local_figures": GEMMA})
         assert refused.status_code == 422, "the old version's answer doesn't count"
+
+
+class TestALocalModelsScores:
+    """Measured on this Mac and kept in the library, tied to the build measured."""
+
+    @staticmethod
+    def kept(build: str) -> None:
+        path = local_measured.path_in(vault.root())
+        path.parent.mkdir(parents=True, exist_ok=True)
+        scores = {
+            "measured_on": "2026-11-14",
+            "questions": 60,
+            "judged": True,
+            "judge_model": "anthropic:claude-opus-5-5",
+            "answers_correct": 0.889,
+            "citation_precision": 0.9625,
+            "unanswerable": 0.867,
+            "answerable_refused": 0.044,
+        }
+        path.write_text(
+            json.dumps({"models": {GEMMA: {"digest": build, **scores, "kept": "r"}}})
+        )
+
+    @staticmethod
+    def measured(app_client) -> dict:
+        found = models_of(app_client)["installed"]["local"]
+        return {model["name"]: model["measured"] for model in found}
+
+    def test_none_until_measured(self, ollama, app_client):
+        assert set(self.measured(app_client).values()) == {None}
+
+    def test_the_build_measured_shows_its_scores(self, ollama, app_client):
+        build = next(m["digest"] for m in TAGS["models"] if m["name"] == GEMMA)
+        self.kept(build)
+        found = self.measured(app_client)
+        assert found[GEMMA]["changed"] is None
+        assert found[GEMMA]["build"] == build, "Settings names the build measured"
+        assert found[GEMMA]["scores"]["answers_correct"] == 0.889
+        assert found[GEMMA]["scores"]["judge_name"] == "Claude Opus 5.5"
+        assert "digest" not in found[GEMMA]["scores"]
+        assert found[SMALL] is None, "another tag isn't measured"
+
+    def test_a_tag_rebuilt_since_shows_none(self, ollama, app_client):
+        build = next(m["digest"] for m in TAGS["models"] if m["name"] == GEMMA)
+        self.kept("0" * 64)
+        found = self.measured(app_client)[GEMMA]
+        assert found["scores"] is None
+        assert found["build"] is None
+        assert found["changed"] == {"measured": "0" * 64, "installed": build}
+
+    def test_a_broken_file_is_not_measured(self, ollama, app_client):
+        path = local_measured.path_in(vault.root())
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{not json")
+        assert set(self.measured(app_client).values()) == {None}

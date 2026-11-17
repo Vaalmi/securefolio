@@ -6,9 +6,14 @@ import unicodedata
 from dataclasses import dataclass, field
 from typing import Any
 
-MARKER = re.compile(r"\s*\[(\d+)\]")
+# A marker names one passage, a list of them or a range: `[1]`, `[1, 2]`, `[1-3]`.
+NAMED = r"\d+(?:\s*[-\u2013]\s*\d+)?"
+MARKER_BODY = rf"{NAMED}(?:\s*[,;]\s*{NAMED})*"
+MARKER = re.compile(rf"\s*\[({MARKER_BODY})\]")
+MARKER_WHOLE = re.compile(MARKER_BODY)
+RANGE = re.compile(r"(\d+)\s*[-\u2013]\s*(\d+)")
 AFTER_STOP = re.compile(
-    r"([.!?])((?:[ \t]*\[\d+\])+)"
+    rf"([.!?])((?:[ \t]*\[{MARKER_BODY}\])+)"
 )  # "monthly. [1]" cites "monthly"
 # A sentence ends at its stop, or at a line's end: a list's heading isn't its first row.
 SENTENCE = re.compile(r"(?<=[.!?])\s+(?=\S)|(?<=:)\s*\n+(?=\S)|\n+(?=\S)")
@@ -98,12 +103,13 @@ def from_claude(content: list[Any] | str, evidence: list[dict[str, Any]]) -> Bui
         if block.get("type") != "text" or not block.get("text"):
             continue
         found = _claude_numbers(block, evidence, built)
-        numbers.extend(n for n in found if n not in numbers)
         if SENTENCE_DONE.search(sentence) and block["text"][0].isspace():
-            _close_sentence(
-                built, sentence, numbers[: -len(found)] if found else numbers
-            )
+            # The block starts the next sentence: the one before keeps what it cited,
+            # even a passage this block cites again.
+            _close_sentence(built, sentence, numbers)
             sentence, numbers = "", list(found)
+        else:
+            numbers.extend(n for n in found if n not in numbers)
         pieces = SENTENCE_END.split(block["text"])
         for at, piece in enumerate(pieces):
             sentence += piece
@@ -117,20 +123,15 @@ def from_claude(content: list[Any] | str, evidence: list[dict[str, Any]]) -> Bui
 def from_markers(
     text: str, sources: list[tuple[dict[str, Any], dict[str, Any]]]
 ) -> Built:
-    """`[n]` markers, read whole, so `[10]` is never taken for `[1]`. Markers after a
+    """`[n]` markers, read whole, so `[10]` is never taken for `[1]`, and a list or a
+    range, `[1, 2]`, `[1][2]` or `[1-3]`, read as each passage. Markers after a
     sentence's stop, as in "Due monthly. [1]", cite that sentence."""
     built = Built()
     for sentence in SENTENCE.split(AFTER_STOP.sub(r"\2\1", text.strip())):
         numbers = []
         for found in MARKER.findall(sentence):
-            # Read as text first: a run of digits too long for `int` names no source,
-            # and leading zeros never reach `int`.
-            at = _source_number(found, len(sources))
-            if at is None:
-                continue
-            at -= 1
-            if 0 <= at < len(sources):
-                evidence, element = sources[at]
+            for at in _named(found, len(sources)):
+                evidence, element = sources[at - 1]
                 number = _number_for(
                     built, _citation_of(evidence, element, element["text"])
                 )
@@ -146,21 +147,28 @@ def from_markers(
     return built
 
 
+def is_refusal(text: str) -> bool:
+    """The reply is the refusal alone, however it ends: models write it with its
+    stop, "I couldn't find enough evidence in this scope.", or without."""
+    said = text.strip().rstrip(".!").rstrip()
+    return said.casefold() == NO_EVIDENCE.casefold()
+
+
 def has_valid_citation(built: Built) -> bool:
     return bool(built.citations)
 
 
 def shape_of(text: str, sources: int) -> dict[str, int | bool]:
     """Counts about a reply, for the log when none of it could be cited: never a word
-    of it. Every bracketed span is counted once, as an `[n]` marker or as another kind,
-    like `[1, 2]`, so the two never overlap."""
+    of it. Every bracketed span is counted once, as a marker, `[1]`, `[1, 2]` or
+    `[1-3]`, or as another kind, like `[sic]`, so the two never overlap."""
     spans = BRACKETED.findall(text)
-    markers = [span for span in spans if span.isdecimal()]
+    markers = [span for span in spans if MARKER_WHOLE.fullmatch(span)]
     return {
         "chars": len(text),
         "sources": sources,
         "markers": len(markers),
-        "in_range": sum(1 for n in markers if _names_a_source(n, sources)),
+        "in_range": sum(1 for span in markers if _named(span, sources)),
         "other_brackets": len(spans) - len(markers),
         "said_none": NO_EVIDENCE.casefold() in text.casefold(),
     }
@@ -177,8 +185,21 @@ def _source_number(digits: str, sources: int) -> int | None:
     return number if 1 <= number <= sources else None
 
 
-def _names_a_source(digits: str, sources: int) -> bool:
-    return _source_number(digits, sources) is not None
+def _named(marker: str, sources: int) -> list[int]:
+    """The passages a marker's text names, each once, in its order: each number of a
+    list on its own, as a single marker is, and a range only when both its ends name
+    a passage and it runs forward, so it can never reach past the passages handed."""
+    named: list[int] = []
+    for item in re.split(r"\s*[,;]\s*", marker.strip()):
+        ends = RANGE.fullmatch(item)
+        if ends:
+            first, last = (_source_number(end, sources) for end in ends.groups())
+            wanted = range(first, last + 1) if first and last and first <= last else []
+        else:
+            one = _source_number(item, sources)
+            wanted = [one] if one else []
+        named.extend(n for n in wanted if n not in named)
+    return named
 
 
 def plain_text(built: Built) -> str:

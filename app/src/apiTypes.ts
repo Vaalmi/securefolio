@@ -310,10 +310,30 @@ export interface AnswerCitation {
   sensitivity: Sensitivity;
 }
 
+// A figure the check found in a cited sentence (agent/figures.py): shown in a passage
+// it cites, worked out by code, or unshown. Offsets are the sentence's.
+export interface AnswerFigure {
+  text: string;
+  kind: "money" | "date" | "percent" | "number" | "unit";
+  start: number;
+  end: number;
+  state: "shown" | "unshown" | "worked";
+  cite?: number;
+  at?: [number, number] | null;
+  found?: string | null;
+}
+
+// Where one of a saved answer's shown figures is in the element it cites: boxes on
+// a PDF page, or a character range in a text kind (backend/figure_places.py).
+export type FigurePlace =
+  | { kind: "pdf"; text: string; rects: Rect[] }
+  | { kind: "text"; text: string; range: [number, number] };
+
 export interface AnswerPart {
   text: string;
   cite?: number[];
   uncited?: boolean;
+  figures?: AnswerFigure[]; // older answers have none
 }
 
 export interface SearchedPassage {
@@ -344,13 +364,17 @@ export interface PendingRow {
 
 export interface Answer {
   counted?: boolean;
-  kind: "answer" | "no_evidence" | "list";
+  kind: "answer" | "no_evidence" | "list" | "passages";
   parts?: AnswerPart[];
   citations?: AnswerCitation[];
   also_searched?: SearchedPassage[];
   left_out?: string[];
   coverage?: { searched: number; indexing: number; private_folders: number };
   closest?: SearchedPassage[];
+  // Passages found when no model could answer: never an answer.
+  reason?: string;
+  found?: SearchedPassage[];
+  follow_up?: boolean;
   table?: {
     rows: TableRow[];
     total: number;
@@ -375,6 +399,8 @@ export interface ThreadMessage {
   role: "user" | "assistant";
   content: string;
   answer: Answer | null;
+  copy_text?: string; // an answer's, as Copy puts it, its marks in words
+  reported?: boolean; // an answer's: it has a "This was wrong" report
   created_at: number;
 }
 

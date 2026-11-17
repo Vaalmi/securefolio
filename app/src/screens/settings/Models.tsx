@@ -3,6 +3,8 @@ import { AlertTriangle } from "lucide-react";
 
 import { getSettings, listTaskModels, updateSettings } from "../../api";
 import type { CloudModel, TaskModelList, TaskModels } from "../../api";
+import { ScoresBlock } from "../../components/Scores";
+import { shortScore } from "../../scoreWords";
 import { useAction } from "../../useAction";
 import { useLoad } from "../../useLoad";
 import { KeysCard } from "./Keys";
@@ -21,16 +23,23 @@ function price(model: CloudModel): string {
   return `${dollars(model.input_usd)} in · ${dollars(model.output_usd)} out per million tokens`;
 }
 
-function optionLabel(model: CloudModel): string {
+/** The answering tasks: the evaluation measures a model as the one that answers. */
+function scored(task: TaskModelList["task"]): boolean {
+  return task === "answer" || task === "deep";
+}
+
+function measuredNote(model: CloudModel, task: TaskModelList["task"]): string {
+  if (!model.measured) return " · not measured";
+  return scored(task) ? shortScore(model.scores) : "";
+}
+
+function optionLabel(model: CloudModel, task: TaskModelList["task"]): string {
   const cost =
     model.input_usd === null || model.output_usd === null
       ? "no known price"
       : `${dollars(model.input_usd)} in, ${dollars(model.output_usd)} out`;
-  const notes = [
-    model.measured ? "" : " · not measured",
-    model.listed ? "" : " · no longer listed",
-  ].join("");
-  return `${model.name} · ${cost}${notes}`;
+  const listed = model.listed ? "" : " · no longer listed";
+  return `${model.name} · ${cost}${measuredNote(model, task)}${listed}`;
 }
 
 type Provider = TaskModels["providers"][number];
@@ -108,6 +117,21 @@ function TaskNotes({
   );
 }
 
+/** The chosen answering model's scores, under its row; none for a helper. */
+function ChosenScores({
+  list,
+}: Readonly<{ list: TaskModelList }>): ReactElement | null {
+  const chosen = list.models.find((model) => model.id === list.chosen);
+  if (!chosen?.scores || !scored(list.task)) return null;
+  return (
+    <ScoresBlock
+      scores={chosen.scores}
+      where="from SecureFolio's evaluation"
+      id={`sc-${list.task}`}
+    />
+  );
+}
+
 function TaskSelect({
   list,
   all,
@@ -128,7 +152,7 @@ function TaskSelect({
       <select
         id={id}
         className="select"
-        style={{ width: 300 }}
+        style={{ width: scored(list.task) ? 400 : 300 }}
         value={list.chosen}
         disabled={saving}
         onChange={(event) => {
@@ -153,7 +177,7 @@ function TaskSelect({
                   value={model.id}
                   disabled={!provider.key_ready && model.id !== list.chosen}
                 >
-                  {optionLabel(model)}
+                  {optionLabel(model, list.task)}
                 </option>
               ))}
             </optgroup>
@@ -183,13 +207,15 @@ export function Models(): ReactElement {
           Changes take effect from the next question, without a restart; a chat
           already answering finishes on its model. Prices are per million
           tokens. Prompt caching is used wherever a model offers it; estimates
-          assume it saves nothing.
+          assume it saves nothing. Scores are the evaluation's, on SecureFolio's
+          own test library, and ship with the app.
         </p>
         {all?.tasks.map((list) => (
           <Row
             key={list.field}
             title={TASKS[list.task].title}
             desc={<TaskNotes list={list} all={all} />}
+            below={<ChosenScores list={list} />}
           >
             <TaskSelect
               list={list}

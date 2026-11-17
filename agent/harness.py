@@ -2,12 +2,14 @@
 come from code; a model's output only ever fills in words."""
 
 import asyncio
+import html
 import json
 import logging
 import re
 import uuid
+from collections import Counter
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Annotated, Any, Required, TypedDict, cast
 
 from langchain_core.messages import (
@@ -22,10 +24,12 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import interrupt
 
-from agent import api, citations, memory, models, prompts
+from agent import api, citations, figures, memory, models, plain, prompts
 from agent.budgets import Budget, for_mode
+from agent.plain import COUNTED_WORDS
 
 logger = logging.getLogger(__name__)
+_fits: Counter[str] = Counter()  # local prompts fitted to their context, this process
 
 CANDIDATES = 24
 KEEP = 12
@@ -38,7 +42,16 @@ LIST_WORDS = re.compile(
     r"\b(total|sum|spend|spending|spent|list (all|every|my)|all (of )?my)\b",
     re.I,
 )
-MAYBE_LIST_WORDS = re.compile(r"\b(which|what)\s+\w+s\b|\bhow much\b", re.I)
+# "Which" or "what" before a plural noun may ask for a list ("what leases"). Before
+# "is", "was", "does" or "has" it asks about one thing, which goes straight to search,
+# unless the question also says list, every, each or all ("what is the list of ..."),
+# as a word of its own, not in "all-in" or "each-way".
+MAYBE_LIST_WORDS = re.compile(
+    r"\b(which|what)\s+(?!(?:is|was|does|has)\b)\w+s\b"
+    r"|\b(which|what)\s+(?:is|was|does|has)\b.*\b(lists?|every|each|all)\b(?!-)"
+    r"|\bhow much\b",
+    re.I,
+)
 LIBRARY_QUESTION = re.compile(
     r"\s*(?:how many|what(?:'s| is) the number of|number of|count(?: of)?(?: my)?)\s+"
     r"(?:documents?|docs?|files?)"
@@ -50,7 +63,6 @@ LIBRARY_QUESTION = re.compile(
 )
 # What a follow-up reads in place of the counts: a document gone Private since must not
 # reach the cloud through a number or a type counted before it did.
-COUNTED_WORDS = "I counted the documents in the library."
 COMPARE_WORDS = re.compile(r"\b(compare|versus|vs\.?|difference between)\b", re.I)
 MONEY = re.compile(r"(?<!\w)([-−])?\$([-−])?\s?(\d[\d,]*(?:\.\d+)?)")
 NUMBER = re.compile(r"(?<![\w.,])([-−])?(\d[\d,]*(?:\.\d+)?)")
@@ -114,6 +126,7 @@ class AskState(TypedDict, total=False):
     helper_local: bool  # the helper steps run on this Mac, decided with the answer
     helper_model: str  # the helper model routed with the answer, read once
     route_reason: str | None  # why the answer is local, when it falls back
+    blocked: str | None  # why no model can answer: then passages are found instead
     model: str  # the cloud model its route chose; Deep's is the one its card showed
     local_tag: str  # the local answers model, read once as the run began
     price: api.Price | None  # the one price a Deep answer goes at, as its card showed
@@ -137,6 +150,7 @@ class AskState(TypedDict, total=False):
     activity: list[str]
     table: dict[str, Any] | None
     answer: Required[dict[str, Any]]
+    written: dict[str, Any] | None  # the newest turn's reply as written, for the eval
     cost_usd: float
 
 
@@ -199,6 +213,16 @@ def _route_of(thread: dict[str, Any], mode: str) -> Any:
     return route
 
 
+def _routed(mode: str, thread_private: bool) -> Any:
+    """The run's route. Ollama is asked for its list only when a local model would
+    run, and here, after the first step shows, so a slow Ollama never holds it back."""
+    route = api.route(mode, False, thread_private)
+    if route.local or route.helper_local:
+        models.refresh_ollama_if_stale()
+        route = api.route(mode, False, thread_private)
+    return route
+
+
 async def prepare(state: AskState, config: RunnableConfig) -> dict[str, Any]:
     _step("searching")
     thread_id, _ = _ids(config)
@@ -212,12 +236,32 @@ async def prepare(state: AskState, config: RunnableConfig) -> dict[str, Any]:
             thread = await asyncio.to_thread(api.threads.get, thread_id)
         else:
             excluded = True
-    route = await asyncio.to_thread(_route_of, thread, state["mode"])
+    route = await asyncio.to_thread(
+        _routed, state["mode"], bool(thread["private_tainted"])
+    )
     include_private = bool(thread["private_tainted"])
+    if route.blocked:
+        # No model can answer: search still can, on this Mac, before any model call.
+        return {
+            "blocked": route.blocked,
+            "local": True,  # nothing leaves the Mac
+            # An earlier question's, which the thread's state keeps: none of it is
+            # this run's.
+            "evidence": [],
+            "also_searched": [],
+            "memory_ids": [],
+            "excluded_private": excluded,
+            "include_private": include_private,
+            "activity": [],
+            "table": None,
+            "cost_usd": 0.0,
+            "turns": [HumanMessage(state["question"])],
+        }
     recalled = await asyncio.to_thread(
         memory.recall, state["question"], include_private
     )
     return {
+        "blocked": None,  # the thread's state keeps an earlier question's block
         "local": route.local,
         "model": route.model,  # what was routed is what goes: never read again
         # The local model this run answers and helps with, if it does, read with the
@@ -246,9 +290,71 @@ async def prepare(state: AskState, config: RunnableConfig) -> dict[str, Any]:
 
 
 def after_prepare(state: AskState) -> str:
+    if state.get("blocked"):
+        return "passages"
     if LIBRARY_QUESTION.fullmatch(state["question"]):
         return "library_facts"
     return "plan"
+
+
+# ---- Passages, when no model can answer ----
+
+PASSAGES_SHOWN = 5
+
+
+def _passages_found(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
+    """What search finds for the owner's own words in the chat's scope, with no
+    model: not an answer. It adds nothing up, says no list is complete, and is never
+    summarised or remembered; the follow-up history gets no turn from it."""
+    question = state["question"]
+    reason = state.get("blocked") or ""
+    allowed = _allowed_private(state, thread)
+    scope = _library_scope(thread["scope"], allowed)
+    ranked = _ranked(question, api.search.retrieve(question, scope, CANDIDATES))
+    single = thread["scope"]["kind"] == "documents" and len(thread["scope"]["ids"]) == 1
+    kept = _one_per_cap(ranked, PASSAGES_SHOWN, single)
+    found = api.search.evidence([item["chunk_id"] for item in kept], allowed)
+    coverage = api.search.coverage(scope)
+    # From the saved questions, which a summary never folds away: this one is saved
+    # as the run starts, so any other means it follows one.
+    asked = api.threads.transcript(thread["id"])
+    asked_before = sum(m["role"] == api.threads.ROLE_USER for m in asked) > 1
+    return {
+        "kind": "passages",
+        "reason": reason,
+        "follow_up": asked_before,
+        "coverage": coverage,
+        "found": [
+            {
+                "document_id": item["document_id"],
+                "title": item["title"],
+                "element_id": item["elements"][0]["id"] if item["elements"] else None,
+                "label": item["elements"][0]["label"] if item["elements"] else "",
+                "text": item["text"][:300],
+            }
+            for item in found
+        ],
+        "model": "",
+        "local": True,
+        "mode": state["mode"],
+        "cost_usd": 0.0,
+        "tokens": 0,
+        "activity": [
+            f"Searched “{question}” in "
+            f"{_plural(coverage['searched'], 'document')}, on this Mac",
+            f"No model answered: {reason}",
+        ],
+        "fell_back": False,
+        "excluded_private": state.get("excluded_private", False),
+    }
+
+
+async def passages(state: AskState, config: RunnableConfig) -> dict[str, Any]:
+    thread_id, _ = _ids(config)
+    thread = await asyncio.to_thread(api.threads.get, thread_id)
+    found = await asyncio.to_thread(_passages_found, state, thread)
+    _step("reading", f"{len(found['found'])} passages")
+    return {"answer": found}
 
 
 def _plural(count: int, one: str) -> str:
@@ -371,9 +477,13 @@ def _fit_turns(turns: list[AnyMessage], budget: Budget) -> list[AnyMessage]:
     return kept
 
 
+def _first_turn(state: AskState, thread: dict[str, Any]) -> bool:
+    return len(state.get("turns", [])) <= 1 and not thread.get("summary")
+
+
 def _skips_the_model(state: AskState, thread: dict[str, Any], kind: str) -> bool:
     """A first-turn lookup with no filter keeps the first word within 2 s."""
-    first = len(state.get("turns", [])) <= 1 and not thread["summary"]
+    first = _first_turn(state, thread)
     could_be_a_list = MAYBE_LIST_WORDS.search(state["question"]) is not None
     return (
         first
@@ -473,13 +583,43 @@ def _allowed_private(state: AskState, thread: dict[str, Any]) -> bool:
     return bool(thread["private_tainted"]) and state.get("local", False)
 
 
+def _own_words(state: AskState, thread: dict[str, Any], dated: bool) -> str | None:
+    """A follow-up's own words, searched too, so a poor rewording can't lose what they
+    find. Skipped only when it would repeat the first search: the same words, and no
+    dates the helper's search had and this one won't."""
+    question = state.get("question") or ""
+    if _first_turn(state, thread) or not question.strip():
+        return None
+    same = question.strip().casefold() == state["query"].strip().casefold()
+    return None if same and not dated else question
+
+
+def _best_of(*searches: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merged by passage, each ranked by the better of its reranker scores."""
+    best: dict[str, dict[str, Any]] = {}
+    for found in searches:
+        for item in found:
+            held = best.get(item["chunk_id"])
+            if held is None or item["score"] > held["score"]:
+                best[item["chunk_id"]] = item
+    return sorted(best.values(), key=lambda item: -item["score"])
+
+
 def _lookup(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
-    scope = _library_scope(thread["scope"], _allowed_private(state, thread), state)
+    allowed = _allowed_private(state, thread)
+    scope = _library_scope(thread["scope"], allowed, state)
     deep = state["mode"] == "deep"
     fetch = DEEP_CANDIDATES if deep else CANDIDATES
     keep = DEEP_KEEP if deep else KEEP
     found = api.search.retrieve(state["query"], scope, fetch)
     ranked = _ranked(state["query"], found)
+    dated = bool(state.get("date_from") or state.get("date_to"))
+    own = _own_words(state, thread, dated)
+    if own is not None:
+        # The thread's scope without the helper's dates, which could filter out
+        # what my own words find.
+        plain = _library_scope(thread["scope"], allowed)
+        ranked = _best_of(ranked, _ranked(own, api.search.retrieve(own, plain, fetch)))
     single = thread["scope"]["kind"] == "documents" and len(thread["scope"]["ids"]) == 1
     kept = _one_per_cap(ranked, keep, single)
     used = {item["chunk_id"] for item in kept}
@@ -501,12 +641,15 @@ def _comparison(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
     the budget is full. Anything left out is named, by code."""
     allowed = _allowed_private(state, thread)
     ids = _scope_ids(thread)
+    own = _own_words(state, thread, dated=False)  # each document's scope has no dates
     per_document = []
     for document_id in ids:
         scope = api.search.Scope(include_private=allowed, document_ids=(document_id,))
-        per_document.append(
-            _ranked(state["query"], api.search.retrieve(state["query"], scope, 8))
-        )
+        items = _ranked(state["query"], api.search.retrieve(state["query"], scope, 8))
+        if own is not None:
+            mine = _ranked(own, api.search.retrieve(own, scope, 8))
+            items = _best_of(items, mine)[:8]
+        per_document.append(items)
     budget = for_mode(state["mode"]).evidence
     chosen, spent, covered, round_no = [], 0, set(), 0
     while any(len(items) > round_no for items in per_document):
@@ -517,11 +660,11 @@ def _comparison(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
             if spent + cost > budget:
                 continue
             spent += cost
-            chosen.append(items[round_no])
+            chosen.append({**_reference(items[round_no]), "round": round_no})
             covered.add(items[round_no]["document_id"])
         round_no += 1
     return {
-        "evidence": [_reference(i) for i in chosen],
+        "evidence": chosen,  # each with its round, which a local fit ranks by
         "also_searched": [],
         "left_out": [d for d in ids if d not in covered],
     }
@@ -839,7 +982,7 @@ def _search_results(
             {
                 "type": "search_result",
                 "source": _source_uri(item),
-                "title": item["title"],
+                "title": _titled(item),
                 "content": [
                     {"type": "text", "text": e["text"]} for e in item["elements"]
                 ],
@@ -847,6 +990,13 @@ def _search_results(
             }
         )
     return blocks
+
+
+def _titled(item: dict[str, Any]) -> str:
+    """A search result's title, with a sheet's column names where its rows came
+    without them. A title is never cited, so a quote stays the document's own words."""
+    columns = item.get("columns")
+    return f"{item['title']} · Columns: {columns}" if columns else item["title"]
 
 
 def _context_text(parts: list[api.Part]) -> str:
@@ -1016,29 +1166,108 @@ def _sources_of(
     return [(item, element) for item in items for element in item["elements"]]
 
 
+def _tagged(at: int, item: dict[str, Any], element: dict[str, Any]) -> str:
+    return (
+        f'<source id="{at}" title="{item["title"]}"{_columns_of(item)}>'
+        f"{element['text']}</source>"
+    )
+
+
 def _local_body(
     sources: list[tuple[dict[str, Any], dict[str, Any]]],
     base: list[api.Part],
     question: str,
 ) -> str:
     tagged = [
-        f'<source id="{at}" title="{item["title"]}">{element["text"]}</source>'
-        for at, (item, element) in enumerate(sources, start=1)
+        _tagged(at, item, element) for at, (item, element) in enumerate(sources, 1)
     ]
     return "\n".join([*tagged, _context_text(base), question])
 
 
+def _columns_of(item: dict[str, Any]) -> str:
+    """A sheet's column names as the tag's attribute, escaped: they're document text."""
+    columns = item.get("columns")
+    return f' columns="{html.escape(columns, quote=True)}"' if columns else ""
+
+
+def _by_rank(state: AskState, items: list[dict[str, Any]]) -> list[int]:
+    """The passages' places, best first. Search hands them over in rank order, but for
+    a comparison of chosen documents (`_comparison`), round by round, each document's
+    next best in turn in the documents' order: those are ranked by their round, then
+    their score. A comparison in a library-wide scope is searched as a lookup, in
+    score order, and has no rounds."""
+    rounds = {
+        e["chunk_id"]: (e["round"], -e["score"])
+        for e in state.get("evidence", [])
+        if "round" in e
+    }
+    if not rounds:
+        return list(range(len(items)))
+    last = (len(items), 0.0)
+    keys = [(*rounds.get(i["chunk_id"], last), at) for at, i in enumerate(items)]
+    return [key[-1] for key in sorted(keys)]
+
+
+def _fit_local(
+    state: AskState, gathered: Gathered, system: str, rest: str
+) -> tuple[Gathered, int]:
+    """The local prompt fitted to its context. The rules, the question, the thread's
+    context and the reserve for thinking and output come first; then the passages by
+    rank, each whole, until the next wouldn't fit. The best is always kept. Those kept
+    go in their own order. A list's cards left out are counted as unseen, and a
+    comparison names any document no longer covered."""
+    room = int(models.LOCAL_CONTEXT * (1 - models.FIT_MARGIN))
+    room -= models.LOCAL_ANSWER_TOKENS + api.count_tokens(system)
+    room -= api.count_tokens(rest)
+    items = gathered.items
+    chosen: set[int] = set()
+    spent = 0
+    for at in _by_rank(state, items):
+        cost = sum(
+            api.count_tokens(_tagged(at + 1, items[at], e))
+            for e in items[at]["elements"]
+        )
+        if chosen and spent + cost > room:
+            break
+        chosen.add(at)
+        spent += cost
+    dropped = len(items) - len(chosen)
+    if not dropped:
+        return gathered, 0
+    kept = [item for at, item in enumerate(items) if at in chosen]
+    _fits["prompts"] += 1
+    logger.info(
+        "a local prompt was fitted to its context: %s",
+        json.dumps({"dropped": dropped, "kept": len(kept), "fitted": _fits["prompts"]}),
+    )
+    if gathered.table is not None:
+        fitted = replace(gathered, items=kept, unseen=gathered.unseen + dropped)
+    else:
+        fitted = replace(gathered, items=kept, left_out=_left_out(state, kept))
+    return fitted, dropped
+
+
 async def _send_local(
     state: AskState,
+    thread_id: str,
     gathered: Gathered,
     on_text: Callable[[str], Awaitable[None]],
-) -> models.Reply:
-    body = _local_body(_sources_of(gathered.items), gathered.base, state["question"])
+) -> tuple[models.Reply, Gathered]:
+    """The reply, and what it was written from: the passages as fitted, which its
+    markers number."""
     table = state.get("table")
+    rest = "\n".join([_context_text(gathered.base), state["question"]])
+    if table is not None:
+        rest = f"{rest}\n{_result_line(table)}"
+    system = prompts.load("answer_list" if table is not None else "answer_local")
+    gathered, dropped = _fit_local(state, gathered, system, rest)
+    body = _local_body(_sources_of(gathered.items), gathered.base, state["question"])
     if table is not None:
         body = f"{body}\n{_result_line(table)}"
-    system = prompts.load("answer_list" if table is not None else "answer_local")
-    return await models.ask_local(system, body, on_text, state.get("local_tag"))
+    counted = api.count_tokens(system) + api.count_tokens(body)
+    of = models.CallOf(thread_id, fit=models.Fit(counted, dropped))
+    reply = await models.ask_local(system, body, on_text, state.get("local_tag"), of)
+    return reply, gathered
 
 
 def _stream_tokens() -> Callable[[str], Awaitable[None]]:
@@ -1158,19 +1387,19 @@ async def answer(state: AskState, config: RunnableConfig) -> dict[str, Any]:
         }
     _step("writing", _writer(current))
     if not gathered.items:
-        return _reply_update(current, None, gathered, False)
+        return _reply_update(current, None, gathered, False, run_id)
     on_text = _stream_tokens()
     if current.get("local"):
-        reply = await _send_local(current, gathered, on_text)
-        return _reply_update(current, reply, gathered, False)
+        reply, gathered = await _send_local(current, thread_id, gathered, on_text)
+        return _reply_update(current, reply, gathered, False, run_id)
     try:
         reply = await _send_cloud(current, thread_id, gathered, budget, on_text)
     except models.NoConnection:
         provider = api.providers.of(_answer_model(current)).name
         _step("writing", _writer(current, f"No connection to {provider}"))
-        reply = await _send_local(current, gathered, on_text)
-        return _reply_update(current, reply, gathered, True)
-    return _reply_update(current, reply, gathered, False)
+        reply, gathered = await _send_local(current, thread_id, gathered, on_text)
+        return _reply_update(current, reply, gathered, True, run_id)
+    return _reply_update(current, reply, gathered, False, run_id)
 
 
 def _writer(state: AskState, fell_back: str | None = None) -> str:
@@ -1187,11 +1416,46 @@ def _writer(state: AskState, fell_back: str | None = None) -> str:
     return line
 
 
+def _handed(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The passages as they were sent, after fitting: what the model had to go on."""
+    return [
+        {
+            "chunk_id": item["chunk_id"],
+            "document_id": item["document_id"],
+            "title": item["title"],
+            "columns": item.get("columns"),
+            "elements": [
+                {"id": e["id"], "text": e["text"], "locator": e.get("locator")}
+                for e in item["elements"]
+            ],
+        }
+        for item in items
+    ]
+
+
+def _written(
+    run_id: str, reply: models.Reply | None, gathered: Gathered
+) -> dict[str, Any]:
+    """Kept apart from the answer, which Verify replaces: a reply Verify throws away
+    is still here to see. Each turn's replaces the last."""
+    return {
+        "run_id": run_id,
+        "text": reply.text if reply else "",
+        "content": reply.content if reply else "",
+        "cites": _cites(reply),
+        "local": bool(reply.local) if reply else False,
+        "model": reply.model if reply else "",
+        "handed": _handed(gathered.items),
+        "table": gathered.table,  # a list's, worked out from the cards; else None
+    }
+
+
 def _reply_update(
     state: AskState,
     reply: models.Reply | None,
     gathered: Gathered,
     fell_back: bool,
+    run_id: str,
 ) -> dict[str, Any]:
     activity = list(state.get("activity", []))
     why = state.get("route_reason")
@@ -1218,6 +1482,7 @@ def _reply_update(
             "items": gathered.items,
             "unseen": gathered.unseen,
         },
+        "written": _written(run_id, reply, gathered),
         "cost_usd": reply.cost_usd if reply else 0.0,
     }
 
@@ -1291,7 +1556,7 @@ def _table_payload(
 
 
 def _built_from(reply: dict[str, Any], items: list[dict[str, Any]]) -> citations.Built:
-    if reply["text"].strip() in ("", citations.NO_EVIDENCE):
+    if not reply["text"].strip() or citations.is_refusal(reply["text"]):
         return citations.Built()
     if reply["local"] or reply.get("cites") == "markers":
         return citations.from_markers(reply["text"], _sources_of(items))
@@ -1313,11 +1578,12 @@ def _verified(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
     table = state.get("table")
     if table is not None and table["rows"]:
         built = _built_from(reply, items)
+        shown = _table_payload(table, items)
         return {
             "kind": "list",
-            "parts": built.parts,
+            "parts": _with_figures(built, items, shown),
             "citations": built.citations,
-            "table": _table_payload(table, items),
+            "table": shown,
         }
     if not items:
         return _no_evidence(state, thread)
@@ -1331,7 +1597,7 @@ def _verified(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
         return _no_evidence(state, thread)
     payload: dict[str, Any] = {
         "kind": "answer",
-        "parts": built.parts,
+        "parts": _with_figures(built, items, None),
         "citations": built.citations,
         "also_searched": _also_searched(state, allowed),
     }
@@ -1341,15 +1607,48 @@ def _verified(state: AskState, thread: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _with_figures(
+    built: citations.Built, items: list[dict[str, Any]], table: dict[str, Any] | None
+) -> list[dict[str, Any]]:
+    """Each cited sentence with its figures checked against the passages it cites, as
+    the model was given them, with their documents' titles. Nothing is rewritten: a
+    part only gains what the check found, and a list's total is never marked."""
+    given = {
+        element["id"]: figures.Passage(element["text"], item["title"])
+        for item, element in _sources_of(items)
+    }
+    passages = {
+        c["n"]: given[c["element_id"]]
+        for c in built.citations
+        if c["element_id"] in given
+    }
+    found = figures.check(built.parts, passages, figures.worked_of(table))
+    return [
+        {**part, "figures": checked} if checked else part
+        for part, checked in zip(built.parts, found, strict=True)
+    ]
+
+
+def _figures_line(payload: dict[str, Any]) -> str | None:
+    """Activity's line when a figure is marked: counts only."""
+    every = [f for part in payload.get("parts", []) for f in part.get("figures") or []]
+    unshown = sum(1 for f in every if f["state"] == figures.UNSHOWN)
+    if not unshown:
+        return None
+    logger.info(
+        "figures checked: %s", json.dumps({"checked": len(every), "unshown": unshown})
+    )
+    return (
+        f"Checked {len(every)} figures against their passages: {unshown} not in "
+        "its sources"
+    )
+
+
 def _cloud_line(model: str, tokens: int, cost: float) -> str:
     found = api.catalog.get(model)
     return (
         f"Cloud AI, {found.name if found else model} · {tokens:,} tokens · ${cost:.2f}"
     )
-
-
-def _strip_markers(text: str) -> str:
-    return citations.MARKER.sub("", text)
 
 
 async def verify(state: AskState, config: RunnableConfig) -> dict[str, Any]:
@@ -1362,7 +1661,12 @@ async def verify(state: AskState, config: RunnableConfig) -> dict[str, Any]:
         if reply["local"]
         else _cloud_line(reply["model"], reply["tokens"], state.get("cost_usd", 0.0))
     )
-    activity = [*state.get("activity", []), f"Wrote the answer with {written}"]
+    marked = _figures_line(payload)
+    activity = [
+        *state.get("activity", []),
+        f"Wrote the answer with {written}",
+        *([marked] if marked else []),
+    ]
     found = None if reply["local"] else api.catalog.get(reply["model"])
     payload.update(
         {
@@ -1383,30 +1687,11 @@ async def verify(state: AskState, config: RunnableConfig) -> dict[str, Any]:
     )
     return {
         "answer": payload,
-        "turns": [AIMessage(_plain_of(payload) or citations.NO_EVIDENCE)],
+        "turns": [AIMessage(plain.text_of(payload) or citations.NO_EVIDENCE)],
     }
 
 
 # ---- Save + remember ----
-
-
-def _plain_of(payload: dict[str, Any]) -> str:
-    """The answer in words, a list's rows and total with it: what's saved and copied,
-    and what a follow-up reads."""
-    if payload.get("counted"):
-        return COUNTED_WORDS
-    words = "".join(part.get("text", "") for part in payload.get("parts", []))
-    table = payload.get("table")
-    if not table:
-        return words
-    lines = [words] if words else []
-    for row in table["rows"]:
-        lines.append(
-            f"{row['title']}, {row['doc_date'] or 'no date'}: {row['amount_text']}"
-        )
-    if table["wants_total"]:
-        lines.append(f"Total: ${table['total']:,.2f}")
-    return "\n".join(lines)
 
 
 def _documents_used(payload: dict[str, Any]) -> list[str]:
@@ -1418,22 +1703,30 @@ def _documents_used(payload: dict[str, Any]) -> list[str]:
 
 
 def _rested_on(state: AskState, payload: dict[str, Any]) -> list[str]:
-    """Everything the answer may have drawn on, cited or not."""
+    """Everything the answer may have drawn on, cited or not: a list's documents that
+    couldn't be counted included, as the model is given them in its total."""
     found = [e["document_id"] for e in state.get("evidence", [])]
     table = state.get("table") or {"rows": []}
     found.extend(row["document_id"] for row in table["rows"])
+    found.extend(row["document_id"] for row in table.get("pending", []))
     found.extend(_documents_used(payload))
     return list(dict.fromkeys(found))
 
 
 def _save_turn(thread_id: str, run_id: str, state: AskState) -> bool:
-    payload = state["answer"]
+    # What it rested on and the memories it was given go with it, so a report of it
+    # can tell, each time it's run, whether it's Private.
+    payload = {
+        **state["answer"],
+        "rested_on": _rested_on(state, state["answer"]),
+        "memory_ids": list(state.get("memory_ids") or []),
+    }
     return api.threads.save_turn(
         thread_id,
         run_id,
         {
             "role": api.threads.ROLE_ASSISTANT,
-            "content": _plain_of(payload),
+            "content": plain.text_of(payload),
             "answer": payload,
         },
         _documents_used(payload),
@@ -1469,7 +1762,7 @@ async def _rebuild_summary(
     )
     try:
         text = await models.helper_text(task)
-    except models.LocalNotReady:
+    except (models.LocalNotReady, models.HelperCut):
         return False  # the turns stay as they are, and the next turn can summarize
     clean = await asyncio.to_thread(memory.scrub, text)
     ordinal = await asyncio.to_thread(_latest_ordinal, thread_id)
@@ -1505,6 +1798,10 @@ def _deleted_texts(thread_id: str) -> set[str]:
 async def save(state: AskState, config: RunnableConfig) -> dict[str, Any]:
     thread_id, run_id = _ids(config)
     await asyncio.to_thread(_save_turn, thread_id, run_id, state)
+    if state.get("blocked"):
+        # Passages found, with no model: nothing is summarised now, as a summary
+        # takes a model. The next question a model answers folds the history.
+        return {}
     thread = await asyncio.to_thread(api.threads.get, thread_id)
     budget = for_mode(state["mode"])
     turns = state.get("turns", [])
@@ -1529,6 +1826,7 @@ def build(checkpointer: Any) -> Any:
     graph = StateGraph(AskState)
     graph.add_node("prepare", prepare)
     graph.add_node("library_facts", library_facts)
+    graph.add_node("passages", passages)
     graph.add_node("plan", plan)
     graph.add_node("retrieve", retrieve)
     graph.add_node("grade", grade)
@@ -1536,7 +1834,10 @@ def build(checkpointer: Any) -> Any:
     graph.add_node("verify", verify)
     graph.add_node("save", save)
     graph.add_edge(START, "prepare")
-    graph.add_conditional_edges("prepare", after_prepare, ["library_facts", "plan"])
+    graph.add_conditional_edges(
+        "prepare", after_prepare, ["passages", "library_facts", "plan"]
+    )
+    graph.add_edge("passages", "save")
     graph.add_edge("library_facts", "save")
     graph.add_edge("plan", "retrieve")
     graph.add_edge("retrieve", "grade")

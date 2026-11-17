@@ -12,6 +12,8 @@ import {
 import { pullLocalModel, updateSettings } from "../../api";
 import type { InstalledModel, LocalJob, ModelsStatus } from "../../api";
 import { useAction } from "../../useAction";
+import { localShortScore } from "../../scoreWords";
+import { LocalScores, LocalScoresNote } from "./LocalScores";
 import { Row } from "./Row";
 
 // Settings, Local models: a model for each job, what's installed in Ollama, and a
@@ -77,16 +79,24 @@ function JobRow({
 }>): ReactElement {
   const { tag } = models.jobs[job.id];
   const options = models.installed.local.filter((m) => m.jobs.includes(job.id));
-  const present = options.some((m) => m.name === tag);
+  const chosen = options.find((m) => m.name === tag);
   const id = `lm-${job.id}`;
+  // Only answers are measured: a model's scores are kept for the build measured.
+  const answers = job.id === "local_answers";
   return (
     <Row
       title={job.title}
       desc={
         <>
           <span>{job.desc}</span>
+          {answers && chosen && <LocalScoresNote model={chosen} />}
           <JobWarning job={job.id} models={models} />
         </>
+      }
+      below={
+        answers && chosen ? (
+          <LocalScores model={chosen} id={`sc-${job.id}`} />
+        ) : undefined
       }
     >
       <label className="sr-only" htmlFor={id}>
@@ -95,15 +105,15 @@ function JobRow({
       <select
         id={id}
         className="select"
-        style={{ width: 240 }}
-        value={present ? tag : ""}
-        aria-invalid={!present}
+        style={{ width: answers ? 340 : 240 }}
+        value={chosen ? tag : ""}
+        aria-invalid={!chosen}
         disabled={saving}
         onChange={(event) => {
           onChoose(event.target.value);
         }}
       >
-        {!present && (
+        {!chosen && (
           <option value="" disabled>
             Choose a model
           </option>
@@ -112,6 +122,7 @@ function JobRow({
           <option key={m.name} value={m.name}>
             {m.name}
             {m.name === models.local.recommended ? " · suggested" : ""}
+            {answers ? localShortScore(m) : ""}
           </option>
         ))}
       </select>

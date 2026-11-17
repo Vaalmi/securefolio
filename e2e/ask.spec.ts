@@ -259,3 +259,27 @@ test("a chat's row menu shows in full at the bottom of a long sidebar", async ({
   await page.keyboard.press("Escape");
   await Promise.all(made.map((id) => api(`/threads/${id}`, "DELETE")));
 });
+
+test("a citation opens at its sentence's figure, on the page and in the viewer", async ({
+  page,
+}) => {
+  const id = (await documentNamed("Roof inspection report.pdf")).id;
+  await page.goto(`/#/ask/new?scope=sel:${id}`);
+  const dock = page.getByRole("textbox", { name: "Ask a question" });
+  await dock.fill("How much will the roof work cost?");
+  // The Ask button waits for who would answer; then Return asks.
+  await expect(
+    page.getByRole("button", { name: /^Ask (Cloud|Local) AI/ }),
+  ).toBeEnabled();
+  await dock.press("Enter");
+  const answer = page.getByRole("article", { name: "Answer" });
+  await expect(answer).toContainText("gives $");
+  await answer.locator("button.cite").first().click();
+  const preview = page.getByRole("complementary", { name: "Sources" });
+  await expect(preview.getByTestId("pdf-page")).toBeVisible();
+  await expect(preview.getByTestId("pdf-figure")).toHaveCount(1);
+  await expect(preview.getByRole("note")).toContainText("Highlighted: $");
+  await preview.getByRole("button", { name: "Open in viewer" }).click();
+  await expect(page).toHaveURL(/#\/doc\/.*el=.*&message=[0-9a-f]+&sentence=0$/);
+  await expect(page.getByTestId("pdf-figure")).toHaveCount(1);
+});

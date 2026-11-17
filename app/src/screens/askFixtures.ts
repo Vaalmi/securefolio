@@ -58,6 +58,13 @@ export const ANSWER = {
   fell_back: false,
 };
 
+// What the backend sends as Copy's text for ANSWER (agent/plain.py, `copy_of`).
+export const COPY_TEXT = [
+  "One cat is fine.[1] This has no source. (uncited) ",
+  "[1] Apartment lease, Page 6",
+  "(uncited): no passage given to the model supports this sentence.",
+].join("\n");
+
 export function turn(answer: object) {
   return [
     {
@@ -72,6 +79,7 @@ export function turn(answer: object) {
       role: "assistant",
       content: "One cat is fine.",
       answer,
+      copy_text: COPY_TEXT,
       created_at: 1_700_000_000,
     },
   ];

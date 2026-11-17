@@ -332,14 +332,34 @@ def where_clause(
 COLUMNS = ["id", "document_id", "revision_id", "sensitivity", "text"]
 
 
+HYBRID = "hybrid"  # what Ask and search always use
+WORDS = "words"  # BM25 alone: for the search measures only
+MEANING = "meaning"  # vectors alone: for the search measures only
+KINDS = (HYBRID, WORDS, MEANING)
+
+
 def search(
-    text: str, vector: np.ndarray | None, where: str | None, limit: int
+    text: str,
+    vector: np.ndarray | None,
+    where: str | None,
+    limit: int,
+    kind: str = HYBRID,
 ) -> list[dict[str, Any]]:
-    """Hybrid when there's a vector; BM25 alone when the model isn't ready yet."""
+    """Hybrid when there's a vector; BM25 alone when the model isn't ready yet. The
+    search measures alone ask for one part on its own: words, or meaning, which
+    needs the vector and ranks by the index's own cosine distance."""
+    if kind not in KINDS:
+        raise ValueError(f"No search of kind {kind!r}")
     table = _table()
     if table.count_rows() == 0:
         return []
-    if vector is None:
+    if kind == MEANING:
+        if vector is None:
+            return []
+        query = table.search(vector.tolist(), query_type="vector").distance_type(
+            "cosine"
+        )
+    elif vector is None or kind == WORDS:
         query = table.search(text, query_type="fts", fts_columns="text")
     else:
         query = (

@@ -257,11 +257,11 @@ def test_a_local_helper_setting_keeps_helpers_on_this_mac(library, cloud, monkey
     keychain.set_key("sk-ant-x")
     asked = []
 
-    async def local(system, _body, _on_text=None, tag=None):
-        asked.append(system)
-        return models.Reply(text="Done.", content="Done.", local=True)
+    async def local(task):
+        asked.append(task.system)
+        return "Done."
 
-    monkeypatch.setattr(models, "ask_local", local)
+    monkeypatch.setattr(models, "_local_text", local)
     task = models.Task(policy.Purpose.SUMMARY, "Summarize.", [], None, False)
     assert asyncio.run(models.helper_text(task)) == "Done."
     assert cloud.requests == []

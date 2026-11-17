@@ -13,6 +13,7 @@ from backend import (
     backup,
     database,
     keychain,
+    local_measured,
     model_catalog,
     model_store,
     policy,
@@ -259,9 +260,14 @@ def get_models(_: AppToken) -> dict[str, Any]:
         }
         for job in settings.LOCAL_JOBS
     }
+    installed = model_store.installed_models()
+    for model in installed["local"]:  # each one's scores, for the build installed
+        model["measured"] = local_measured.of(
+            model["name"], model_store.digest(model["name"])
+        )
     return {
         "jobs": jobs,
-        "installed": model_store.installed_models(),
+        "installed": installed,
         "memory": model_store.memory_needed([job["tag"] for job in jobs.values()]),
         "mac_memory_gb": model_store.memory_gib(),
         "search": model_store.group_status("search"),

@@ -9,7 +9,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q2",
@@ -21,7 +22,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q3",
@@ -33,7 +35,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q4",
@@ -45,7 +48,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q5",
@@ -57,7 +61,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q6",
@@ -69,7 +74,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q7",
@@ -81,7 +87,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q8",
@@ -93,7 +100,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q9",
@@ -105,7 +113,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q10",
@@ -117,7 +126,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q11",
@@ -141,7 +151,8 @@
    "$989.60",
    "$675.67",
    "$1,366.15"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q12",
@@ -163,7 +174,8 @@
   },
   "answer_facts": [
    "$3,031.42"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q13",
@@ -175,7 +187,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q14",
@@ -187,7 +200,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q15",
@@ -199,7 +213,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q16",
@@ -211,7 +226,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q17",
@@ -223,7 +239,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q18",
@@ -235,7 +252,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q19",
@@ -247,7 +265,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q20",
@@ -272,7 +291,8 @@
    "$7,854.43",
    "$7,615.75",
    "$29,795.53"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q21",
@@ -294,7 +314,8 @@
   },
   "answer_facts": [
    "2 years"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q22",
@@ -306,7 +327,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q23",
@@ -318,7 +340,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q24",
@@ -338,7 +361,8 @@
   },
   "answer_facts": [
    "$18,152.40"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q25",
@@ -350,7 +374,8 @@
   "documents": [],
   "private": true,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q26",
@@ -362,7 +387,8 @@
   "documents": [],
   "private": true,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q27",
@@ -374,7 +400,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q28",
@@ -386,7 +413,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q29",
@@ -398,7 +426,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q30",
@@ -410,7 +439,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q31",
@@ -422,7 +452,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q32",
@@ -434,7 +465,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q33",
@@ -446,7 +478,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q34",
@@ -458,7 +491,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q35",
@@ -470,7 +504,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q36",
@@ -482,7 +517,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q37",
@@ -494,7 +530,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q38",
@@ -506,7 +543,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q39",
@@ -518,7 +556,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q40",
@@ -530,7 +569,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q41",
@@ -542,7 +582,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q42",
@@ -554,7 +595,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q43",
@@ -566,7 +608,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": "document"
  },
  {
   "id": "q44",
@@ -578,7 +621,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q45",
@@ -598,7 +642,8 @@
   },
   "answer_facts": [
    "$798.79"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q46",
@@ -618,7 +663,8 @@
   },
   "answer_facts": [
    "$297.93"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q47",
@@ -638,7 +684,8 @@
   },
   "answer_facts": [
    "$1,046.12"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q48",
@@ -658,7 +705,8 @@
   },
   "answer_facts": [
    "$1,805.56"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q49",
@@ -678,7 +726,8 @@
   },
   "answer_facts": [
    "$506.14"
-  ]
+  ],
+  "assessed_by": null
  },
  {
   "id": "q50",
@@ -690,7 +739,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q51",
@@ -702,7 +752,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q52",
@@ -714,7 +765,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q53",
@@ -726,7 +778,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q54",
@@ -738,7 +791,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q55",
@@ -750,7 +804,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q56",
@@ -762,7 +817,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q57",
@@ -774,7 +830,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q58",
@@ -786,7 +843,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q59",
@@ -798,7 +856,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q60",
@@ -810,7 +869,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q61",
@@ -822,7 +882,8 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
  },
  {
   "id": "q62",
@@ -834,6 +895,177 @@
   "documents": [],
   "private": false,
   "passage_facts": {},
-  "answer_facts": []
+  "answer_facts": [],
+  "assessed_by": null
+ },
+ {
+  "id": "f1",
+  "category": "fact",
+  "question": "When does it end?",
+  "expected_document": "Home/Apartment lease.pdf",
+  "expected_page": 1,
+  "answer": "August 3, 2027",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q1",
+  "standalone": "When does my apartment lease end?"
+ },
+ {
+  "id": "f2",
+  "category": "near_miss",
+  "question": "Is there a parking fee in it?",
+  "expected_document": "Home/Apartment lease.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q3",
+  "standalone": "What is the parking fee on my apartment lease?"
+ },
+ {
+  "id": "f3",
+  "category": "fact",
+  "question": "And the second limit, in miles?",
+  "expected_document": "Home/Car warranty booklet.pdf",
+  "expected_page": 2,
+  "answer": "90,000 miles",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q5",
+  "standalone": "At what mileage does the car warranty's basic coverage end?"
+ },
+ {
+  "id": "f4",
+  "category": "near_miss",
+  "question": "What's its cancellation fee?",
+  "expected_document": "Finance/Renters policy.pdf",
+  "expected_page": null,
+  "answer": null,
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q9",
+  "standalone": "What's the cancellation fee on my renters policy?"
+ },
+ {
+  "id": "f5",
+  "category": "multi",
+  "question": "Which of them costs the most?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Finance/Auto policy.pdf",
+   "Finance/Renters policy.pdf",
+   "Finance/Umbrella policy.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Finance/Auto policy.pdf": "$989.60",
+   "Finance/Renters policy.pdf": "$675.67",
+   "Finance/Umbrella policy.pdf": "$1,366.15"
+  },
+  "answer_facts": [
+   "$1,366.15"
+  ],
+  "assessed_by": null,
+  "follows": "q12",
+  "standalone": "Which of my insurance policies has the highest annual premium?"
+ },
+ {
+  "id": "f6",
+  "category": "exact",
+  "question": "What was its invoice number?",
+  "expected_document": "Finance/Tanner Hardware receipt.pdf",
+  "expected_page": null,
+  "answer": "INV-403991",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q13",
+  "standalone": "What is the invoice number on my Tanner Hardware receipt?"
+ },
+ {
+  "id": "f7",
+  "category": "fact",
+  "question": "Within how many years?",
+  "expected_document": "Home/Roof inspection report.pdf",
+  "expected_page": 2,
+  "answer": "2 years",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q17",
+  "standalone": "Within how many years does the roof need work, by the roof inspection report?"
+ },
+ {
+  "id": "f8",
+  "category": "multi",
+  "question": "And what would the work in all three cost?",
+  "expected_document": null,
+  "expected_page": null,
+  "answer": null,
+  "documents": [
+   "Home/Roof inspection report.pdf",
+   "Home/Energy audit report.pdf",
+   "Home/Foundation survey report.pdf"
+  ],
+  "private": false,
+  "passage_facts": {
+   "Home/Roof inspection report.pdf": "$14,325.35",
+   "Home/Energy audit report.pdf": "$7,854.43",
+   "Home/Foundation survey report.pdf": "$7,615.75"
+  },
+  "answer_facts": [
+   "$29,795.53"
+  ],
+  "assessed_by": null,
+  "follows": "q21",
+  "standalone": "What would the work in the three house reports cost in all?"
+ },
+ {
+  "id": "f9",
+  "category": "fact",
+  "question": "And in April?",
+  "expected_document": "Finance/Bank statement April.pdf",
+  "expected_page": 1,
+  "answer": "$35,445.31",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q22",
+  "standalone": "What was my closing balance in April 2026?"
+ },
+ {
+  "id": "f10",
+  "category": "fact",
+  "question": "What was the closing balance on the second one?",
+  "expected_document": "Finance/Bank statement April.pdf",
+  "expected_page": 1,
+  "answer": "$35,445.31",
+  "documents": [],
+  "private": false,
+  "passage_facts": {},
+  "answer_facts": [],
+  "assessed_by": null,
+  "follows": "q24",
+  "standalone": "What was my closing balance in April 2026?"
  }
 ]

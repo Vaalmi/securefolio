@@ -1,10 +1,102 @@
 import type { ReactElement } from "react";
-import { AlertTriangle, Info, Lock } from "lucide-react";
+import { AlertTriangle, Calculator, Info, Lock, TextQuote } from "lucide-react";
 
 import type { Answer } from "../api";
 import { fmtDate } from "../format";
-import { AnswerBody } from "./AskParts";
+import { AnswerBody, TipTag, WORKED_TIP } from "./AskParts";
 import { money } from "../money";
+
+/**
+ * What search found when no model could answer: labelled as not an answer, with
+ * why, each passage previewing its document. It adds nothing up and says no list
+ * is complete.
+ */
+export function PassagesFound({
+  answer,
+  scopeLabel,
+  onPreview,
+}: Readonly<{
+  answer: Answer;
+  scopeLabel: string;
+  onPreview: (key: string) => void;
+}>): ReactElement {
+  const found = answer.found ?? [];
+  const coverage = answer.coverage ?? {
+    searched: 0,
+    indexing: 0,
+    private_folders: 0,
+  };
+  const searched = `${coverage.searched.toLocaleString("en-US")} ${coverage.searched === 1 ? "document" : "documents"} in ${scopeLabel}`;
+  const words = answer.follow_up ? (
+    <p className="small">
+      Found with your words alone. No AI read this question with the chat's
+      earlier ones, so whatever it refers back to wasn't worked out.
+    </p>
+  ) : null;
+  if (found.length === 0)
+    return (
+      <div className="banner info" role="status">
+        <span className="banner-icon">
+          <Info size={16} aria-hidden="true" />
+        </span>
+        <div className="stack" style={{ gap: 4 }}>
+          <strong>I couldn't find enough evidence in this scope.</strong>
+          <p className="small">
+            Searched {searched}.
+            {coverage.indexing > 0 &&
+              ` ${coverage.indexing.toLocaleString("en-US")} more are still indexing.`}
+          </p>
+          <p className="small">No AI answered: {answer.reason}</p>
+          {words}
+        </div>
+      </div>
+    );
+  return (
+    <div className="stack" style={{ gap: 10 }}>
+      <div className="stack" style={{ gap: 4 }}>
+        <h2 className="h-sm hstack" style={{ gap: 6 }}>
+          <TextQuote size={16} aria-hidden="true" /> Passages found, no AI
+          answer
+        </h2>
+        <p className="small" style={{ color: "var(--ink-2)" }}>
+          SecureFolio hasn't checked that they answer your question. No AI could
+          answer: {answer.reason}
+        </p>
+        {words}
+      </div>
+      <div className="stack" style={{ gap: 8 }}>
+        {found.map((passage) => (
+          <div
+            key={`${passage.document_id}${passage.element_id ?? ""}`}
+            className="passage"
+          >
+            <div className="p-head">
+              <strong>{passage.title}</strong>
+              <span className="muted">· {passage.label}</span>
+              <span className="spacer" />
+              <button
+                type="button"
+                className="btn sm"
+                aria-label={`Preview ${passage.title}, ${passage.label}`}
+                onClick={() => {
+                  onPreview(
+                    `x-${passage.document_id}-${passage.element_id ?? ""}`,
+                  );
+                }}
+              >
+                Preview
+              </button>
+            </div>
+            <blockquote>{passage.text}</blockquote>
+          </div>
+        ))}
+      </div>
+      <p className="xs muted">
+        Searched {searched}, on this Mac. Nothing was sent anywhere.
+      </p>
+    </div>
+  );
+}
 
 export function NoEvidence({
   answer,
@@ -112,8 +204,14 @@ export function ListAnswer({
     <div className="stack" style={{ gap: 12 }}>
       {table.wants_total && (
         <p>
-          The total is <strong className="mono">{money(table.total)}</strong>,
-          across {table.rows.length} documents, worked out from their cards.
+          The total is <strong className="mono">{money(table.total)}</strong>
+          <TipTag
+            className="badge outline worked-tag"
+            icon={<Calculator size={12} aria-hidden="true" />}
+            label="Worked out"
+            tip={WORKED_TIP}
+          />
+          , across {table.rows.length} documents, worked out from their cards.
         </p>
       )}
       {(answer.parts?.length ?? 0) > 0 && (

@@ -117,6 +117,9 @@ function Turns({
             onIncludePrivate={() => {
               void ask.changeScope.run(ALL_PRIVATE, false);
             }}
+            before={
+              messages.slice(0, at - 1).filter((m) => m.role === "user").length
+            }
           />
         );
       })}

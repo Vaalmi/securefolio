@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import type { ReactElement } from "react";
 import {
   ChevronLeft,
@@ -13,6 +13,7 @@ import {
 
 import { downloadDocument, reindexDocument, relocateDocument } from "../api";
 import type { DocumentDetail, Locator, PageCost, Rect } from "../api";
+import { CitedFigures } from "../citedFigures";
 import { chooseFile } from "../desktop";
 import { fmtMoment, pageOf } from "../format";
 import { Modal } from "../ui";
@@ -288,6 +289,10 @@ export function Viewer({
   const [declined, setDeclined] = useState(false);
   const kind = doc.file_kind;
   const onThisPage = pageOf(locator) === page;
+  const placed = useContext(CitedFigures);
+  const figures = onThisPage
+    ? placed.flatMap((f) => (f.kind === "pdf" ? f.rects : []))
+    : [];
   const { rects, precision } = onThisPage
     ? rectsOf(locator)
     : { rects: [], precision: null };
@@ -326,6 +331,7 @@ export function Viewer({
             zoom={zoom}
             rects={rects}
             precision={precision}
+            figures={figures}
             label={doc.title}
             onPages={setPages}
             onDeclined={() => {

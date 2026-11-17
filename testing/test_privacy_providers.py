@@ -61,7 +61,7 @@ STUB_ENVS = {
     providers.OPENAI: STUB_OPENAI_ENV,
     providers.OPENROUTER: STUB_OPENROUTER_ENV,
 }
-SOURCE = re.compile(r'<source id="\d+" title="[^"]*">(.*?)</source>', re.DOTALL)
+SOURCE = re.compile(r'<source id="\d+" title="[^"]*"[^>]*>(.*?)</source>', re.DOTALL)
 
 
 def planted() -> str:

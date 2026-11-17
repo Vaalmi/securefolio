@@ -5,6 +5,8 @@ calibration half and, with the maintainer's secret seed, the sealed held-out hal
 import io
 import json
 import random
+import sys
+import tempfile
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
@@ -75,6 +77,8 @@ FOLDERS = {
     "Medical": "private",
     "Taxes": "private",
 }
+CALIBRATION = 303  # the calibration half's seed
+HELD_OUT_PREFIX = "H "  # on the held-out half's documents and question ids
 HALF_FILLER_DOCS = 12
 TOPIC_FACTS = 7
 TOPIC_FINDS = 6
@@ -94,6 +98,16 @@ class Question:
     # words the answer must hold.
     passage_facts: dict[str, str] = field(default_factory=dict)
     answer_facts: list[str] = field(default_factory=list)
+    # "document" when the fact asked for is the document itself: a "find" question is
+    # right when it cites the expected document.
+    assessed_by: str | None = None
+    # A follow-up: the id of the first question whose thread it's asked in, as the
+    # second turn, and the question it stands for alone.
+    follows: str | None = None
+    standalone: str | None = None
+
+
+FOLLOW_UP_FIELDS = ("follows", "standalone")  # written for follow-ups only
 
 
 class Builder:
@@ -102,6 +116,7 @@ class Builder:
         self.rng = random.Random(seed)  # noqa: S311
         self.prefix = prefix
         self.questions: list[Question] = []
+        self.follow_ups: list[Question] = []
         self.locators: dict[str, dict[str, Any]] = {}
         for folder in FOLDERS:
             (out / folder).mkdir(parents=True, exist_ok=True)
@@ -187,6 +202,16 @@ class Builder:
         self.find("Find my apartment lease", doc)
         self.fact("When does my apartment lease end?", doc, 1, end)
         self.near("What is the parking fee on my apartment lease?", doc)
+        self.follow_up(
+            Question("", "fact", "When does it end?", doc, 1, end),
+            "What is the pet deposit on my apartment lease?",
+            "When does my apartment lease end?",
+        )
+        self.follow_up(
+            Question("", "near_miss", "Is there a parking fee in it?", doc),
+            "When does my apartment lease end?",
+            "What is the parking fee on my apartment lease?",
+        )
 
     def warranty(self) -> None:
         end = self.day(2026, 2029)
@@ -206,6 +231,11 @@ class Builder:
             ),
         )
         self.fact("When does the car warranty end?", doc, 2, end)
+        self.follow_up(  # "the second one" as a clause: the second of two limits
+            Question("", "fact", "And the second limit, in miles?", doc, 2, miles),
+            "When does the car warranty end?",
+            "At what mileage does the car warranty's basic coverage end?",
+        )
         self.find("Open the warranty booklet for my car", doc)
         self.near("Does the car warranty cover tire replacement?", doc)
 
@@ -228,6 +258,12 @@ class Builder:
             )
             docs.append((doc, premium))
             self.exact(f"What is the policy number on my {name.lower()}?", doc, number)
+            if name == "Renters policy":
+                self.follow_up(
+                    Question("", "near_miss", "What's its cancellation fee?", doc),
+                    "What is the policy number on my renters policy?",
+                    "What's the cancellation fee on my renters policy?",
+                )
         premiums = dict(docs)
         self.multi(
             "Compare the annual premiums across my insurance policies.",
@@ -238,6 +274,19 @@ class Builder:
             "What did I spend on insurance in 2025?",
             premiums,
             [_sum_of(premiums.values())],
+        )
+        highest = max(premiums.values(), key=_amount)
+        self.follow_up(  # the scope carried over: the policies it just spoke of
+            Question(
+                "",
+                "multi",
+                "Which of them costs the most?",
+                documents=list(premiums),
+                passage_facts=premiums,
+                answer_facts=[highest],
+            ),
+            "What did I spend on insurance in 2025?",
+            "Which of my insurance policies has the highest annual premium?",
         )
 
     def receipts(self) -> None:
@@ -259,6 +308,14 @@ class Builder:
             )
             self.exact(f"How much did I pay for {what}?", doc, total)
             self.find(f"Where's the receipt from {shop}?", doc)
+            if shop == "Tanner Hardware":
+                self.follow_up(
+                    Question(
+                        "", "exact", "What was its invoice number?", doc, None, number
+                    ),
+                    f"How much did I pay for {what}?",
+                    f"What is the invoice number on my {shop} receipt?",
+                )
 
     def reports(self) -> None:
         docs: list[str] = []
@@ -278,12 +335,15 @@ class Builder:
             )
             docs.append(doc)
             costs[doc], soonest[doc] = cost, finding
-            self.fact(
-                f"What does the {name.lower()} report estimate the work will cost?",
-                doc,
-                2,
-                cost,
-            )
+            asked = f"What does the {name.lower()} report estimate the work will cost?"
+            self.fact(asked, doc, 2, cost)
+            if topic == "roof":
+                self.follow_up(
+                    Question("", "fact", "Within how many years?", doc, 2, finding),
+                    asked,
+                    "Within how many years does the roof need work, by the roof "
+                    "inspection report?",
+                )
         self.multi(
             "What do the three house reports recommend, and what would it all cost?",
             costs,
@@ -294,6 +354,18 @@ class Builder:
             "Which of the house reports says work is needed soonest?",
             soonest,
             [soonest[first]],
+        )
+        self.follow_up(  # the scope carried over: the three reports
+            Question(
+                "",
+                "multi",
+                "And what would the work in all three cost?",
+                documents=list(costs),
+                passage_facts=costs,
+                answer_facts=[_sum_of(costs.values())],
+            ),
+            "Which of the house reports says work is needed soonest?",
+            "What would the work in the three house reports cost in all?",
         )
 
     def statements(self) -> None:
@@ -317,6 +389,24 @@ class Builder:
             "How did my closing balance change from March to April 2026?",
             balances,
             [_money(abs(_amount(april) - _amount(march)))],
+        )
+        april_doc = list(balances)[1]
+        self.follow_up(  # a period carried over
+            Question("", "fact", "And in April?", april_doc, 1, april),
+            "What was my closing balance in March 2026?",
+            "What was my closing balance in April 2026?",
+        )
+        self.follow_up(  # "the second one" as a document: the second it named
+            Question(
+                "",
+                "fact",
+                "What was the closing balance on the second one?",
+                april_doc,
+                1,
+                april,
+            ),
+            "How did my closing balance change from March to April 2026?",
+            "What was my closing balance in April 2026?",
         )
 
     def private_docs(self) -> None:
@@ -523,8 +613,18 @@ class Builder:
     ) -> None:
         self.questions.append(Question(self._id(), category, text, doc, page, answer))
 
+    def follow_up(self, question: Question, first: str, standalone: str) -> None:
+        """A second turn in the thread of the first question asked as `first`. It
+        draws nothing from the seed, so adding follow-ups changes no document."""
+        (asked,) = [q for q in self.questions if q.question == first]
+        question.id = f"{self.prefix}f{len(self.follow_ups) + 1}"
+        question.follows, question.standalone = asked.id, standalone
+        self.follow_ups.append(question)
+
     def find(self, text: str, doc: str) -> None:
-        self.questions.append(Question(self._id(), "find", text, doc))
+        self.questions.append(
+            Question(self._id(), "find", text, doc, assessed_by="document")
+        )
 
     def exact(self, text: str, doc: str, answer: str) -> None:
         self.questions.append(Question(self._id(), "exact", text, doc, None, answer))
@@ -839,15 +939,61 @@ def _text_pdf(lines: list[str]) -> bytes:
     return buffer.getvalue()
 
 
+def _written(question: Question) -> dict[str, Any]:
+    """A question as the set holds it: a first question has no follow-up fields."""
+    found = asdict(question)
+    if question.follows is None:
+        for name in FOLLOW_UP_FIELDS:
+            found.pop(name)
+    return found
+
+
 def write_questions(builder: Builder, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    asked = [*builder.questions, *builder.follow_ups]
     path.write_text(
-        json.dumps([asdict(q) for q in builder.questions], indent=1), encoding="utf-8"
+        json.dumps([_written(q) for q in asked], indent=1), encoding="utf-8"
     )
 
 
+def _same_set(found: list[dict[str, Any]], written: list[dict[str, Any]]) -> bool:
+    """Whether a set's first questions are the ones these are, in whatever schema it
+    was written: a set sealed before a field existed lacks it, so each question is
+    compared on the fields it has, and every value it has must be this seed's."""
+    return len(found) == len(written) and all(
+        set(held) <= set(made) and all(held[k] == made[k] for k in held)
+        for held, made in zip(found, written, strict=True)
+    )
+
+
+class FollowUpsThere(Exception):
+    """The set has its follow-ups already; adding them again would change it."""
+
+
+class NotThisSet(Exception):
+    """The set's first questions aren't the ones this seed writes."""
+
+
+def add_follow_ups(questions: Path, seed: int, prefix: str = "") -> int:
+    """Adds the follow-ups a seed's library has to its question set, changing nothing
+    else in it, and writing no document: the library is built again in a folder of
+    its own, only to find them. Returns how many were added."""
+    found = json.loads(questions.read_text(encoding="utf-8"))
+    if any(q.get("follows") for q in found):
+        raise FollowUpsThere(f"{questions} has its follow-ups already.")
+    with tempfile.TemporaryDirectory() as scratch:
+        builder = Builder(Path(scratch), seed, prefix)
+        builder.build_all()
+    if not _same_set(found, [_written(q) for q in builder.questions]):
+        # The held-out half's seed is secret, so the refusal never names it.
+        raise NotThisSet(f"{questions} isn't the set its seed writes.")
+    asked = [*found, *(_written(q) for q in builder.follow_ups)]
+    questions.write_text(json.dumps(asked, indent=1), encoding="utf-8")
+    return len(builder.follow_ups)
+
+
 def build_held_out(out: Path, seed: int, questions: Path) -> None:
-    builder = Builder(out, seed, prefix="H ")
+    builder = Builder(out, seed, prefix=HELD_OUT_PREFIX)
     builder.build_all()
     write_questions(builder, questions)
     (out / "folders.json").write_text(json.dumps(FOLDERS), encoding="utf-8")
@@ -858,7 +1004,11 @@ def build_held_out(out: Path, seed: int, questions: Path) -> None:
 
 def main() -> None:
     root = Path(__file__).parent.parent
-    builder = Builder(root / "library", 303)
+    if sys.argv[1:] == ["--follow-ups"]:
+        added = add_follow_ups(root / "evals/calibration/questions.json", CALIBRATION)
+        print(f"Added {added} follow-ups; no document was written.")
+        return
+    builder = Builder(root / "library", CALIBRATION)
     builder.build_all()
     builder.format_fixtures()
     write_questions(builder, root / "evals" / "calibration" / "questions.json")

@@ -1,10 +1,22 @@
 import type { ReactElement } from "react";
-import { AlertTriangle, Cloud, Cpu } from "lucide-react";
+import { AlertTriangle, Cloud, Cpu, Search } from "lucide-react";
 
 import type { AskRoute, Mode } from "../api";
 import { askLabel, canAsk } from "../askRoute";
 
 // The Ask button and the note beside it, for every Ask box, from the backend's route.
+
+function RouteIcon({
+  route,
+}: Readonly<{ route: AskRoute | undefined }>): ReactElement | null {
+  if (!route) return null;
+  if (route.blocked) return <Search size={14} aria-hidden="true" />;
+  return route.local ? (
+    <Cpu size={14} aria-hidden="true" />
+  ) : (
+    <Cloud size={14} aria-hidden="true" />
+  );
+}
 
 /** The Ask button. Its label is the backend's route answer, not worked out here, and
  * a route nothing can answer disables it. Return is its key, unless Return opens a
@@ -31,10 +43,13 @@ export function AskButton({
       disabled={disabled || !ready}
       onClick={onClick}
       aria-keyshortcuts={showsKey ? "Enter" : undefined}
-      title={route?.name}
+      title={
+        route?.blocked
+          ? "No AI can answer. Find passages searches your library on this Mac."
+          : route?.name
+      }
     >
-      {route?.local && <Cpu size={14} aria-hidden="true" />}
-      {route && !route.local && <Cloud size={14} aria-hidden="true" />}
+      <RouteIcon route={route} />
       {askLabel(route, mode)}
       {showsKey && (
         <span className="kbd" aria-hidden="true">
@@ -67,12 +82,12 @@ export function RouteNote({
     return (
       <span className="small hstack needs-key" style={{ gap: 4 }}>
         <AlertTriangle size={12} aria-hidden="true" />
-        {route.blocked}{" "}
-        {route.local ? (
+        <span>
+          {route.blocked} No AI can answer now, so Find passages shows what
+          search finds, on this Mac.{" "}
+          <a href="#/settings/models">Keys and models</a> ·{" "}
           <a href="#/settings/local">Local models</a>
-        ) : (
-          <a href="#/settings/models">Keys and models</a>
-        )}
+        </span>
       </span>
     );
   }

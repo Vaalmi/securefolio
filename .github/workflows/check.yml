@@ -4,9 +4,13 @@
 # three cores until tests time out.
 name: check
 
+# A branch with a pull request runs once, for the pull request, not again for each
+# push to it. A manual run checks any branch on both platforms.
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,7 +24,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # A private repo pays for macOS minutes at ten times the Linux rate, so
+        # there a pull request runs on Ubuntu only, and macOS runs on pushes to
+        # main and manual runs. A public repo's runners are free: both, always.
+        os: ${{ fromJSON(github.event.repository.private && github.event_name == 'pull_request' && '["ubuntu-latest"]' || '["ubuntu-latest", "macos-latest"]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     env:
@@ -31,7 +38,7 @@ jobs:
           persist-credentials: false
 
       # uv takes the Python version from .python-version.
-      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           enable-cache: true
 

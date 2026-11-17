@@ -5,6 +5,7 @@ import { ArrowLeft, Star } from "lucide-react";
 import {
   cloudReadPage,
   getChunkElement,
+  getFigurePlaces,
   getCitedElement,
   getCloudPageCost,
   getDocument,
@@ -18,6 +19,7 @@ import type {
   PageCost,
   StoredElement,
 } from "../api";
+import { CitedFigures } from "../citedFigures";
 import { ConfirmLeaving, MoreMenu } from "../components/DocumentActions";
 import type { Confirm } from "../components/DocumentActions";
 import { AskPanel, RelatedPanel } from "../components/DocumentAsk";
@@ -365,6 +367,20 @@ export function DocumentView({ id }: Readonly<{ id: string }>): ReactElement {
         : Promise.resolve(null),
     chunk ?? "",
   );
+  // Opened from a sentence's citation: that sentence's figures, placed by the
+  // backend in the cited element, named here by ids alone.
+  const cited = route.params.get("el");
+  const message = route.params.get("message");
+  const sentence = route.params.get("sentence");
+  const placed = useLoad(
+    () =>
+      cited && message && sentence !== null
+        ? getFigurePlaces(id, cited, message, Number(sentence)).then(
+            (found) => found.figures,
+          )
+        : Promise.resolve([]),
+    `${cited ?? ""}-${message ?? ""}-${sentence ?? ""}`,
+  );
   // While a job works on it, keep looking, so a new revision shows with no refresh.
   const detail = useLoad(() => getDocument(id), id, {
     every: FOLLOW_MS,
@@ -394,10 +410,12 @@ export function DocumentView({ id }: Readonly<{ id: string }>): ReactElement {
       </Page>
     );
   return (
-    <Loaded
-      detail={detail.data}
-      reload={detail.reload}
-      citedId={route.params.get("el") ?? fromLink.data ?? null}
-    />
+    <CitedFigures.Provider value={placed.data ?? []}>
+      <Loaded
+        detail={detail.data}
+        reload={detail.reload}
+        citedId={route.params.get("el") ?? fromLink.data ?? null}
+      />
+    </CitedFigures.Provider>
   );
 }

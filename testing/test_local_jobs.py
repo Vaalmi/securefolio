@@ -70,7 +70,7 @@ class Ollama:
 
 @pytest.fixture
 def ollama(library, monkeypatch):
-    monkeypatch.setattr(agent_service, "OLLAMA_FRESH_SECONDS", 0.0)
+    monkeypatch.setattr(agent_service.models, "OLLAMA_FRESH_SECONDS", 0.0)
     monkeypatch.setattr(model_store, "_capabilities", {})
     side = Ollama()
     with stub_ollama() as stub:

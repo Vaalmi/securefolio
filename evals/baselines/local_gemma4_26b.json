@@ -1,0 +1,110 @@
+{
+ "judged": true,
+ "questions": 60,
+ "recall_at_10": 0.9767441860465116,
+ "mrr": 0.8604651162790697,
+ "citations_judged": 53,
+ "coverage": 0.9555555555555556,
+ "facts_found": 0.813953488372093,
+ "unanswerable": 0.8333333333333334,
+ "answerable_refused": 0.13953488372093023,
+ "thrown_away": 4,
+ "citations_not_judged": 0,
+ "failed": 5,
+ "not_assessed": 0,
+ "stopped": 0,
+ "not_scored": 5,
+ "wrong_by_step": {
+  "citations": 6,
+  "answer_or_refuse": 4,
+  "search": 1
+ },
+ "cost_usd": 0.0,
+ "citation_precision": 0.9433962264150944,
+ "answers_correct": 0.7906976744186046,
+ "answered_by": [
+  "gemma4:26b"
+ ],
+ "private_answered_by": [
+  "gemma4:26b"
+ ],
+ "private": {
+  "questions": 2,
+  "answered_by": [
+   "gemma4:26b"
+  ],
+  "recall_at_10": 1.0,
+  "refused": 0,
+  "thrown_away": 0,
+  "wrong_by_step": {}
+ },
+ "wrong_questions_by_step": {
+  "reading": [],
+  "search": [
+   "q20"
+  ],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [
+   "q14",
+   "q16",
+   "q52",
+   "q54"
+  ],
+  "facts": [],
+  "citations": [
+   "q6",
+   "q21",
+   "q24",
+   "q45",
+   "q46",
+   "q49"
+  ],
+  "couldnt_tell": []
+ },
+ "private_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "follow_up_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "answer_model": "local:gemma4:26b",
+ "citations_by_hand": 0,
+ "question_set": "7c30ae479627aa1ba457fd46b13f2271418fdf3ad4b54a342bfedb83e7850d7e",
+ "spent_usd": 0.2108,
+ "local_loaded": {
+  "tag": "gemma4:26b",
+  "ollama": "0.40.14",
+  "details": {
+   "parent_model": "",
+   "format": "safetensors",
+   "family": "gemma4",
+   "families": null,
+   "parameter_size": "26.2B",
+   "quantization_level": "nvfp4",
+   "runner": "mlx"
+  },
+  "parameters": "temperature                    1\ntop_k                          64\ntop_p                          0.95",
+  "modified_at": "2026-11-01T07:08:21.899058863-05:00",
+  "trained_context": 262144,
+  "loaded_context": 65536
+ },
+ "limit_usd": 1.0,
+ "stopped_at_limit": false,
+ "kept": "20261113T215801751286Z-local_gemma4_26b",
+ "rescored_from": "20261113T181715253940Z-local_gemma4_26b"
+}

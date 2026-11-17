@@ -3,7 +3,6 @@ stays Claude Opus 5.5, and the scores mark the model as measured in the catalog.
 
 import json
 import shutil
-from pathlib import Path
 
 import pytest
 import sqlalchemy as sa
@@ -11,94 +10,28 @@ import sqlalchemy as sa
 from agent import models
 from backend import (
     database,
-    keychain,
     model_catalog,
-    providers,
     settings,
     sources,
     states,
 )
-from backend.build_mode import STUB_ANTHROPIC_ENV, STUB_OLLAMA_ENV, STUB_OPENAI_ENV
-from backend.main import NO_WORKER_ENV
+from backend.build_mode import STUB_OLLAMA_ENV
 from evals import cli, run
+from evals.tests.fake_runs import fake_evaluate
+from evals.tests.questions import DATA, QUESTION, SOL
 from testing.queue import drain
 from testing.stub_models import (
-    completion,
     ollama_reply,
-    openai_reply,
-    stub_anthropic,
     stub_ollama,
-    stub_openai,
 )
 
-SOL = "openai:gpt-6.1-sol"
 LUNA = "openai:gpt-6-luna"  # not measured
-DATA = Path(__file__).parents[2] / "data" / "library"
-QUESTION = {
-    "id": "q1",
-    "category": "fact",
-    "question": "What is the pet deposit on my apartment lease?",
-    "expected_document": "Home/Apartment lease.pdf",
-    "expected_page": 3,
-    "answer": "$299.11",
-    "documents": [],
-    "private": False,
-    "passage_facts": {},
-    "answer_facts": [],
-}
 SCORES = {
     "recall_at_10": 0.9,
     "citation_precision": 0.95,
     "answers_correct": 0.9,
     "unanswerable": 1.0,
 }
-
-
-def judged(_path: str, body: dict) -> dict:
-    """Anthropic's side: the judge finds every citation supported."""
-    return {
-        "id": "msg",
-        "type": "message",
-        "role": "assistant",
-        "model": body["model"],
-        "content": [{"type": "text", "text": json.dumps({"supported": True})}],
-        "stop_reason": "end_turn",
-        "usage": {"input_tokens": 10, "output_tokens": 5},
-    }
-
-
-def answered(path: str, body: dict) -> dict:
-    """OpenAI's side: the plan as usual, and an answer citing its first source."""
-    if '<source id=\\"' not in json.dumps(body):
-        return openai_reply(path, body)
-    return completion(body, "The pet deposit is $299.11. [1]")
-
-
-@pytest.fixture
-def measured_file(tmp_path, monkeypatch):
-    """A copy of backend/model_measured.json, so a test never writes the real one."""
-    copy = tmp_path / "model_measured.json"
-    shutil.copy(model_catalog.MEASURED, copy)
-    monkeypatch.setattr(model_catalog, "MEASURED", copy)
-    return copy
-
-
-@pytest.fixture
-def stubs(library, monkeypatch):
-    """Both providers' stubs, with keys, and the evaluation's own process settings
-    put back afterwards."""
-    monkeypatch.setenv(NO_WORKER_ENV, "1")
-    monkeypatch.setattr(keychain, "get_key", keychain.get_key)
-    for provider in (providers.ANTHROPIC, providers.OPENAI):
-        keychain.set_key(f"test-{provider}-key", provider)
-    with stub_anthropic() as anthropic, stub_openai() as openai:
-        anthropic.reply = judged
-        openai.reply = answered
-        monkeypatch.setenv(STUB_ANTHROPIC_ENV, anthropic.url)
-        monkeypatch.setenv(STUB_OPENAI_ENV, openai.url)
-        yield anthropic, openai
-    for provider in (providers.ANTHROPIC, providers.OPENAI):
-        keychain.delete_key(provider)
 
 
 def test_another_model_answers_and_opus_still_judges(stubs, tmp_path):
@@ -108,7 +41,7 @@ def test_another_model_answers_and_opus_still_judges(stubs, tmp_path):
     sources.add_source(str(home), states.STANDARD)
     drain()
     before = settings.get(settings.MODEL_ANSWER)
-    report, _claims = run.evaluate([QUESTION], SOL)
+    report, _claims = run.evaluate([QUESTION], SOL, limit_usd=50.0)
     assert report["answer_model"] == SOL
     assert report["answered_by"] == [SOL]
     answers = [r for r in openai.requests if '<source id=\\"' in r.raw]
@@ -144,7 +77,7 @@ def test_a_private_question_answered_on_this_mac_isnt_a_fallback(
     with stub_ollama() as local:
         local.reply = ollama_reply
         monkeypatch.setenv(STUB_OLLAMA_ENV, local.url)
-        report, _claims = run.evaluate([QUESTION, private], SOL)
+        report, _claims = run.evaluate([QUESTION, private], SOL, limit_usd=50.0)
     assert report["answered_by"] == [SOL]
     assert report["private_answered_by"] == [models.local_tag()]
     run.record_measured(SOL, report, "2026-11-05")
@@ -160,7 +93,7 @@ def test_the_vault_never_holds_the_runs_model(stubs, tmp_path, monkeypatch):
     before = settings.get(settings.MODEL_ANSWER)
     seen = []
 
-    def stopped(_client, _questions, _started):
+    def stopped(_client, _questions, _kept=None, _judge=True):
         seen.append(settings.get(settings.MODEL_ANSWER))
         with database.read() as connection:
             stored = connection.execute(
@@ -173,7 +106,7 @@ def test_the_vault_never_holds_the_runs_model(stubs, tmp_path, monkeypatch):
 
     monkeypatch.setattr(run, "_ask_all", stopped)
     with pytest.raises(KeyboardInterrupt):
-        run.evaluate([QUESTION], SOL)
+        run.evaluate([QUESTION], SOL, limit_usd=50.0)
     assert seen[0] == SOL, "this run answers with it"
     assert seen[1] != SOL, "but the vault never stored it"
     assert settings.get(settings.MODEL_ANSWER) == before
@@ -192,7 +125,7 @@ def test_answers_a_fallback_wrote_arent_recorded(library, measured_file, monkeyp
 
 def test_a_model_it_doesnt_know_is_refused_before_anything_runs(stubs):
     with pytest.raises(run.NotAModel):
-        run.evaluate([QUESTION], "openai:no-such-model")
+        run.evaluate([QUESTION], "openai:no-such-model", limit_usd=50.0)
 
 
 def is_measured(model_id: str) -> bool:
@@ -218,14 +151,10 @@ def test_the_command_line_records_the_model_that_answered(
     library, measured_file, monkeypatch, tmp_path
 ):
     seen = []
-
-    def evaluate(questions, model=None):
-        seen.append(model)
-        return {**SCORES, "answer_model": model, "answered_by": [model], "rows": []}, []
-
-    monkeypatch.setattr(run, "evaluate", evaluate)
+    found = {**SCORES, "answer_model": SOL, "answered_by": [SOL], "rows": []}
+    monkeypatch.setattr(run, "evaluate", fake_evaluate(found, seen=seen))
     monkeypatch.setattr(cli, "REPORTS", tmp_path / "reports")
-    cli.main(["--model", SOL, "--record", "--skip-hard-pages"])
+    cli.main(["--model", SOL, "--record", "--skip-hard-pages", "--limit-usd", "50"])
     assert seen == [SOL]
     assert SOL in json.loads(measured_file.read_text())["models"]
 

@@ -1,16 +1,17 @@
 """One document: its record, its bytes for the viewer, and what can be done to it."""
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend import (
     cards,
     collections,
     documents,
     elements,
+    figure_places,
     files,
     jobs,
     model_catalog,
@@ -21,6 +22,7 @@ from backend import (
     states,
 )
 from backend.dependencies import AppToken
+from backend.locators import Rect
 
 router = APIRouter()
 
@@ -47,6 +49,28 @@ class StoredText(BaseModel):
 class CitedElement(BaseModel):
     element: dict[str, Any] | None
     current: bool
+
+
+class PdfFigurePlace(BaseModel):
+    """A figure on a PDF page: one box per line it runs across."""
+
+    kind: Literal["pdf"]
+    text: str
+    rects: list[Rect]
+
+
+class TextFigurePlace(BaseModel):
+    """A figure in a text kind: its characters in the element's text."""
+
+    kind: Literal["text"]
+    text: str
+    range: tuple[int, int]
+
+
+class FigurePlaces(BaseModel):
+    figures: list[
+        Annotated[PdfFigurePlace | TextFigurePlace, Field(discriminator="kind")]
+    ]
 
 
 class Queued(BaseModel):
@@ -190,6 +214,22 @@ def get_document_page(document_id: str, page: int, _: AppToken) -> StoredText:
     """One page's or slide's stored text."""
     found = elements.of_page(document_id, page)
     return StoredText(elements=found, total=len(found))
+
+
+@router.get(
+    "/documents/{document_id}/elements/{element_id}/figures",
+    operation_id="get_figure_places",
+)
+def get_figure_places(
+    document_id: str,
+    element_id: str,
+    message: str,
+    sentence: Annotated[int, Query(ge=0)],
+    _: AppToken,
+) -> FigurePlaces:
+    """Where an answer's sentence's shown figures are, by ids alone."""
+    placed = figure_places.places(document_id, element_id, message, sentence)
+    return FigurePlaces.model_validate({"figures": placed})
 
 
 @router.get(

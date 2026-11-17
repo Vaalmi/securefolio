@@ -64,7 +64,7 @@ class Ollama:
 
 @pytest.fixture
 def ollama(library, monkeypatch):
-    monkeypatch.setattr(agent_service, "OLLAMA_FRESH_SECONDS", 0.0)
+    monkeypatch.setattr(agent_service.models, "OLLAMA_FRESH_SECONDS", 0.0)
     monkeypatch.setattr(model_store, "_capabilities", {}, raising=False)
     monkeypatch.setattr(model_store, "_pull", dict(model_store._pull))  # noqa: SLF001
     side = Ollama()

@@ -4,14 +4,15 @@ timers that keep them tidy."""
 import asyncio
 import hashlib
 import logging
+import os
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from langgraph.types import Command
 
-from agent import checkpoints, harness, memory, models
+from agent import checkpoints, harness, memory, models, plain
 from backend import (
     backup,
     database,
@@ -30,6 +31,9 @@ logger = logging.getLogger(__name__)
 FLUSH_SECONDS = 0.04
 IDLE_FOR_MEMORY_SECONDS = 300
 TICK_SECONDS = 60
+# Set by the evaluation alone: while it runs, no idle work. No memory from its
+# threads, no waiting question asked again, no backup, no reranker unloaded mid-run.
+NO_TICKS_ENV = "SECUREFOLIO_NO_TICKS"
 RUN_FAILED = "This answer couldn't be finished."
 
 
@@ -53,7 +57,8 @@ class Service:
         await self.saver.setup()
         self.graph = harness.build(self.saver)
         await self.sweep()
-        self.timer = asyncio.create_task(self._ticks())
+        if not os.environ.get(NO_TICKS_ENV):
+            self.timer = asyncio.create_task(self._ticks())
 
     async def close(self) -> None:
         waiting = list(self.tasks.values())
@@ -225,6 +230,15 @@ class Service:
         await _in_thread(threads.delete, thread_id)
         await checkpoints.delete(self.saver, thread_id)
 
+    async def turn_record(self, thread_id: str, run_id: str) -> dict[str, Any] | None:
+        """For the evaluation: what a run's answer was handed and wrote, before Verify
+        checked it. None when that run wrote no answer, as a question about the
+        library itself doesn't."""
+        config = {"configurable": {"thread_id": thread_id, "run_id": run_id}}
+        snapshot = await self.graph.aget_state(config)
+        written = snapshot.values.get("written")
+        return written if written and written.get("run_id") == run_id else None
+
     async def wait_for_event(self, run_id: str, seconds: float) -> None:
         signal = self.signals.get(run_id)
         if signal is None:
@@ -235,6 +249,107 @@ class Service:
             signal.clear()
         except TimeoutError:
             return
+
+
+def recording_calls() -> Any:
+    """For the evaluation: every model call recorded, counts only, while it runs."""
+    return models.recording_calls()
+
+
+def ranked(query: str, found: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """For the evaluation: passages in the order Ask's reranker puts them."""
+    return harness._ranked(query, found)  # noqa: SLF001  the one ranking there is
+
+
+def spending_limit(usd: float) -> Any:
+    """For the evaluation: no cloud request goes that could take it past `usd`."""
+    return models.spending_limit(usd)
+
+
+def limit_reached() -> bool:
+    """For the evaluation: whether a request was refused for its limit."""
+    return models.limit_reached()
+
+
+def copy_text(answer: dict[str, Any]) -> str:
+    """What Copy puts on the clipboard for a saved answer, its marks in words."""
+    return plain.copy_of(answer)
+
+
+def note_text(answer: dict[str, Any]) -> str:
+    """What Save as note keeps of a saved answer: its words with their marks, made
+    from its parts as Copy's are, so an answer saved before the marks gains them too.
+    A count keeps its numbers, which the chat's copy leaves out for its follow-ups."""
+    if answer.get("counted"):
+        return "".join(part["text"] for part in answer["parts"])
+    return plain.text_of(answer)
+
+
+def judged_by(model: str) -> Any:
+    """For the evaluation: the model that judges this process's run."""
+    return models.judged_by(model)
+
+
+def judge_model() -> str:
+    """For the evaluation: the model judging now, Claude Opus 5.5 unless a run says."""
+    return models.judge_model()
+
+
+def only_providers(providers: tuple[str, ...] | None) -> Any:
+    """For the evaluation: no cloud request goes to a provider the run doesn't name."""
+    return models.only_providers(providers)
+
+
+def resting_on(documents: Sequence[str], memories: Sequence[str]) -> Any:
+    """For the evaluation: while one question is asked, every request also rests on
+    what it does, for policy to read as each leaves."""
+    return policy.resting_on(documents, memories)
+
+
+def provider_allowed(model_id: str) -> bool:
+    """For the evaluation: whether this run may send to this model."""
+    return models.provider_allowed(model_id)
+
+
+def judge_citation(
+    sentence: str,
+    target: models.Cited,
+    siblings: list[models.Cited],
+    thread_id: str | None,
+    *,
+    rests_on: Sequence[str] = (),
+) -> bool:
+    """The eval judge: one citation of a sentence, against the words it points at.
+    `rests_on` names more documents for policy to read when the call leaves."""
+    return models.judge_citation(
+        sentence, target, siblings, thread_id, rests_on=rests_on
+    )
+
+
+def judge_sentence(
+    sentence: str,
+    cited: list[models.Cited],
+    thread_id: str | None,
+    *,
+    rests_on: Sequence[str] = (),
+) -> bool:
+    """The eval judge: a sentence with no citation, against the answer's sources."""
+    return models.judge_sentence(sentence, cited, thread_id, rests_on=rests_on)
+
+
+def take_calls(thread_id: str | None) -> list[dict[str, Any]]:
+    """For the evaluation: the records of one thread's model calls."""
+    return models.take_calls(thread_id)
+
+
+def local_setup(tag: str) -> dict[str, Any]:
+    """For the evaluation's record: Ollama's own account of a local model."""
+    return models.local_setup(tag)
+
+
+def local_listed(tag: str) -> bool:
+    """For the evaluation: whether Ollama, on this Mac, lists this tag now."""
+    return models.tag_listed(tag)
 
 
 KEY_REFUSED = models.KeyRefused
@@ -276,16 +391,10 @@ def local_tag(job: str = settings.LOCAL_ANSWERS) -> str:
     return models.local_tag(job)
 
 
-OLLAMA_FRESH_SECONDS = 5.0
-
-
 def refresh_ollama() -> None:
     """Gives `model_store` Ollama's list, so policy can read it without the agent: at
     most every few seconds, and never a real Ollama under the checks' stand-ins."""
-    listed = model_store.ollama_listed_at()
-    if listed is not None and time.time() - listed < OLLAMA_FRESH_SECONDS:
-        return
-    models.refresh_ollama_list()
+    models.refresh_ollama_if_stale()
 
 
 def fetch_openrouter_models() -> None:

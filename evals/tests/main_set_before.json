@@ -1,0 +1,221 @@
+{
+ "facts_found": {
+  "f1": [
+   true,
+   false
+  ],
+  "q1": [
+   true,
+   false,
+   false,
+   false
+  ],
+  "q2": [
+   true,
+   false,
+   false
+  ],
+  "q20": [
+   true,
+   false,
+   false
+  ],
+  "q3": [
+   true,
+   false
+  ],
+  "q4": [
+   true,
+   false
+  ],
+  "q50": [
+   true,
+   false
+  ]
+ },
+ "run": {
+  "report": {
+   "answer_model": "openai:gpt-6.1-sol",
+   "answerable_refused": 0.0,
+   "answered_by": [
+    "openai:gpt-6.1-sol"
+   ],
+   "answers_correct": 0.0,
+   "citation_precision": 1.0,
+   "citations_by_hand": 0,
+   "citations_judged": 6,
+   "citations_not_judged": 0,
+   "cost_usd": 0.0024,
+   "coverage": 1.0,
+   "facts_found": 0.0,
+   "failed": 0,
+   "follow_up_wrong_questions_by_step": {
+    "answer_or_refuse": [],
+    "cards": [],
+    "citations": [],
+    "couldnt_tell": [],
+    "facts": [
+     "f1"
+    ],
+    "handing_over": [],
+    "reading": [],
+    "search": []
+   },
+   "follow_ups": {
+    "answerable_refused": 0.0,
+    "answers_correct": 0.0,
+    "citation_precision": 1.0,
+    "citations_judged": 1,
+    "citations_not_judged": 0,
+    "cost_usd": 0.0004,
+    "coverage": 1.0,
+    "facts_found": 0.0,
+    "failed": 0,
+    "judged": true,
+    "mrr": 0.5,
+    "not_assessed": 0,
+    "not_scored": 0,
+    "questions": 1,
+    "recall_at_10": 1.0,
+    "stopped": 0,
+    "thrown_away": 0,
+    "unanswerable": 0.0,
+    "wrong_by_step": {
+     "facts": 1
+    }
+   },
+   "helpers_cut": {},
+   "judged": true,
+   "limit_usd": 50.0,
+   "local_prompts": {
+    "answers": 0,
+    "context": 32768,
+    "fitted": 0,
+    "largest": 0,
+    "largest_counted": 0,
+    "passages_dropped": 0
+   },
+   "mrr": 0.4583333333333333,
+   "not_assessed": 0,
+   "not_scored": 0,
+   "private": {
+    "answered_by": [],
+    "failed": 0,
+    "not_assessed": 0,
+    "questions": 0,
+    "recall_at_10": 0.0,
+    "refused": 0,
+    "stopped": 0,
+    "thrown_away": 0,
+    "wrong_by_step": {}
+   },
+   "private_answered_by": [],
+   "private_wrong_questions_by_step": {
+    "answer_or_refuse": [],
+    "cards": [],
+    "citations": [],
+    "couldnt_tell": [],
+    "facts": [],
+    "handing_over": [],
+    "reading": [],
+    "search": []
+   },
+   "question_set": "06718bcfd4e3204752aa43681e9aaed56888c75dece0eb86aace2325b9d5e93c",
+   "questions": 6,
+   "recall_at_10": 1.0,
+   "stopped": 0,
+   "stopped_at_limit": false,
+   "thrown_away": 0,
+   "unanswerable": 0.0,
+   "wrong_by_step": {
+    "answer_or_refuse": 2,
+    "citations": 2,
+    "facts": 2
+   },
+   "wrong_questions_by_step": {
+    "answer_or_refuse": [
+     "q4",
+     "q50"
+    ],
+    "cards": [],
+    "citations": [
+     "q1",
+     "q2"
+    ],
+    "couldnt_tell": [],
+    "facts": [
+     "q3",
+     "q20"
+    ],
+    "handing_over": [],
+    "reading": [],
+    "search": []
+   }
+  },
+  "rows": [
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "q1",
+    "kind": "answer",
+    "rank": 2,
+    "state": "answered",
+    "step": "citations"
+   },
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "f1",
+    "kind": "answer",
+    "rank": 2,
+    "state": "answered",
+    "step": "facts"
+   },
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "q2",
+    "kind": "answer",
+    "rank": 2,
+    "state": "answered",
+    "step": "citations"
+   },
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "q3",
+    "kind": "answer",
+    "rank": 2,
+    "state": "answered",
+    "step": "facts"
+   },
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "q4",
+    "kind": "answer",
+    "rank": null,
+    "state": "answered",
+    "step": "answer_or_refuse"
+   },
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "q20",
+    "kind": "answer",
+    "rank": 3,
+    "state": "answered",
+    "step": "facts"
+   },
+   {
+    "correct": false,
+    "facts_found": false,
+    "id": "q50",
+    "kind": "answer",
+    "rank": null,
+    "state": "answered",
+    "step": "answer_or_refuse"
+   }
+  ]
+ }
+}

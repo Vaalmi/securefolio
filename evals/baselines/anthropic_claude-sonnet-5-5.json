@@ -1,0 +1,96 @@
+{
+ "judged": true,
+ "questions": 60,
+ "recall_at_10": 0.9777777777777777,
+ "mrr": 0.8666666666666667,
+ "citations_judged": 79,
+ "coverage": 0.9420289855072463,
+ "facts_found": 1.0,
+ "unanswerable": 1.0,
+ "answerable_refused": 0.0,
+ "thrown_away": 0,
+ "citations_not_judged": 0,
+ "failed": 0,
+ "not_assessed": 0,
+ "stopped": 0,
+ "not_scored": 0,
+ "wrong_by_step": {
+  "citations": 1
+ },
+ "cost_usd": 0.6064,
+ "citation_precision": 0.9746835443037974,
+ "answers_correct": 0.9777777777777777,
+ "answered_by": [
+  "anthropic:claude-sonnet-5-5"
+ ],
+ "private_answered_by": [
+  "gemma4:26b"
+ ],
+ "private": {
+  "questions": 2,
+  "answered_by": [
+   "gemma4:26b"
+  ],
+  "recall_at_10": 1.0,
+  "refused": 0,
+  "thrown_away": 0,
+  "wrong_by_step": {}
+ },
+ "wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [
+   "q24"
+  ],
+  "couldnt_tell": []
+ },
+ "private_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "follow_up_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "answer_model": "anthropic:claude-sonnet-5-5",
+ "citations_by_hand": 0,
+ "question_set": "7c30ae479627aa1ba457fd46b13f2271418fdf3ad4b54a342bfedb83e7850d7e",
+ "spent_usd": 0.9166,
+ "local_loaded": {
+  "tag": "gemma4:26b",
+  "ollama": "0.40.14",
+  "details": {
+   "parent_model": "",
+   "format": "safetensors",
+   "family": "gemma4",
+   "families": null,
+   "parameter_size": "26.2B",
+   "quantization_level": "nvfp4",
+   "runner": "mlx"
+  },
+  "parameters": "temperature                    1\ntop_k                          64\ntop_p                          0.95",
+  "modified_at": "2026-11-01T07:08:21.899058863-05:00",
+  "trained_context": 262144,
+  "loaded_context": 65536
+ },
+ "limit_usd": 1.5,
+ "stopped_at_limit": false,
+ "kept": "20261113T215810230287Z-anthropic_claude-sonnet-5-5",
+ "rescored_from": "20261113T193836688408Z-anthropic_claude-sonnet-5-5"
+}

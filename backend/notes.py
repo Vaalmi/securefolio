@@ -2,6 +2,7 @@
 
 import time
 import uuid
+from collections.abc import Callable
 from typing import Any
 
 import sqlalchemy as sa
@@ -75,7 +76,9 @@ def _citations_of(answer: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def from_answer(message_id: str) -> dict[str, Any]:
+def from_answer(
+    message_id: str, text_of: Callable[[dict[str, Any]], str]
+) -> dict[str, Any]:
     """A saved answer carries its citations with their revision ids, and the
     sensitivity of the chat it came from."""
     with database.write() as connection:
@@ -86,13 +89,15 @@ def from_answer(message_id: str) -> dict[str, Any]:
             .mappings()
             .first()
         )
-        if message is None or not message["answer"]:
+        # Passages found with no model aren't an answer, so they're never a note.
+        if (
+            message is None
+            or not message["answer"]
+            or message["answer"].get("kind") == "passages"
+        ):
             raise refusals.not_found("There's no such answer.")
         saved = _citations_of(message["answer"])
-        # A count's message holds no numbers, for its follow-ups. The owner keeps them.
-        body = message["content"]
-        if message["answer"].get("counted"):
-            body = "".join(part["text"] for part in message["answer"]["parts"])
+        body = text_of(message["answer"])
         row = {
             "id": uuid.uuid4().hex,
             "title": body[:TITLE_CHARACTERS],

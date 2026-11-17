@@ -19,7 +19,7 @@ OLLAMA = "http://127.0.0.1:11434"
 @pytest.fixture
 def ollama(library, monkeypatch):
     monkeypatch.delenv(build_mode.STUB_MODELS_ENV, raising=False)
-    monkeypatch.setattr(agent_service, "OLLAMA_FRESH_SECONDS", 0.0)
+    monkeypatch.setattr(agent_service.models, "OLLAMA_FRESH_SECONDS", 0.0)
     monkeypatch.setattr(model_store, "_capabilities", {})
     try:
         httpx.get(f"{OLLAMA}/api/version", timeout=2).raise_for_status()

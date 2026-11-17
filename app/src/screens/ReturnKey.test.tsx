@@ -240,16 +240,15 @@ describe("the hints", () => {
     expect(button).not.toHaveTextContent("↵");
   });
 
-  it("drop Return from the button while answering is blocked", async () => {
+  it("keep Return on the button when no AI can answer: it finds passages", async () => {
     home({ ...LOCAL_ROUTE, blocked: "Ollama isn't running on this Mac." });
     const box = await screen.findByRole("combobox");
     await userEvent.type(box, "rent");
-    const button = await screen.findByRole("button", { name: /^Ask Local AI/ });
-    expect(button).not.toHaveAttribute("aria-keyshortcuts");
-    expect(button).not.toHaveTextContent("↵");
-    expect(document.querySelector(".results-foot")).not.toHaveTextContent(
-      "↵ ask",
-    );
+    const button = await screen.findByRole("button", {
+      name: /^Find passages/,
+    });
+    expect(button).toBeEnabled();
+    expect(button).toHaveAttribute("aria-keyshortcuts", "Enter");
   });
 
   it("asks for the route again when its window comes back", async () => {
@@ -276,7 +275,7 @@ describe("the hints", () => {
     ).toBeVisible();
   });
 
-  it("opens the box once a blocked route can answer, without leaving", async () => {
+  it("asks a model once a blocked route can answer, without leaving", async () => {
     // A blocked route was asked only once.
     let route: object = { ...LOCAL_ROUTE, blocked: "Ollama isn't running." };
     fakeBackend({
@@ -291,8 +290,10 @@ describe("the hints", () => {
     open("/home");
     const box = await screen.findByRole("combobox");
     await userEvent.type(box, "rent");
-    const button = await screen.findByRole("button", { name: /^Ask Local AI/ });
-    expect(button).toBeDisabled();
+    const button = await screen.findByRole("button", {
+      name: /^Find passages/,
+    });
+    expect(button).toBeEnabled();
     route = LOCAL_ROUTE; // Ollama started
     await waitFor(
       () => {

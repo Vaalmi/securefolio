@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import type { ReactElement } from "react";
 
 import {
@@ -8,6 +8,8 @@ import {
   getDocumentSheets,
 } from "../api";
 import type { Locator, Rect, StoredElement } from "../api";
+import { CitedFigures } from "../citedFigures";
+import { FigureText } from "../components/FigureText";
 import { useDataUrl } from "../useDataUrl";
 import { useLoad } from "../useLoad";
 import { useStoredWindow } from "./useStoredWindow";
@@ -152,6 +154,7 @@ export function LinesView({
 }: Readonly<TextProps>): ReactElement {
   const text = useStoredWindow(id, citedOrdinal);
   useCitationInView(citedId, text.loaded);
+  const figures = useContext(CitedFigures);
   return (
     <div className="lines" role="document" aria-label={label}>
       <WindowBar {...text} />
@@ -159,7 +162,14 @@ export function LinesView({
         const start =
           element.locator.kind === "lines" ? element.locator.start : 1;
         const mark = cited(element, citedId);
-        return element.text.split("\n").map((line, i) => (
+        const lines = element.text.split("\n");
+        // Where each line starts in its element's text, in characters.
+        const starts = lines.map((_, i) =>
+          lines
+            .slice(0, i)
+            .reduce((sum, line) => sum + Array.from(line).length + 1, 0),
+        );
+        return lines.map((line, i) => (
           <div
             key={`${element.id}-${String(i)}`}
             className={`line ${mark.on ? "hl" : ""}`}
@@ -168,7 +178,13 @@ export function LinesView({
             <span className="ln" aria-hidden="true">
               {start + i}
             </span>
-            <span className="mono">{line || " "}</span>
+            <span className="mono">
+              {mark.on && line ? (
+                <FigureText text={line} places={figures} offset={starts[i]} />
+              ) : (
+                line || " "
+              )}
+            </span>
           </div>
         ));
       })}
@@ -184,6 +200,7 @@ export function EmailView({
 }: Readonly<Omit<TextProps, "label">>): ReactElement {
   const text = useStoredWindow(id, citedOrdinal);
   useCitationInView(citedId, text.loaded);
+  const figures = useContext(CitedFigures);
   return (
     <div className="stored-text">
       <WindowBar {...text} />
@@ -195,7 +212,11 @@ export function EmailView({
             style={{ marginBottom: 10, whiteSpace: "pre-wrap" }}
           >
             <span className={mark.on ? "hl" : undefined} id={mark.id}>
-              {element.text}
+              {mark.on ? (
+                <FigureText text={element.text} places={figures} />
+              ) : (
+                element.text
+              )}
             </span>
           </p>
         );
@@ -216,6 +237,7 @@ export function StructureView({
 }: Readonly<TextProps>): ReactElement {
   const text = useStoredWindow(id, citedOrdinal);
   useCitationInView(citedId, text.loaded);
+  const figures = useContext(CitedFigures);
   return (
     <div className="stored-text" role="document" aria-label={label}>
       <WindowBar {...text} />
@@ -232,7 +254,13 @@ export function StructureView({
             data-anchor={anchor}
             id={mark.id}
           >
-            <span className={mark.on ? "hl" : undefined}>{element.text}</span>
+            <span className={mark.on ? "hl" : undefined}>
+              {mark.on ? (
+                <FigureText text={element.text} places={figures} />
+              ) : (
+                element.text
+              )}
+            </span>
           </h2>
         ) : (
           <p
@@ -241,7 +269,13 @@ export function StructureView({
             id={mark.id}
             style={{ whiteSpace: "pre-wrap" }}
           >
-            <span className={mark.on ? "hl" : undefined}>{element.text}</span>
+            <span className={mark.on ? "hl" : undefined}>
+              {mark.on ? (
+                <FigureText text={element.text} places={figures} />
+              ) : (
+                element.text
+              )}
+            </span>
           </p>
         );
       })}

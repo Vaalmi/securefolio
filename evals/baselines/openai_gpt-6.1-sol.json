@@ -1,0 +1,103 @@
+{
+ "judged": true,
+ "questions": 60,
+ "recall_at_10": 0.9777777777777777,
+ "mrr": 0.8666666666666667,
+ "citations_judged": 84,
+ "coverage": 0.9836065573770492,
+ "facts_found": 0.9777777777777777,
+ "unanswerable": 0.7333333333333333,
+ "answerable_refused": 0.0,
+ "thrown_away": 0,
+ "citations_not_judged": 0,
+ "failed": 0,
+ "not_assessed": 0,
+ "stopped": 0,
+ "not_scored": 0,
+ "wrong_by_step": {
+  "citations": 2,
+  "answer_or_refuse": 4
+ },
+ "cost_usd": 0.1844,
+ "citation_precision": 0.9642857142857143,
+ "answers_correct": 0.9555555555555556,
+ "answered_by": [
+  "openai:gpt-6.1-sol"
+ ],
+ "private_answered_by": [
+  "gemma4:26b"
+ ],
+ "private": {
+  "questions": 2,
+  "answered_by": [
+   "gemma4:26b"
+  ],
+  "recall_at_10": 1.0,
+  "refused": 0,
+  "thrown_away": 0,
+  "wrong_by_step": {}
+ },
+ "wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [
+   "q52",
+   "q53",
+   "q54",
+   "q56"
+  ],
+  "facts": [],
+  "citations": [
+   "q21",
+   "q24"
+  ],
+  "couldnt_tell": []
+ },
+ "private_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "follow_up_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "answer_model": "openai:gpt-6.1-sol",
+ "citations_by_hand": 0,
+ "question_set": "7c30ae479627aa1ba457fd46b13f2271418fdf3ad4b54a342bfedb83e7850d7e",
+ "spent_usd": 0.5687,
+ "local_loaded": {
+  "tag": "gemma4:26b",
+  "ollama": "0.40.14",
+  "details": {
+   "parent_model": "",
+   "format": "safetensors",
+   "family": "gemma4",
+   "families": null,
+   "parameter_size": "26.2B",
+   "quantization_level": "nvfp4",
+   "runner": "mlx"
+  },
+  "parameters": "temperature                    1\ntop_k                          64\ntop_p                          0.95",
+  "modified_at": "2026-11-01T07:08:21.899058863-05:00",
+  "trained_context": 262144,
+  "loaded_context": 65536
+ },
+ "limit_usd": 1.5,
+ "stopped_at_limit": false,
+ "kept": "20261113T215814323798Z-openai_gpt-6.1-sol",
+ "rescored_from": "20261113T211211873292Z-openai_gpt-6.1-sol"
+}

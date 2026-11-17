@@ -1,6 +1,8 @@
 """Decides, before any model call, whether a payload may go to the cloud, from the
 sensitivity of each of its parts; thread taint; default scopes; where an answer goes."""
 
+import contextlib
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
@@ -370,6 +372,42 @@ def is_stale(part: Part, thread_id: str | None) -> bool:
     return part.kind == PartKind.TITLES and _any_private(part.document_ids)
 
 
+# For the evaluation only: what the question being asked also rests on, for this
+# process while it holds; read fresh as each request leaves.
+_held_documents: tuple[str, ...] = ()
+_held_memories: tuple[str, ...] = ()
+
+
+@contextlib.contextmanager
+def resting_on(documents: Sequence[str], memories: Sequence[str]) -> Iterator[None]:
+    """While it holds, every request in this process also rests on these documents
+    and memories: one Private when a request leaves refuses that request."""
+    global _held_documents, _held_memories  # noqa: PLW0603  one question at a time
+    before = (_held_documents, _held_memories)
+    _held_documents, _held_memories = tuple(documents), tuple(memories)
+    try:
+        yield
+    finally:
+        _held_documents, _held_memories = before
+
+
+def _any_private_memory(memory_ids: Sequence[str]) -> bool:
+    if not memory_ids:
+        return False
+    with database.read() as connection:
+        return (
+            connection.execute(
+                sa.select(memories.c.id)
+                .where(
+                    memories.c.id.in_(list(memory_ids)),
+                    memories.c.sensitivity == states.PRIVATE,
+                )
+                .limit(1)
+            ).first()
+            is not None
+        )
+
+
 def refusal(parts: list[Part], thread_id: str | None = None) -> str | None:
     """Why this request may not go to the cloud right now, read fresh each time."""
     if settings.get(settings.OFFLINE):
@@ -380,8 +418,12 @@ def refusal(parts: list[Part], thread_id: str | None = None) -> str | None:
         return PRIVATE_PART
     if any(is_stale(part, thread_id) for part in parts):
         return STALE_PART
-    named = sorted({d for part in parts for d in part.document_ids})
-    return PRIVATE_PART if _any_private(named) else None
+    named = sorted(
+        {d for part in parts for d in part.document_ids} | {*_held_documents}
+    )
+    if _any_private(named) or _any_private_memory(_held_memories):
+        return PRIVATE_PART
+    return None
 
 
 def page_cloud_problem(model: str, price: spend.Price | None) -> str | None:

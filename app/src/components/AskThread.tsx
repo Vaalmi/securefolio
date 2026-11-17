@@ -14,9 +14,10 @@ import { PrivateBadge } from "../ui";
 import { useAction } from "../useAction";
 import { useLoad } from "../useLoad";
 import { useThreadsChanged } from "../useThreadsChanged";
-import { ListAnswer, NoEvidence } from "./AskAnswers";
+import { ListAnswer, NoEvidence, PassagesFound } from "./AskAnswers";
 import { ChatMenu } from "./ChatMenu";
 import { AnswerActions, AnswerBody, AnswerMeta, Steps } from "./AskParts";
+import { ReportAction } from "./WrongReport";
 
 function emptyTitle(count: number): string {
   if (count === 0) return "Ask your library";
@@ -75,6 +76,7 @@ export function AnswerTurn({
   onDeep,
   onAskLater,
   onIncludePrivate,
+  before,
 }: Readonly<{
   message: ThreadMessage;
   answer: Answer;
@@ -86,8 +88,24 @@ export function AnswerTurn({
   onDeep: () => void;
   onAskLater: () => void;
   onIncludePrivate: () => void;
+  before: number; // the questions before this answer's in the chat
 }>): ReactElement {
   const noEvidence = answer.kind === "no_evidence";
+  if (answer.kind === "passages") {
+    // Not an answer: no model's label, no actions, nothing to copy or save.
+    return (
+      <article
+        className="answer found-article"
+        aria-label="Passages found, not an answer"
+      >
+        <PassagesFound
+          answer={answer}
+          scopeLabel={thread.scope.label}
+          onPreview={onCite}
+        />
+      </article>
+    );
+  }
   return (
     <article className="answer" aria-label="Answer">
       {answer.kind === "answer" && (
@@ -128,7 +146,6 @@ export function AnswerTurn({
       {!noEvidence && (
         <AnswerActions
           message={message}
-          answer={answer}
           canDeep={
             deepCloud && !thread.private_tainted && answer.mode !== "deep"
           }
@@ -136,6 +153,13 @@ export function AnswerTurn({
           onRetry={onRetry}
         />
       )}
+      <ReportAction
+        threadId={thread.id}
+        messageId={message.id}
+        answer={answer}
+        before={before}
+        reportedAlready={message.reported ?? false}
+      />
     </article>
   );
 }
@@ -209,6 +233,16 @@ export function Foot({
   route,
 }: Readonly<{ route: AskRoute | undefined }>): ReactElement | null {
   if (!route) return null;
+  // No AI can answer: no answer's disclosure, as the approved screens show.
+  if (route.blocked)
+    return (
+      <div className="xs muted" style={{ textAlign: "center", marginTop: 6 }}>
+        <span className="hstack" style={{ justifyContent: "center", gap: 4 }}>
+          <Search size={11} aria-hidden="true" /> No AI can answer now. Search
+          runs on this Mac, and nothing leaves it.
+        </span>
+      </div>
+    );
   return (
     <div className="xs muted" style={{ textAlign: "center", marginTop: 6 }}>
       {route.local && route.helper_local && (

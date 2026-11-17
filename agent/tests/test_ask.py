@@ -186,21 +186,18 @@ class TestPrivacy:
         assert found["thread"]["private_tainted"] is True
         assert last_answer(found)["local"] is True
 
-    def test_with_no_local_model_a_private_thread_says_so(
+    def test_with_no_local_model_a_private_thread_finds_passages(
         self, folder, cloud, app_client, monkeypatch
     ):
+        """Nothing on this Mac can answer, so the
+        run finds passages instead of being refused, and says why."""
         monkeypatch.setenv(STUB_OLLAMA_ENV, "http://127.0.0.1:9")
         scope = {"kind": "library", "include_private": True, "label": "All"}
         thread = new_thread(app_client, scope)
-        # Refused before it starts (409), with the reason: nothing on this Mac runs it.
-        made = app_client.post(
-            f"/api/threads/{thread}/messages",
-            json={"text": "What about the rent?", "mode": "standard"},
-        )
-        assert made.status_code == 409
-        assert "Ollama isn't running" in made.json()["detail"]
-        found = app_client.get(f"/api/threads/{thread}").json()
-        assert found["messages"] == []
+        found = ask(app_client, thread, "What about the rent?")
+        passages = last_answer(found)
+        assert passages["kind"] == "passages"
+        assert "Ollama isn't running" in passages["reason"]
         assert cloud.requests == []
 
 
@@ -329,16 +326,18 @@ class TestCitations:
         assert shape == {
             "chars": 39,
             "sources": 3,
-            "markers": 2,
-            "in_range": 1,
-            "other_brackets": 1,
+            "markers": 3,
+            "in_range": 2,
+            "other_brackets": 0,
             "said_none": False,
         }
         assert citations.shape_of(f"{NO_EVIDENCE}.", 2)["said_none"] is True
 
     def test_every_bracket_is_counted_once_however_long(self):
         grouped = citations.shape_of("Due [1, 2, 3, 4, 5, 6, 7, 8, 9].", 9)
-        assert (grouped["markers"], grouped["other_brackets"]) == (0, 1)
+        assert (grouped["markers"], grouped["other_brackets"]) == (1, 0)
+        shapes = citations.shape_of("Due [a, 2] and [1 to 2].", 9)
+        assert (shapes["markers"], shapes["other_brackets"]) == (0, 2)
         number = "1234567890" * 500  # longer than `int` reads from text
         long = citations.shape_of(f"An id [{number}] and [007] and [].", 9)
         assert (long["markers"], long["in_range"], long["other_brackets"]) == (2, 1, 1)
@@ -420,6 +419,12 @@ class TestCards:
             "Renters insurance",
         ]
         assert answer["table"]["pending"][0]["title"] == "Umbrella insurance"
+        # The model is given the
+        # uncounted one in the total too, so the answer rested on it, and a report
+        # of it is Private if it is.
+        rested = set(answer["rested_on"])
+        assert {r["document_id"] for r in answer["table"]["rows"]} <= rested
+        assert answer["table"]["pending"][0]["document_id"] in rested
 
     def test_more_cards_than_the_budget_holds_still_total(
         self, library, cloud, app_client, tmp_path, monkeypatch
@@ -497,6 +502,16 @@ class TestComparison:
         seen = {b["title"] for b in last if b.get("type") == "search_result"}
         assert len(seen) < 30
         assert len(seen) + len(answer["left_out"]) == 30
+
+    def test_each_passage_carries_its_round(self, many, app_client):
+        """A local fit ranks a comparison's passages by round, then score."""
+        scope = {"kind": "documents", "ids": many[:3], "label": "Selected"}
+        thread = {"scope": scope, "private_tainted": False}
+        state: Any = {"query": "roof", "mode": "standard", "local": False}
+        found = harness._comparison(state, thread)  # noqa: SLF001
+        rounds = [e["round"] for e in found["evidence"]]
+        assert rounds == sorted(rounds)
+        assert rounds[:3] == [0, 0, 0], "each document's best comes first"
 
 
 def app_ids() -> list[str]:
@@ -828,6 +843,194 @@ def test_a_list_total_ignores_words_about_the_asking(
     assert told, "the model is given the total, and doesn't work one out"
 
 
+class TestWhatIs:
+    """A first question about one thing goes to search with no helper call."""
+
+    @staticmethod
+    def _planned(cloud) -> list[Any]:
+        return [r for r in cloud.requests if "stands alone" in system_of(r.body)]
+
+    @pytest.mark.parametrize(
+        "question",
+        [
+            "What is the rent on my lease?",
+            "What was the rent on my lease?",
+            "What does the lease say about rent?",
+            "What has the roof report found?",
+            "Which is due first, the rent or the roof?",
+            "What is the all-in rent on my lease?",
+        ],
+    )
+    def test_reaches_search_with_no_helper_call(
+        self, folder, cloud, app_client, question
+    ):
+        answer = last_answer(ask(app_client, new_thread(app_client), question))
+        assert self._planned(cloud) == []
+        assert answer["citations"], "search ran and the answer cites what it found"
+
+    @pytest.mark.parametrize(
+        "question",
+        [
+            "What is the total I spent on rent?",
+            "What is the list of contracts that expire this year?",
+            "What was the rent on each lease?",
+            "What is the rent in every lease?",
+            "What does each lease say about rent?",
+        ],
+    )
+    def test_one_that_asks_for_a_list_is_still_planned(
+        self, folder, cloud, app_client, question
+    ):
+        ask(app_client, new_thread(app_client), question)
+        assert len(self._planned(cloud)) == 1
+
+    @pytest.mark.parametrize(
+        "question",
+        [
+            "What leases do I have?",
+            "Which receipts are from March?",
+            "How much is rent?",
+        ],
+    )
+    def test_a_plural_noun_or_how_much_still_waits(
+        self, folder, cloud, app_client, question
+    ):
+        ask(app_client, new_thread(app_client), question)
+        assert len(self._planned(cloud)) == 1
+
+    def test_a_follow_up_is_still_planned(self, folder, cloud, app_client):
+        thread = new_thread(app_client)
+        ask(app_client, thread, "What is the rent on my lease?")
+        ask(app_client, thread, "What is it for the roof?")
+        assert len(self._planned(cloud)) == 1
+
+
+class TestFollowUpSearch:
+    """A follow-up searches with the helper's rewording and with my own words."""
+
+    @staticmethod
+    def _searches(monkeypatch) -> list[tuple[str, Any]]:
+        seen: list[tuple[str, Any]] = []
+        real = harness.api.search.retrieve
+
+        def spy(query, scope, fetch, *args, **kwargs):
+            seen.append((query, scope))
+            return real(query, scope, fetch, *args, **kwargs)
+
+        monkeypatch.setattr(harness.api.search, "retrieve", spy)
+        return seen
+
+    @staticmethod
+    def _lost(_path, body):
+        """A rewording that loses the lease: the wrong words, and dates nothing has."""
+        if "stands alone" in system_of(body):
+            return plan_reply(
+                body, "roof seams", date_from="1990-01-01", date_to="1990-01-31"
+            )
+        return default_reply(_path, body)
+
+    def test_a_rewording_that_loses_the_passage_still_finds_it(
+        self, folder, cloud, app_client, monkeypatch
+    ):
+        cloud.reply = self._lost
+        searches = self._searches(monkeypatch)
+        thread = new_thread(app_client)
+        ask(app_client, thread, "When is the rent due?")
+        answer = last_answer(ask(app_client, thread, "And when is the rent due?"))
+        assert answer["kind"] == "answer"
+        assert answer["citations"][0]["title"] == "Lease"
+        mine = [
+            scope for query, scope in searches if query == "And when is the rent due?"
+        ]
+        assert mine, "my own words were searched"
+        assert all(s.date_from is None and s.date_to is None for s in mine)
+
+    def test_my_own_words_kept_but_dated_are_searched_again_without_dates(
+        self, folder, cloud, app_client, monkeypatch
+    ):
+        def dated(_path, body):
+            if "stands alone" in system_of(body):
+                return plan_reply(
+                    body,
+                    "And when is the rent due?",
+                    date_from="1990-01-01",
+                    date_to="1990-01-31",
+                )
+            return default_reply(_path, body)
+
+        cloud.reply = dated
+        searches = self._searches(monkeypatch)
+        thread = new_thread(app_client)
+        ask(app_client, thread, "When is the rent due?")
+        answer = last_answer(ask(app_client, thread, "And when is the rent due?"))
+        assert answer["kind"] == "answer"
+        assert answer["citations"][0]["title"] == "Lease"
+        undated = [
+            s
+            for query, s in searches
+            if query == "And when is the rent due?" and s.date_from is None
+        ]
+        assert undated, "my own words were searched without the helper's dates"
+
+    def test_a_follow_up_the_helper_left_as_it_was_searches_once(
+        self, folder, cloud, app_client, monkeypatch
+    ):
+        def same(_path, body):
+            if "stands alone" in system_of(body):
+                return plan_reply(body, "And when is the rent due?")
+            return default_reply(_path, body)
+
+        cloud.reply = same
+        searches = self._searches(monkeypatch)
+        thread = new_thread(app_client)
+        ask(app_client, thread, "When is the rent due?")
+        ask(app_client, thread, "And when is the rent due?")
+        follow = [q for q, _ in searches if q == "And when is the rent due?"]
+        assert len(follow) == 1
+
+    def test_a_first_question_searches_once(
+        self, folder, cloud, app_client, monkeypatch
+    ):
+        searches = self._searches(monkeypatch)
+        thread = new_thread(app_client)
+        ask(app_client, thread, "When is the rent due?")
+        assert [query for query, _ in searches] == ["When is the rent due?"]
+
+    def test_a_comparison_follow_up_searches_my_words_too(self, folder, monkeypatch):
+        ids = app_ids()
+        thread = {
+            "scope": {"kind": "documents", "ids": ids, "label": "Selected"},
+            "private_tainted": False,
+            "summary": "",
+        }
+        real = harness.api.search.retrieve
+
+        def lost(query, scope, fetch, *args, **kwargs):
+            return [] if query == "nothing here" else real(query, scope, fetch)
+
+        monkeypatch.setattr(harness.api.search, "retrieve", lost)
+        state: Any = {
+            "query": "nothing here",
+            "question": "Compare the rent and the roof",
+            "turns": ["first", "second"],
+            "mode": "standard",
+            "local": False,
+        }
+        found = harness._comparison(state, thread)  # noqa: SLF001
+        assert {e["document_id"] for e in found["evidence"]} == set(ids)
+        assert found["left_out"] == []
+
+    def test_a_passage_both_find_keeps_its_better_score(self):
+        reworded = [{"chunk_id": "a", "score": 0.2}, {"chunk_id": "b", "score": 0.9}]
+        mine = [{"chunk_id": "a", "score": 0.8}, {"chunk_id": "c", "score": 0.5}]
+        merged = harness._best_of(reworded, mine)  # noqa: SLF001
+        assert [(i["chunk_id"], i["score"]) for i in merged] == [
+            ("b", 0.9),
+            ("a", 0.8),
+            ("c", 0.5),
+        ]
+
+
 class TestListsThatNeedAQuestionsDetail:
     @pytest.fixture
     def contracts(self, library, tmp_path):
@@ -1125,7 +1328,7 @@ def test_a_saved_list_keeps_its_total_rows_and_cards(
     cloud.reply = reply
     thread = new_thread(app_client)
     found = ask(app_client, thread, "What did I spend on insurance?")
-    saved = notes.from_answer(found["messages"][-1]["id"])
+    saved = notes.from_answer(found["messages"][-1]["id"], agent_service.note_text)
     assert "Auto insurance" in saved["body"]
     assert "Total: $1,284.00" in saved["body"]
     assert saved["citations"][0]["element_id"] is None

@@ -2,14 +2,23 @@ import { useEffect, useRef } from "react";
 import type { ReactElement } from "react";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
-import { getDocument, resolveCitation } from "../api";
-import type { Answer, Locator, StoredElement, ThreadMessage } from "../api";
+import { getDocument, getFigurePlaces, resolveCitation } from "../api";
+import type {
+  Answer,
+  FigurePlace,
+  Locator,
+  Rect,
+  StoredElement,
+  ThreadMessage,
+} from "../api";
+import { highlighted } from "../citedFigures";
 import { go } from "../router";
 import { Tabs } from "../ui";
 import { useLoad } from "../useLoad";
 import { PdfView } from "../viewers/PdfView";
 import { isPicture } from "../viewers/pictures";
 import { ImageView } from "../viewers/TextViews";
+import { FigureText } from "./FigureText";
 
 const CARD_LOCATOR: Locator = { kind: "card", field: "amounts" };
 const CARD_ELEMENT = "card:";
@@ -18,6 +27,7 @@ type PdfPlace = Extract<Locator, { kind: "pdf" }>;
 
 interface Source {
   key: string;
+  messageId?: string; // a citation's answer
   n: number;
   documentId: string;
   elementId: string | null;
@@ -35,6 +45,7 @@ function citedSources(turns: ThreadMessage[]): Source[] {
     if (!answer) return [];
     const cited = (answer.citations ?? []).map((c) => ({
       key: `${message.id}-${String(c.n)}`,
+      messageId: message.id,
       n: c.n,
       documentId: c.document_id,
       elementId: c.element_id,
@@ -62,19 +73,21 @@ function citedSources(turns: ThreadMessage[]): Source[] {
 
 function searched(answers: Answer[]): Source[] {
   return answers.flatMap((answer) =>
-    [...(answer.also_searched ?? []), ...(answer.closest ?? [])].map(
-      (passage) => ({
-        key: `x-${passage.document_id}-${passage.element_id ?? ""}`,
-        n: 0,
-        documentId: passage.document_id,
-        elementId: passage.element_id,
-        title: passage.title,
-        label: passage.label,
-        quote: passage.snippet ?? passage.text ?? "",
-        locator: null,
-        turn: 0,
-      }),
-    ),
+    [
+      ...(answer.also_searched ?? []),
+      ...(answer.closest ?? []),
+      ...(answer.found ?? []),
+    ].map((passage) => ({
+      key: `x-${passage.document_id}-${passage.element_id ?? ""}`,
+      n: 0,
+      documentId: passage.document_id,
+      elementId: passage.element_id,
+      title: passage.title,
+      label: passage.label,
+      quote: passage.snippet ?? passage.text ?? "",
+      locator: null,
+      turn: 0,
+    })),
   );
 }
 
@@ -119,10 +132,12 @@ function CitedPage({
   source,
   pdf,
   quote,
+  figures,
 }: Readonly<{
   source: Source;
   pdf: PdfPlace;
   quote: string;
+  figures: Rect[];
 }>): ReactElement | null {
   const kind = useLoad(
     () => getDocument(source.documentId).then((d) => d.document.file_kind),
@@ -147,6 +162,7 @@ function CitedPage({
       zoom={50}
       rects={pdf.rects}
       precision={pdf.precision}
+      figures={figures}
       label={source.title}
       onPages={() => undefined}
       onDeclined={() => undefined}
@@ -154,16 +170,57 @@ function CitedPage({
   );
 }
 
+/** A citation chip's key names its sentence after its source: `<source>-s<n>`. */
+function sentenceOf(key: string | null): {
+  base: string | null;
+  sentence: number | null;
+} {
+  const found = /^(.*)-s(\d+)$/.exec(key ?? "");
+  return found
+    ? { base: found[1], sentence: Number(found[2]) }
+    : { base: key, sentence: null };
+}
+
+// The sentence's figures placed in the cited element, when it opened from one.
+function usePlacedFigures(
+  source: Source,
+  sentence: number | null,
+): FigurePlace[] {
+  const { documentId, elementId, messageId } = source;
+  const found = useLoad(
+    () =>
+      messageId && elementId && sentence !== null && !isOnACard(elementId)
+        ? getFigurePlaces(documentId, elementId, messageId, sentence).then(
+            (placed) => placed.figures,
+          )
+        : Promise.resolve([]),
+    `${source.key}-${String(sentence)}`,
+  );
+  return found.data ?? [];
+}
+
 function Preview({
   source,
+  sentence,
   onBack,
-}: Readonly<{ source: Source; onBack: () => void }>): ReactElement {
+}: Readonly<{
+  source: Source;
+  sentence: number | null;
+  onBack: () => void;
+}>): ReactElement {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     heading.current?.focus();
   }, [source.key]);
   const { element, pdf, changed, opens } = useCitationPlace(source);
   const quote = element?.text ?? source.quote;
+  const figures = usePlacedFigures(source, sentence);
+  const caption = highlighted(figures);
+  // The viewer places the same figures, from the same ids.
+  const opening =
+    sentence !== null && source.messageId && opens.includes("?el=")
+      ? `${opens}&message=${source.messageId}&sentence=${String(sentence)}`
+      : opens;
   return (
     <>
       <div className="panel-head" style={{ paddingRight: 48 }}>
@@ -195,11 +252,21 @@ function Preview({
               source={source}
               pdf={pdf}
               quote={quote}
+              figures={figures.flatMap((f) =>
+                f.kind === "pdf" ? f.rects : [],
+              )}
             />
           ) : (
-            <blockquote>{quote}</blockquote>
+            <blockquote>
+              {element ? <FigureText text={quote} places={figures} /> : quote}
+            </blockquote>
           )}
         </div>
+        {caption && (
+          <p className="small muted" role="note">
+            {caption}
+          </p>
+        )}
         {changed && (
           <p className="small muted" role="note">
             This file has changed since the answer, so this is the text it read
@@ -211,7 +278,7 @@ function Preview({
             type="button"
             className="btn primary"
             onClick={() => {
-              go(opens);
+              go(opening);
             }}
           >
             <ExternalLink size={14} aria-hidden="true" /> Open in viewer
@@ -358,11 +425,13 @@ export function SourcesPanel({
   const answers = turns.flatMap((m) => (m.answer ? [m.answer] : []));
   const cited = citedSources(turns);
   const also = searched(answers);
-  const active = [...cited, ...also].find((source) => source.key === activeKey);
+  const { base, sentence } = sentenceOf(activeKey);
+  const active = [...cited, ...also].find((source) => source.key === base);
   if (active) {
     return (
       <Preview
         source={active}
+        sentence={sentence}
         onBack={() => {
           onCite("");
           window.setTimeout(() => {

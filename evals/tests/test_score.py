@@ -5,6 +5,8 @@ import json
 import pytest
 
 from evals import cli, score
+from evals import kept as keeping
+from evals.tests.fake_runs import fake_evaluate
 
 
 def report(**changes) -> dict:
@@ -25,6 +27,7 @@ def row(category="fact", rank: int | None = 1, correct=True, parts=2, uncited=0)
     return {
         "category": category,
         "rank": rank,
+        "facts_found": correct,
         "correct": correct,
         "parts": parts,
         "uncited": uncited,
@@ -143,13 +146,31 @@ def test_a_set_of_your_own_writes_only_into_your_vault(tmp_path, monkeypatch):
     monkeypatch.setenv("SECUREFOLIO_VAULT", str(vault))
     monkeypatch.setattr(cli, "REPORTS", checkout)
     monkeypatch.setattr(
-        cli.run, "evaluate", lambda _q, _model=None: (report(), [{"passage": "mine"}])
+        cli.run, "evaluate", fake_evaluate(report(), [{"passage": "mine"}])
     )
     monkeypatch.setattr(cli.run, "sample", lambda claims, _: claims)
-    cli.main(["--questions", str(own_set(tmp_path)), "--sample-citations", "1"])
+    cli.main(
+        [
+            "--questions",
+            str(own_set(tmp_path)),
+            "--sample-citations",
+            "1",
+            "--limit-usd",
+            "50",
+        ]
+    )
     assert "mine" in (vault / "evals" / "claims.json").read_text()
     assert (vault / "evals" / "citations_to_check.json").exists()
     assert (vault / "evals" / "last.json").exists()
+    runs = list((vault / "evals" / "runs").iterdir())
+    assert len(runs) == 1, "the run is kept in the vault"
+    assert keeping.Kept(runs[0]).state == keeping.FINISHED
+    assert "figures" in (keeping.Kept(runs[0]).report() or {})
+    # A run of your own set measures no
+    # hard pages, and its latest report has its figures all the same.
+    last = json.loads((vault / "evals" / "last.json").read_text())
+    assert last["figures"] == (keeping.Kept(runs[0]).report() or {})["figures"]
+    assert list((vault / "evals" / "figures").glob("*.csv")), "its sheet too"
     assert not checkout.exists()
 
 

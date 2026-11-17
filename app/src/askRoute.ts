@@ -9,6 +9,7 @@ import { useLoad } from "./useLoad";
 
 export function askLabel(route: AskRoute | undefined, mode: Mode): string {
   if (!route) return "Ask"; // not known yet, so nothing is assumed
+  if (route.blocked) return "Find passages"; // no AI can answer: search still can
   if (route.local) return "Ask Local AI";
   return mode === "deep" ? "Ask Cloud AI · Deep" : "Ask Cloud AI";
 }
@@ -66,7 +67,8 @@ export function useAskRoute(query: RouteQuery): {
   return { data: fresh, error: fresh ? undefined : loaded.error };
 }
 
-/** Whether a question may be asked now: the route for it has come, and isn't blocked. */
+/** Whether a question may be sent now: the route for it has come. When no AI can
+ * answer, it finds passages instead. */
 export function canAsk(route: AskRoute | undefined): route is AskRoute {
-  return route !== undefined && !route.blocked;
+  return route !== undefined;
 }

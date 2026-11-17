@@ -177,7 +177,7 @@ npm run dev
 
 - `npm run check` runs every check: ruff, pyright and pytest, Prettier, ESLint, tsc and vitest, cargo fmt, clippy and test, the bundle build on macOS, and the Playwright tests. The checks call no real model and need no network once installed.
 - `npm run verify:models` runs the real search, OCR and page-reading models on this Mac.
-- `npm run eval` runs the evaluation over the synthetic library with real models and your key. It costs about a dollar a run.
+- `npm run eval -- --limit-usd 2` runs the evaluation over the synthetic library with real models and your key. It prints what the run is expected to cost first, about a dollar on the default models, and stops before any request that could take it past the limit; `--estimate-only` prints the estimate and stops. A local model's unjudged run (`--model local:<tag>`) sends nothing and needs no limit.
 
 | Folder             | What's in it                                                                            |
 | ------------------ | --------------------------------------------------------------------------------------- |

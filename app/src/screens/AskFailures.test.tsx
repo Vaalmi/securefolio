@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { calls, DETAIL, DOC, fakeBackend } from "../fakeBackend";
 import { installBrowser, open } from "../testApp";
-import { ANSWER, chat, THREAD } from "./askFixtures";
+import { ANSWER, chat, COPY_TEXT, THREAD } from "./askFixtures";
 
 beforeEach(() => {
   installBrowser();
@@ -141,44 +141,11 @@ describe("copying an answer", () => {
     });
   }
 
-  it("keeps its citations", async () => {
+  it("puts the backend's text on the clipboard, its marks in words", async () => {
     chat();
     open("/ask/t1");
     await screen.findByRole("article", { name: "Answer" });
-    const text = await copied();
-    expect(text).toContain("[1]");
-  });
-
-  it("keeps a list's rows and total", async () => {
-    chat({
-      ...ANSWER,
-      kind: "list",
-      parts: [{ text: "One policy." }],
-      citations: [],
-      table: {
-        rows: [
-          {
-            n: 1,
-            document_id: "d1",
-            title: "Auto policy",
-            doc_date: null,
-            amount: 1284,
-            amount_text: "$1,284.00",
-            summary: "A policy.",
-          },
-        ],
-        total: 1284,
-        wants_total: true,
-        pending: [],
-        unchecked_pending: 0,
-        shown_to_model: 1,
-      },
-    });
-    open("/ask/t1");
-    await screen.findByRole("article", { name: "Answer" });
-    const text = await copied();
-    expect(text).toContain("Auto policy, no date: $1,284.00");
-    expect(text).toContain("Total: $1,284.00");
+    expect(await copied()).toBe(COPY_TEXT);
   });
 });
 

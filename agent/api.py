@@ -117,6 +117,11 @@ def scope_id(provider: str) -> str | None:
     return (_settings.get(found) or None) if found else None
 
 
+def ollama_listed_at() -> float | None:
+    """When Ollama's list was last handed to the backend, or None."""
+    return _model_store.ollama_listed_at()
+
+
 def route(mode: str, include_private: bool, thread_private: bool) -> Any:
     return _policy.route(mode, include_private, thread_private)
 

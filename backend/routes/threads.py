@@ -10,7 +10,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from backend import agent_service, notes, policy, refusals, threads
+from backend import agent_service, notes, reports, threads
 from backend.dependencies import AppToken
 
 router = APIRouter()
@@ -102,10 +102,21 @@ def create_thread(body: NewThread, _: AppToken) -> dict[str, Any]:
 
 @router.get("/threads/{thread_id}", operation_id="get_thread")
 def get_thread(thread_id: str, _: AppToken) -> ThreadDetail:
-    """A chat with its transcript and any answer in progress."""
+    """A chat with its transcript, its answers' reports, and any answer in progress."""
+    thread = threads.get(thread_id)
+    reported = reports.reported_in(thread_id)
     return ThreadDetail(
-        thread=threads.get(thread_id),
-        messages=threads.transcript(thread_id),
+        thread=thread,
+        messages=[
+            {
+                **m,
+                "copy_text": agent_service.copy_text(m["answer"]),
+                "reported": m["id"] in reported,
+            }
+            if m.get("answer")
+            else m
+            for m in threads.transcript(thread_id)
+        ],
         active_run=threads.active_run(thread_id),
         last_failure=threads.last_failure(thread_id),
     )
@@ -135,23 +146,94 @@ def set_thread_scope(thread_id: str, body: ScopeBody, _: AppToken) -> dict[str, 
 async def send_message(
     thread_id: str, body: NewMessage, request: Request, _: AppToken
 ) -> dict[str, Any]:
-    """Starts an answer, unless one runs or nothing can answer it now (409)."""
-    thread = threads.get(thread_id)
-    taint = bool(thread["private_tainted"])
-    # Refused here only for what needs no network: no connection is tried, so the
-    # run starts, and its first step shows within 250 ms, before routing asks,
-    # waiting, whether the answer's provider can be reached.
-    route = await asyncio.to_thread(policy.route, body.mode, False, taint, wait=False)
-    if route.local or route.helper_local:
-        # Ollama is asked only when a local model would run: a direct request learns,
-        # as the route preview does, whether it can before it starts.
-        await asyncio.to_thread(agent_service.refresh_ollama)
-        route = await asyncio.to_thread(
-            policy.route, body.mode, False, taint, wait=False
-        )
-    if route.blocked:
-        raise refusals.conflict(route.blocked)
+    """Starts an answer, or passages found when no model can answer it now."""
+    threads.get(thread_id)  # a chat that doesn't exist is refused here
+    # Nothing is asked here, Ollama included, so the run starts and its first step
+    # shows within 250 ms; the run routes, and a route nothing can answer finds
+    # passages rather than being refused.
     return await _service(request).start(thread_id, body.text, body.mode)
+
+
+class PlaceFields(BaseModel):
+    # Whole numbers as sent: "3" or 2.5 is never read as another page.
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+
+class PagePlace(PlaceFields):
+    kind: Literal["page"]
+    page: int
+
+
+class SlidePlace(PlaceFields):
+    kind: Literal["slide"]
+    slide: int
+
+
+class MessagePlace(PlaceFields):
+    kind: Literal["message"]
+    message: int
+
+
+class LinesPlace(PlaceFields):
+    kind: Literal["lines"]
+    start: int
+    end: int
+
+
+class CellsPlace(PlaceFields):
+    kind: Literal["cells"]
+    sheet: str
+    cells: str
+
+
+# Its shape by kind; whether the document has that place is `reports`' to say.
+Place = Annotated[
+    PagePlace | SlidePlace | MessagePlace | LinesPlace | CellsPlace,
+    Field(discriminator="kind"),
+]
+
+
+class ReportBody(BaseModel):
+    """What "This was wrong" says: the right document and the place in it, or none
+    when it isn't in the library, and the fact and a note, both optional."""
+
+    document_id: str | None = None
+    place: Place | None = None
+    fact: str | None = None
+    note: str | None = None
+
+
+class Reported(BaseModel):
+    id: str
+    private: bool
+    why: str | None
+
+
+class ReportPrivacy(BaseModel):
+    why: str | None
+
+
+@router.post(
+    "/threads/{thread_id}/messages/{message_id}/report", operation_id="report_answer"
+)
+def report_answer(
+    thread_id: str, message_id: str, body: ReportBody, _: AppToken
+) -> Reported:
+    """Saves "This was wrong" as a question in the owner's own set, on this Mac."""
+    place = body.place.model_dump() if body.place else None
+    said = reports.Report(body.document_id, place, body.fact, body.note)
+    return Reported(**reports.save(thread_id, message_id, said))
+
+
+@router.get(
+    "/threads/{thread_id}/messages/{message_id}/report/privacy",
+    operation_id="get_report_privacy",
+)
+def get_report_privacy(
+    thread_id: str, message_id: str, _: AppToken, document_id: str | None = None
+) -> ReportPrivacy:
+    """Whether a report with this document picked would be Private, and why."""
+    return ReportPrivacy(why=reports.privacy(thread_id, message_id, document_id))
 
 
 @router.post("/threads/{thread_id}/resume", operation_id="resume_thread")
@@ -219,7 +301,7 @@ def follow_run(
 @router.post("/messages/{message_id}/note", operation_id="save_answer_as_note")
 def save_answer_as_note(message_id: str, _: AppToken) -> dict[str, Any]:
     """Saves an answer to Notes, with its citations."""
-    return notes.from_answer(message_id)
+    return notes.from_answer(message_id, agent_service.note_text)
 
 
 class Later(BaseModel):

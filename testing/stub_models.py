@@ -50,9 +50,16 @@ def _ollama_reply(path: str, body: dict[str, Any]) -> dict[str, Any]:
     if path == "/api/tags":
         return {"models": [{"name": "gemma4:26b"}]}
     if path == "/api/show":
-        return {"capabilities": ["completion", "vision"]}
+        return {
+            "capabilities": ["completion", "vision"],
+            "details": {"family": "stub", "quantization_level": "Q4_K_M"},
+            "parameters": "temperature 1",
+            "model_info": {"stub.context_length": 131072},
+        }
     if path == "/api/ps":
         return {"models": []}
+    if path == "/api/version":
+        return {"version": "0.0.0-stub"}
     return {
         "model": body.get("model", "stub"),
         "message": {"role": "assistant", "content": "stub local answer"},
@@ -142,9 +149,16 @@ def _sse(event: str, data: dict[str, Any]) -> str:
     return f"event: {event}\ndata: {json.dumps({'type': event, **data})}\n\n"
 
 
+CUT_SHORT = "cut_short"  # an answer's mark: its stream ends before its final usage
+
+
 def _stream_events(answer: dict[str, Any]) -> Iterator[str]:
+    """Anthropic's events. An answer marked CUT_SHORT stops after its text, before the
+    message_delta that carries the stop reason and the final usage."""
+    answer = dict(answer)
+    cut = answer.pop(CUT_SHORT, False)
     usage = answer.get("usage", {"input_tokens": 10, "output_tokens": 5})
-    message = {**answer, "content": [], "usage": {**usage, "output_tokens": 0}}
+    message = {**answer, "content": [], "usage": {**usage, "output_tokens": 1}}
     yield _sse("message_start", {"message": message})
     for at, block in enumerate(answer["content"]):
         yield _sse(
@@ -157,6 +171,8 @@ def _stream_events(answer: dict[str, Any]) -> Iterator[str]:
             delta = {"type": "citations_delta", "citation": citation}
             yield _sse("content_block_delta", {"index": at, "delta": delta})
         yield _sse("content_block_stop", {"index": at})
+    if cut:
+        return
     stopped = {"stop_reason": "end_turn", "stop_sequence": None}
     yield _sse("message_delta", {"delta": stopped, "usage": usage})
     yield _sse("message_stop", {})

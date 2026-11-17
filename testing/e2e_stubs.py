@@ -4,6 +4,7 @@ model. A key with "-any-" in it isn't tied to one workspace or project: sent wit
 its ID, the provider refuses it, as each one does."""
 
 import json
+import re
 import sys
 import time
 from threading import Thread
@@ -53,12 +54,48 @@ def _plan(body: dict[str, Any]) -> dict[str, Any]:
     return _message(body, [{"type": "text", "text": json.dumps(fields)}])
 
 
+AMOUNT = re.compile(r"\$[\d,]+(?:\.\d\d)?")
+
+
+def _an_amount(results: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """For a question asking how much: a sentence giving the first amount a passage
+    holds, citing the block it's in, as a model reading it would."""
+    for at, result in enumerate(results):
+        for block, content in enumerate(result["content"]):
+            found = AMOUNT.search(content["text"])
+            if found:
+                return {
+                    "type": "text",
+                    "text": f"{result['title']} gives {found.group(0)}. ",
+                    "citations": [
+                        {
+                            "type": "search_result_location",
+                            "source": result["source"],
+                            "title": result["title"],
+                            "cited_text": content["text"],
+                            "search_result_index": at,
+                            "start_block_index": block,
+                            "end_block_index": block + 1,
+                        }
+                    ],
+                }
+    return None
+
+
 def _answer(body: dict[str, Any]) -> dict[str, Any]:
     results = [
         block
         for block in body["messages"][-1]["content"]
         if isinstance(block, dict) and block.get("type") == "search_result"
     ]
+    asked_how_much = any(
+        "how much" in block.get("text", "").lower()
+        for block in body["messages"][-1]["content"]
+        if isinstance(block, dict) and block.get("type") == "text"
+    )
+    amount = _an_amount(results) if asked_how_much else None
+    if amount is not None:
+        return _message(body, [amount])
     content: list[dict[str, Any]] = []
     for at, result in enumerate(results[:3]):
         content.append(
@@ -76,6 +113,19 @@ def _answer(body: dict[str, Any]) -> dict[str, Any]:
                         "end_block_index": 1,
                     }
                 ],
+            }
+        )
+    asked = " ".join(
+        block.get("text", "")
+        for block in body["messages"][-1]["content"]
+        if isinstance(block, dict) and block.get("type") == "text"
+    )
+    if results and "a year" in asked:
+        # A figure no passage holds, as a model's own sum would be: it's marked.
+        content.append(
+            {
+                **content[0],
+                "text": "That comes to $123,456.78 a year. ",
             }
         )
     return _message(body, content or [{"type": "text", "text": "No evidence."}])
@@ -115,9 +165,22 @@ def _local_json(schema: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# For the end-to-end test of passages when no model can answer: a test turns the
+# local model away, as if removed from Ollama, and back. Only the stub has these.
+GONE = "/stub/models-gone"
+BACK = "/stub/models-back"
+_models_gone = {"on": False}
+
+
 def ollama_reply(path: str, body: dict[str, Any]) -> dict[str, Any]:
+    if path in (GONE, BACK):
+        _models_gone["on"] = path == GONE
+        return {}
     if path == "/api/tags":
-        return {"models": [{"name": "gemma4:26b"}]}
+        if _models_gone["on"]:
+            return {"models": []}
+        # Its build, as Ollama names one: a local model's scores are kept for it.
+        return {"models": [{"name": "gemma4:26b", "digest": "5c1b2e7a90d4" * 5}]}
     if path == "/api/show":  # what it can do, as Ollama says
         return {"capabilities": ["completion", "vision"]}
     if path == "/api/ps":

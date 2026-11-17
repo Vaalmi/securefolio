@@ -1,6 +1,7 @@
 """`npm run evals:seal`: a maintainer-only step. Draws a random seed once and writes
 the whole held-out set under data/evals/answers/, and nowhere else. Sealing the
-answer keys is never part of the build, so the build never runs this."""
+answer keys is never part of the build, so the build never runs this. --add-follow-ups
+adds the follow-ups to a set sealed before it had them, from its stored seed."""
 
 import argparse
 import json
@@ -12,6 +13,7 @@ from data.build import hard_pages, library
 ANSWERS = Path(__file__).parent.parent / "evals" / "answers"
 HELD_OUT_BAD_PAGES = 20
 HELD_OUT_GOOD_PAGES = 40
+HELD_OUT_PREFIX = library.HELD_OUT_PREFIX
 
 
 class AlreadySealed(Exception):
@@ -43,10 +45,26 @@ def seal(target: Path, reseed: bool = False) -> None:
     library.build_held_out(target / "library", seed, target / "questions.json")
 
 
+def add_follow_ups(target: Path) -> int:
+    """Adds the follow-ups to a set sealed before it had them, from its stored seed,
+    changing nothing else in it: the library and the keys stay as they were."""
+    seed = json.loads((target / "seed.json").read_text(encoding="utf-8"))["seed"]
+    return library.add_follow_ups(target / "questions.json", seed, HELD_OUT_PREFIX)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reseed", action="store_true")
+    parser.add_argument(
+        "--add-follow-ups",
+        action="store_true",
+        help="Add the follow-ups to a set sealed before it had them.",
+    )
     arguments = parser.parse_args()
+    if arguments.add_follow_ups:
+        added = add_follow_ups(ANSWERS)
+        print(f"Added {added} follow-ups. Nothing in data/evals/answers/ was printed.")
+        return
     seal(ANSWERS, arguments.reseed)
     print("Sealed. Nothing in data/evals/answers/ was printed.")
 

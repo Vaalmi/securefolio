@@ -10,6 +10,7 @@ import type {
   Collection,
   DocumentDetail,
   Facets,
+  FigurePlace,
   Health,
   LibraryCounts,
   LibraryParams,
@@ -42,9 +43,11 @@ import type {
   Backups,
 } from "./apiTypes";
 import type { OpenRouterList, ProviderKey, TaskModels } from "./apiModelTypes";
+import type { ReportBody } from "./apiReportTypes";
 
 export type * from "./apiTypes";
 export type * from "./apiModelTypes";
+export type * from "./apiReportTypes";
 
 // One function per backend operation the app calls. No other module builds a URL.
 
@@ -361,6 +364,44 @@ export function resolveCitation(
 ): Promise<CitationPlace> {
   return get<CitationPlace>(
     `/documents/${documentId}/citation?revision_id=${revisionId}&element_id=${elementId}`,
+  );
+}
+
+/** "This was wrong": saved as a question in the owner's own set, on this Mac. */
+export function reportAnswer(
+  threadId: string,
+  messageId: string,
+  body: ReportBody,
+): Promise<{ id: string; private: boolean; why: string | null }> {
+  return post(`/threads/${threadId}/messages/${messageId}/report`, body);
+}
+
+/** Whether a report with this document picked would be Private, and why. */
+export function getReportPrivacy(
+  threadId: string,
+  messageId: string,
+  documentId: string | null,
+): Promise<{ why: string | null }> {
+  const asked = documentId ? `?document_id=${documentId}` : "";
+  return get(
+    `/threads/${threadId}/messages/${messageId}/report/privacy${asked}`,
+  );
+}
+
+/** Where a saved answer's sentence's shown figures are in the element it cites:
+ * ids in, places out, never a figure in the address. */
+export function getFigurePlaces(
+  documentId: string,
+  elementId: string,
+  messageId: string,
+  sentence: number,
+): Promise<{ figures: FigurePlace[] }> {
+  const asked = new URLSearchParams({
+    message: messageId,
+    sentence: String(sentence),
+  });
+  return get<{ figures: FigurePlace[] }>(
+    `/documents/${documentId}/elements/${elementId}/figures?${asked.toString()}`,
   );
 }
 

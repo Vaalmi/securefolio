@@ -9,7 +9,7 @@ from typing import Any
 import sqlalchemy as sa
 from sqlalchemy.engine import Connection
 
-from backend import database, embedder, index, locators, policy, states
+from backend import database, embedder, index, locators, policy, states, tokens
 from backend.database import (
     cards,
     chunks,
@@ -31,6 +31,8 @@ HAS_TOKEN = re.compile(r"\w")
 RANK = "bm25(documents_fts, 0.0, 10.0, 6.0, 1.0, 2.0, 3.0)"
 DOCUMENTS_FETCHED = 32
 FTS = sa.table("documents_fts", sa.column("document_id"))
+COLUMN_TOKENS = 256  # as a sheet chunk's heading is cut
+CELL = " | "  # how a sheet row's cells are joined in its element
 
 
 @dataclass(frozen=True)
@@ -347,11 +349,16 @@ def run(
 
 
 def retrieve(
-    query: str, scope: Scope, fetch: int, exclude: tuple[str, ...] = ()
+    query: str,
+    scope: Scope,
+    fetch: int,
+    exclude: tuple[str, ...] = (),
+    kind: str = index.HYBRID,
 ) -> list[dict[str, Any]]:
     """For Ask: candidates with their elements, each checked fresh. Unlike typeahead
-    this waits for the embedder, as a question is worth a real answer."""
-    vector = embedder.embed_query(query)
+    this waits for the embedder, as a question is worth a real answer. Ask always
+    searches `hybrid`; the search measures alone ask for words or meaning alone."""
+    vector = None if kind == index.WORDS else embedder.embed_query(query)
     with database.read() as connection:
         ids = _narrowed_ids(connection, scope) if scope.narrowed() else None
     where = index.where_clause(
@@ -361,7 +368,7 @@ def retrieve(
         date_from=scope.date_from,
         date_to=scope.date_to,
     )
-    rows = index.search(query, vector, where, fetch)
+    rows = index.search(query, vector, where, fetch, kind)
     found = []
     with database.read() as connection:
         for item in _checked(connection, rows, scope, ids):
@@ -501,6 +508,7 @@ def evidence(chunk_ids: list[str], include_private: bool) -> list[dict[str, Any]
         )
         by_id = {row["chunk_id"]: row for row in rows}
         found = []
+        headers: dict[tuple[str, str], Any] = {}
         for chunk_id in chunk_ids:
             row = by_id.get(chunk_id)
             if row is None:
@@ -512,8 +520,67 @@ def evidence(chunk_ids: list[str], include_private: bool) -> list[dict[str, Any]
                 "active_revision_id": row["active_revision_id"],
             }
             hit = {"id": chunk_id, "text": row["text"]}
-            found.append(_with_elements(connection, {"hit": hit, "document": document}))
+            item = _with_elements(connection, {"hit": hit, "document": document})
+            found.append(_with_columns(connection, item, headers))
     return found
+
+
+def _with_columns(
+    connection: Connection,
+    item: dict[str, Any],
+    headers: dict[tuple[str, str], dict[str, Any] | None],
+) -> dict[str, Any]:
+    """A sheet's rows past its first chunk have nothing to say what their values are.
+    Such a passage gets its sheet's column names, from the sheet's first row, as the
+    chunk's heading took them. A passage that holds that row needs none."""
+    sheet = next(
+        (
+            e["locator"]["sheet"]
+            for e in item["elements"]
+            if (e["locator"] or {}).get("kind") == "sheet"
+        ),
+        None,
+    )
+    if sheet is None:
+        return item
+    key = (item["revision_id"], sheet)
+    if key not in headers:
+        headers[key] = _first_row(connection, *key)
+    header = headers[key]
+    if header is None or any(e["id"] == header["id"] for e in item["elements"]):
+        return item
+    names = [name.strip() for name in header["text"].split(CELL)]
+    return {**item, "columns": _cut(", ".join(name for name in names if name))}
+
+
+def _first_row(connection: Connection, revision_id: str, sheet: str) -> Any:
+    """The sheet's first non-blank row, which is where its column names are."""
+    name = sa.func.json_extract(elements.c.locator, "$.sheet")
+    return (
+        connection.execute(
+            sa.select(elements.c.id, elements.c.text)
+            .where(elements.c.revision_id == revision_id, name == sheet)
+            .order_by(elements.c.ordinal)
+            .limit(1)
+        )
+        .mappings()
+        .first()
+    )
+
+
+def _cut(text: str) -> str:
+    """At most COLUMN_TOKENS, broken after a whole word where it can."""
+    if tokens.count(text) <= COLUMN_TOKENS:
+        return text
+    low, high = 0, len(text)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if tokens.count(text[:middle]) <= COLUMN_TOKENS:
+            low = middle
+        else:
+            high = middle - 1
+    space = text.rfind(" ", 0, low)
+    return text[: space if space > 0 else low].rstrip(", ")
 
 
 def title_of(document_id: str) -> str:

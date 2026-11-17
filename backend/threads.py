@@ -320,6 +320,17 @@ def transcript(thread_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in rows]
 
 
+def message(message_id: str) -> dict[str, Any] | None:
+    """One saved message, or None."""
+    with database.read() as connection:
+        row = (
+            connection.execute(sa.select(messages).where(messages.c.id == message_id))
+            .mappings()
+            .first()
+        )
+    return dict(row) if row else None
+
+
 def add_message_in(
     connection: Connection, thread_id: str, run_id: str, message: dict[str, Any]
 ) -> str:

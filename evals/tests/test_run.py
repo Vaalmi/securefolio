@@ -1,6 +1,6 @@
 """What counts as a hit, and as a correct answer."""
 
-from evals import run
+from evals import run, score
 
 
 def item(title: str, text: str, page: int | None = None) -> dict:
@@ -31,14 +31,14 @@ PAIR = {
 
 
 def test_a_hit_needs_the_answer_on_its_page():
-    assert run._hit(FACT, [item("Lease", "It is $299.11.", 3)]) == 1  # noqa: SLF001
-    assert run._hit(FACT, [item("Lease", "It is $299.11.", 2)]) is None  # noqa: SLF001
-    assert run._hit(FACT, [item("Lease", "Boilerplate.", 3)]) is None  # noqa: SLF001
+    assert score.hit(FACT, [item("Lease", "It is $299.11.", 3)], 10) == 1
+    assert score.hit(FACT, [item("Lease", "It is $299.11.", 2)], 10) is None
+    assert score.hit(FACT, [item("Lease", "Boilerplate.", 3)], 10) is None
 
 
 def test_across_documents_a_cover_page_isnt_a_hit():
     covers = [item("One", "Cover."), item("Two", "Cover.")]
-    assert run._hit(PAIR, covers) is None  # noqa: SLF001
+    assert score.hit(PAIR, covers, 10) is None
 
 
 def test_across_documents_the_rank_is_the_last_fact_found():
@@ -47,7 +47,7 @@ def test_across_documents_the_rank_is_the_last_fact_found():
         item("Other", "Nothing."),
         item("Two", "It is $30.00."),
     ]
-    assert run._hit(PAIR, ranked) == 3  # noqa: SLF001
+    assert score.hit(PAIR, ranked, 10) == 3
 
 
 def answer(text: str, *titles: str) -> dict:
@@ -93,13 +93,13 @@ def test_an_answer_spanning_elements_on_the_wrong_page_is_no_hit():
             {"text": "$299.11.", "locator": {"page": 2}},
         ],
     }
-    assert run._hit(FACT, [spanning]) is None  # noqa: SLF001
+    assert score.hit(FACT, [spanning], 10) is None
     spanning["elements"][1]["locator"] = {"page": 3}
-    assert run._hit(FACT, [spanning]) == 1  # noqa: SLF001
+    assert score.hit(FACT, [spanning], 10) == 1
 
 
 def test_a_false_sentence_in_a_list_counts_against_it(monkeypatch):
-    monkeypatch.setattr(run.models, "judge_sentence", lambda *_given: False)
+    monkeypatch.setattr(run.models, "judge_sentence", lambda *_given, **_named: False)
     listed = {
         "thread_id": "t1",
         "parts": [{"text": "These cost more than last year.", "uncited": True}],
@@ -122,7 +122,7 @@ def test_a_false_sentence_in_a_list_counts_against_it(monkeypatch):
 def test_the_judge_is_told_the_answers_thread(monkeypatch):
     seen = []
 
-    def records(_sentence, _target, _siblings, thread):
+    def records(_sentence, _target, _siblings, thread, **_named):
         seen.append(thread)
         return True
 
@@ -149,7 +149,7 @@ def test_the_judge_is_told_the_answers_thread(monkeypatch):
 def test_private_evidence_never_reaches_the_judge(monkeypatch):
     called = []
 
-    def refuses(*_given):
+    def refuses(*_given, **_named):
         called.append(True)
         raise run.models.CloudRefused("Private")
 

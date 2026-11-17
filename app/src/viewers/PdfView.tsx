@@ -67,6 +67,7 @@ export function PdfView({
   zoom,
   rects,
   precision,
+  figures = [],
   label,
   onPages,
   onDeclined,
@@ -76,6 +77,7 @@ export function PdfView({
   zoom: number;
   rects: Rect[];
   precision: string | null;
+  figures?: Rect[]; // the cited sentence's figures, placed on this page
   label: string;
   onPages: (pages: number) => void;
   onDeclined: () => void;
@@ -85,6 +87,9 @@ export function PdfView({
   const [pdf, setPdf] = useState<PDFDocumentProxy>();
   const [prompt, setPrompt] = useState<Password>();
   const [failed, setFailed] = useState<string>();
+  // The page the canvas shows. While the next one loads, the last one stays drawn,
+  // so its highlights wait, hidden but in place for the scroll to the passage.
+  const [drawn, setDrawn] = useState<number>();
 
   useEffect(() => {
     if (!file.data) return;
@@ -121,13 +126,19 @@ export function PdfView({
       const viewport = loaded.getViewport({
         scale: (CSS_DPI_SCALE * zoom) / 100,
       });
+      // The canvas is cleared and drawn again: no page is on it until this one is.
+      setDrawn(undefined);
       target.width = viewport.width;
       target.height = viewport.height;
       const task = loaded.render({ canvas: target, viewport });
       cancel = () => {
         task.cancel();
       };
-      task.promise.catch(() => undefined);
+      task.promise
+        .then(() => {
+          if (current) setDrawn(page);
+        })
+        .catch(() => undefined);
     });
     return () => {
       current = false;
@@ -151,6 +162,7 @@ export function PdfView({
   }
   if (prompt) return <PasswordPrompt prompt={prompt} onDecline={onDeclined} />;
   const words = precision === "words";
+  const shown = drawn === page ? undefined : "hidden";
   return (
     <div
       className="pdf-page"
@@ -171,6 +183,21 @@ export function PdfView({
             top: `${String(rect.y0 * 100)}%`,
             width: `${String((rect.x1 - rect.x0) * 100)}%`,
             height: `${String((rect.y1 - rect.y0) * 100)}%`,
+            visibility: shown,
+          }}
+        />
+      ))}
+      {figures.map((rect, i) => (
+        <span
+          key={`f${String(i)}`}
+          data-testid="pdf-figure"
+          className="pdf-fig"
+          style={{
+            left: `${String(rect.x0 * 100)}%`,
+            top: `${String(rect.y0 * 100)}%`,
+            width: `${String((rect.x1 - rect.x0) * 100)}%`,
+            height: `${String((rect.y1 - rect.y0) * 100)}%`,
+            visibility: shown,
           }}
         />
       ))}

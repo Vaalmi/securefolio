@@ -143,6 +143,7 @@ def _model(model: model_catalog.Model) -> dict[str, Any]:
         "input_usd": model.input_usd,
         "output_usd": model.output_usd,
         "measured": model.measured,
+        "scores": model_catalog.scores(model.id),
         "listed": model.listed,
     }
 

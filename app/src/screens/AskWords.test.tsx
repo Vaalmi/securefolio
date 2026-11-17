@@ -87,21 +87,36 @@ describe("the Ask button", () => {
     });
   });
 
-  it("is disabled where nothing can answer, saying why", async () => {
+  it("finds passages where nothing can answer, saying why", async () => {
+    // Never a disabled button.
     fakeBackend({ "GET /ask/route": BLOCKED });
     open("/home");
     const box = await screen.findByRole("combobox");
     await userEvent.type(box, "When is rent due?");
     expect(
-      screen.getByRole("button", { name: /^Ask Local AI/ }),
-    ).toBeDisabled();
+      screen.getByRole("button", { name: /^Find passages/ }),
+    ).toBeEnabled();
     expect(screen.getByText(/Ollama isn't running on this Mac/)).toBeVisible();
     expect(screen.getByRole("link", { name: "Local models" })).toHaveAttribute(
       "href",
       "#/settings/local",
     );
-    await userEvent.keyboard("{Enter}");
-    expect(window.location.hash).toBe("#/home");
+    expect(
+      screen.getByRole("link", { name: "Keys and models" }),
+    ).toHaveAttribute("href", "#/settings/models");
+  });
+
+  it("in a chat nothing can answer, promises no AI under the box", async () => {
+    // No "Local AI answers" or "Cloud AI gets".
+    chat(ANSWER, { "GET /ask/route": BLOCKED });
+    open("/ask/t1");
+    expect(
+      await screen.findByText(
+        /No AI can answer now\. Search runs on this Mac, and nothing leaves it\./,
+      ),
+    ).toBeVisible();
+    expect(screen.queryByText(/Local AI answers on this Mac/)).toBeNull();
+    expect(screen.queryByText(/gets this question/)).toBeNull();
   });
 
   it("says Local AI answers for want of a key, with the way to Keys and models", async () => {

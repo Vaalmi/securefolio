@@ -1,21 +1,31 @@
 {
-  "about": "Models the evaluation has measured as the Answer model, written by `npm run eval -- --model <id> --record` on the synthetic evaluation set. A model not here is shown as not measured.",
+  "about": "Models the evaluation has measured as the Answer model on the synthetic evaluation set, for Settings: written from a finished, judged kept run by `npm run eval -- --record-from <run>`, or by a run with --record. A model not here is shown as not measured.",
   "models": {
     "anthropic:claude-sonnet-5-5": {
-      "measured_on": "2026-11-02",
-      "recall_at_10": 0.9787,
-      "citation_precision": 0.9756,
-      "answers_correct": 0.9787,
+      "measured_on": "2026-11-14",
+      "questions": 60,
+      "judged": true,
+      "judge_model": "anthropic:claude-opus-5-5",
+      "answers_correct": 0.9777777777777777,
+      "citation_precision": 0.9764705882352941,
+      "facts_found": 1.0,
       "unanswerable": 1.0,
-      "source": "evals/baseline.json, v2.0's evaluation"
+      "answerable_refused": 0.0,
+      "recall_at_10": 0.9777777777777777,
+      "source": "npm run eval -- --record-from 20261114T172908515130Z-anthropic_claude-sonnet-5-5"
     },
     "openai:gpt-6.1-sol": {
-      "measured_on": "2026-11-06",
-      "recall_at_10": 0.9787234042553191,
-      "citation_precision": 0.9767441860465116,
-      "answers_correct": 0.9787234042553191,
-      "unanswerable": 0.8666666666666667,
-      "source": "npm run eval -- --model openai:gpt-6.1-sol --record"
+      "measured_on": "2026-11-14",
+      "questions": 60,
+      "judged": true,
+      "judge_model": "anthropic:claude-opus-5-5",
+      "answers_correct": 0.9555555555555556,
+      "citation_precision": 0.9625,
+      "facts_found": 0.9777777777777777,
+      "unanswerable": 0.8,
+      "answerable_refused": 0.0,
+      "recall_at_10": 0.9777777777777777,
+      "source": "npm run eval -- --record-from 20261114T173945934723Z-openai_gpt-6.1-sol"
     }
   }
 }

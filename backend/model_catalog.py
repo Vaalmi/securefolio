@@ -134,6 +134,20 @@ def measured(model_id: str) -> bool:
     return model_id in json.loads(MEASURED.read_text())["models"]
 
 
+def shown(scores: dict[str, Any]) -> dict[str, Any]:
+    """A model's scores as Settings shows them, with its judge's name."""
+    judge = scores.get("judge_model")
+    found = get(judge) if judge else None
+    return {**scores, "judge_name": found.name if found else judge}
+
+
+def scores(model_id: str) -> dict[str, Any] | None:
+    """The evaluation's scores for a cloud model, as `model_measured.json` has them,
+    or None when it's not measured."""
+    found = json.loads(MEASURED.read_text())["models"].get(model_id)
+    return shown(found) if found else None
+
+
 def chosen() -> set[str]:
     """The models the tasks are set to: kept through every refresh of the list."""
     return {str(settings.get(key)) for key in settings.MODEL_TASKS}

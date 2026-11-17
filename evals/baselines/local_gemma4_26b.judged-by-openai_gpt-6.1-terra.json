@@ -1,0 +1,159 @@
+{
+ "judged": true,
+ "questions": 60,
+ "recall_at_10": 0.9777777777777777,
+ "mrr": 0.8666666666666667,
+ "citations_judged": 80,
+ "coverage": 0.9818181818181818,
+ "facts_found": 0.9111111111111111,
+ "unanswerable": 0.8666666666666667,
+ "answerable_refused": 0.044444444444444446,
+ "thrown_away": 0,
+ "citations_not_judged": 0,
+ "failed": 0,
+ "not_assessed": 0,
+ "stopped": 0,
+ "not_scored": 0,
+ "wrong_by_step": {
+  "answer_or_refuse": 4,
+  "search": 1,
+  "citations": 2
+ },
+ "cost_usd": 0.0,
+ "citation_precision": 0.9625,
+ "answers_correct": 0.8888888888888888,
+ "follow_ups": {
+  "judged": true,
+  "questions": 10,
+  "recall_at_10": 1.0,
+  "mrr": 0.8229166666666666,
+  "citations_judged": 7,
+  "coverage": 1.0,
+  "facts_found": 0.75,
+  "unanswerable": 1.0,
+  "answerable_refused": 0.125,
+  "thrown_away": 0,
+  "citations_not_judged": 0,
+  "failed": 0,
+  "not_assessed": 0,
+  "stopped": 0,
+  "not_scored": 0,
+  "wrong_by_step": {
+   "citations": 1,
+   "cards": 1
+  },
+  "cost_usd": 0.0,
+  "citation_precision": 0.8571428571428571,
+  "answers_correct": 0.75
+ },
+ "answered_by": [
+  "gemma4:26b"
+ ],
+ "private_answered_by": [
+  "gemma4:26b"
+ ],
+ "private": {
+  "questions": 2,
+  "answered_by": [
+   "gemma4:26b"
+  ],
+  "failed": 0,
+  "not_assessed": 0,
+  "stopped": 0,
+  "recall_at_10": 1.0,
+  "refused": 0,
+  "thrown_away": 0,
+  "wrong_by_step": {}
+ },
+ "helpers_cut": {},
+ "local_prompts": {
+  "context": 32768,
+  "answers": 0,
+  "fitted": 0,
+  "passages_dropped": 0,
+  "largest": 0,
+  "largest_counted": 0
+ },
+ "wrong_questions_by_step": {
+  "reading": [],
+  "search": [
+   "q20"
+  ],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [
+   "q14",
+   "q16",
+   "q52",
+   "q54"
+  ],
+  "facts": [],
+  "citations": [
+   "q21",
+   "q24"
+  ],
+  "couldnt_tell": []
+ },
+ "private_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [],
+  "couldnt_tell": []
+ },
+ "follow_up_wrong_questions_by_step": {
+  "reading": [],
+  "search": [],
+  "handing_over": [],
+  "cards": [
+   "f8"
+  ],
+  "answer_or_refuse": [],
+  "facts": [],
+  "citations": [
+   "f5"
+  ],
+  "couldnt_tell": []
+ },
+ "answer_model": "local:gemma4:26b",
+ "citations_by_hand": 0,
+ "question_set": "7c30ae479627aa1ba457fd46b13f2271418fdf3ad4b54a342bfedb83e7850d7e",
+ "local_loaded": {
+  "tag": "gemma4:26b",
+  "ollama": "0.40.14",
+  "details": {
+   "parent_model": "",
+   "format": "safetensors",
+   "family": "gemma4",
+   "families": null,
+   "parameter_size": "26.2B",
+   "quantization_level": "nvfp4",
+   "runner": "mlx"
+  },
+  "parameters": "temperature                    1\ntop_k                          64\ntop_p                          0.95",
+  "modified_at": "2026-11-01T07:08:21.899058863-05:00",
+  "trained_context": 262144,
+  "loaded_context": 32768
+ },
+ "first_run": {
+  "spent_usd": 0.3588,
+  "limit_usd": 0.7,
+  "stopped_at_limit": false
+ },
+ "spent_usd": 0.0568,
+ "limit_usd": 0.6,
+ "stopped_at_limit": false,
+ "kept": "20261115T233631458744Z-local_gemma4_26b",
+ "rejudged_from": "20261114T181604325607Z-local_gemma4_26b",
+ "agreement": {
+  "first_judge": "anthropic:claude-opus-5-5",
+  "judge": "openai:gpt-6.1-terra",
+  "claims": 88,
+  "differ": 0,
+  "changed": []
+ },
+ "judge_model": "openai:gpt-6.1-terra"
+}

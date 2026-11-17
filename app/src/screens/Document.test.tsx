@@ -119,6 +119,38 @@ describe("Document", () => {
     });
   });
 
+  it.each([
+    ["DOCX", "text"],
+    ["HTML", "heading"],
+  ])(
+    "marks a %s %s's figure from the sentence that cited it",
+    async (kind, elementKind) => {
+      const text = "Budget \u{1F3E0} $1,200 for the move";
+      const at = Array.from(text).join("").indexOf("$");
+      const start = Array.from(text.slice(0, at)).length;
+      const stored = element(
+        "e1",
+        text,
+        { kind: "anchor", anchor: "#p1" },
+        elementKind,
+      );
+      doc(kind, {
+        "GET /documents/d1/elements/e1": { current: true, element: stored },
+        "GET /documents/d1/text": { elements: [stored], total: 1 },
+        "GET /documents/d1/elements/e1/figures": {
+          figures: [
+            { kind: "text", text: "$1,200", range: [start, start + 6] },
+          ],
+        },
+      });
+      open("/doc/d1?el=e1&message=m2&sentence=0");
+      const mark = await screen.findByText("$1,200", {
+        selector: "mark.hl-fig",
+      });
+      expect(mark).toBeVisible();
+    },
+  );
+
   it("opens a slide, with its pager", async () => {
     const stored = element("e1", "Dues rise", {
       kind: "slide",
